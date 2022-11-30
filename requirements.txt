@@ -7,3 +7,4 @@ numpy==1.23.5
 opencv-python==4.6.0.66
 pycodestyle==2.10.0
 tomli==2.0.1
+dlib==19.24.99

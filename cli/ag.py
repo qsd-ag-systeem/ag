@@ -1,4 +1,6 @@
 import click
+import os
+from core.main import folder_exec
 
 
 @click.group()
@@ -9,7 +11,9 @@ def cli():
 @cli.command()
 @click.argument('folder', type=click.Path(exists=True))
 def enroll(folder: str) -> None:
-    click.echo(f'Enroll: {folder}')
+    folder_path = os.path.abspath(os.curdir + "/" + folder)
+    folder_exec(folder, folder_path)
+    click.echo('Enroll')
 
 
 @cli.command()
