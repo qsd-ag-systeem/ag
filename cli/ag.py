@@ -1,11 +1,18 @@
 import click
 
 
-@click.command()
-@click.option('--count', default=1, help='Number of greetings.')
-@click.option('--name', prompt='Your name',
-              help='The person to greet.')
-def cli(count, name):
-    """Simple program that greets NAME for a total of COUNT times."""
-    for _ in range(count):
-        click.echo(f"Hello {name}!")
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
+@click.argument('folder', type=click.Path(exists=True))
+def enroll() -> None:
+    click.echo('Enroll')
+
+
+@cli.command()
+@click.option("--dataset", "-d", "dataset", type=str, required=True, help="De naam van een bestaande dataset. In het geval dat bij de enrollment een naam is gekozen anders dan de folder naam kan ook de folder naam alsnog gebruikt worden bij het verwijderen.")
+def search(dataset: str) -> None:
+    click.echo(f'Search: {dataset}')
