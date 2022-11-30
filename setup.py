@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+
 setup(
     name='Automatisch Gelaatsherkennings Systeem',
     version='0.1.0',
