@@ -1,5 +1,9 @@
+-e git+https://github.com/qsd-ag-systeem/ag.git@43ddd754756c708171a04c6669c3068dfb974a08#egg=Automatisch_Gelaatsherkennings_Systeem
 autopep8==2.0.0
 click==8.1.3
+cmake==3.25.0
 colorama==0.4.6
+numpy==1.23.5
+opencv-python==4.6.0.66
 pycodestyle==2.10.0
 tomli==2.0.1
