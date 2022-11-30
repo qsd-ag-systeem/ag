@@ -8,8 +8,8 @@ def cli():
 
 @cli.command()
 @click.argument('folder', type=click.Path(exists=True))
-def enroll() -> None:
-    click.echo('Enroll')
+def enroll(folder: str) -> None:
+    click.echo(f'Enroll {folder}')
 
 
 @cli.command()
