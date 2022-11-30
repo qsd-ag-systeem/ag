@@ -25,7 +25,7 @@ class Table:
         self.rows = rows
         self.header = header
 
-    def printTable(self):
+    def print_table(self):
         widths = [len(cell) for cell in self.header]
         for row in self.rows:
             for i, cell in enumerate(row.cells):
@@ -40,18 +40,19 @@ class Table:
             print(formatted_row.format(*row.cells))
             print("+" + "+".join("-" * (width + 2) for width in widths) + "+")
 
-class SearchResults:
+class search_results:
     results = []
-    searchFileName = ""
+    search_file_name = ""
 
-    def __init__(self, searchFileName, results):
-        self.searchFileName = searchFileName
+    def __init__(self, search_file_name, results):
+        self.search_file_name = search_file_name
         self.results = results
+        self.sort()
 
     def sort(self):
         self.results.sort(key=lambda x: x.match, reverse=True)
 
-    def printResults(self, limit = 10):
+    def print_results(self, limit = 10):
         rows = []
         header = ["Rank", "Naam", "Match (%)", "Location"]
         top10 = self.results[0:limit]
@@ -61,14 +62,13 @@ class SearchResults:
         table = Table(rows, header)
 
         print("Matches found!")
-        print("File: " + self.searchFileName)
-        table.printTable()
+        print("File: " + self.search_file_name)
+        table.print_table()
 
 results = []
 for i in range(100):
     name = fake.name()
     results.append(SearchResult(name, fake.random_int(min=0, max=100), "./images/" + name.replace(" ", "_").lower() + ".png"))
 
-searchResults = SearchResults("./unknown_images/yilong_ma.png", results)
-searchResults.sort()
-searchResults.printResults()
+search_results = search_results("./unknown_images/yilong_ma.png", results)
+search_results.print_results()
