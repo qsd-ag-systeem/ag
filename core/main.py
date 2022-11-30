@@ -25,7 +25,7 @@ def insert_data(dataset, name, face_emb):
     print("")
 
 
-def folder_exec(dataset, path):
+def folder_exec(dataset: str, path: str) -> None:
     print("Processing directory", path, "...")
     files = (x for x in Path(path).iterdir() if x.is_file())
     for file in files:
