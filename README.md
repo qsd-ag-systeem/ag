@@ -1,4 +1,4 @@
-# Automatisch Gelaatsherkennings Systeem
+# Automatisch Gelaat Herkenningssysteem
 
 [Convential Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
