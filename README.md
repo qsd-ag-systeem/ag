@@ -6,9 +6,13 @@
 
 ```bash
 python -m pip install --user virtualenv
+virtualenv venv
+
 pip install -r requirements.txt
+
 . venv\\bin\\activate
 # of
 source venv/bin/activate
+
 pip install --editable .
 ```
