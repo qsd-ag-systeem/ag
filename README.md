@@ -6,7 +6,7 @@
 
 ```bash
 python -m pip install --user virtualenv
-pip install -r requirement.txt
+pip install -r requirements.txt
 . venv\\bin\\activate
 pip install --editable .
 ```
