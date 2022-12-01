@@ -26,7 +26,8 @@ def init():
     global facerec, shape_predictor, face_detector, use_cuda
 
     root_dir = os.path.abspath(os.curdir)
-    face_rec_model_path = root_dir + '/core/data/dlib_face_recognition_resnet_model_v1.dat'
+    face_rec_model_path = root_dir + \
+        '/core/data/dlib_face_recognition_resnet_model_v1.dat'
     predictor_path = root_dir + '/core/data/shape_predictor_68_face_landmarks.dat'
     detector_path = root_dir + '/core/data/mmod_human_face_detector.dat'
 
@@ -67,13 +68,15 @@ def folder_exec(dataset, path):
                 try:
                     rect = face.rect if use_cuda else face
                     raw_shape = shape_predictor(img, rect)
-                    face_descriptor = facerec.compute_face_descriptor(img, raw_shape)
-                    face_emb = vec2list(face_descriptor)
+                    face_descriptor = facerec.compute_face_descriptor(
+                        img, raw_shape)
+                    face_embeddings = vec2list(face_descriptor)
                     x = (rect.left(), rect.top())
                     y = (rect.right(), rect.bottom())
 
-                    if len(face_emb) == 128:
-                        insert_data(dataset, file.name, face_emb, width, height, x, y)
+                    if len(face_embeddings) == 128:
+                        insert_data(dataset, file.name,
+                                    face_embeddings, width, height, x, y)
                 except:
                     print(f"Face processing error! {file_name}")
         except:
