@@ -13,13 +13,14 @@ use_cuda = False
 
 
 def insert_data(dataset, file_name, face_emb, width, height, x, y):
-    print("insert", dataset, file_name, width, height, x, y)
-
-    db = DbConnection()
-    db_cursor = db.cursor
-    db_cursor.execute(
-        "INSERT INTO faces (dataset, file_name, face_embedding, width, height, x, y) VALUES (%s, %s, %s, %s, %s, point(%s, %s), point(%s, %s))",
-        (dataset, file_name, face_emb, width, height, x[0], x[1], y[0], y[1]))
+    try:
+        db = DbConnection()
+        db_cursor = db.cursor
+        db_cursor.execute(
+            "INSERT INTO faces (dataset, file_name, face_embedding, width, height, x, y) VALUES (%s, %s, %s, %s, %s, point(%s, %s), point(%s, %s))",
+            (dataset, file_name, face_emb, width, height, x[0], x[1], y[0], y[1]))
+    except:
+        print("Insert error", dataset, file_name, width, height, x, y)
 
 
 def init():
@@ -32,7 +33,7 @@ def init():
 
     facerec = dlib.face_recognition_model_v1(face_rec_model_path)
     shape_predictor = dlib.shape_predictor(predictor_path)
-    # use_cuda = dlib.DLIB_USE_CUDA
+    use_cuda = dlib.DLIB_USE_CUDA
 
     if use_cuda:
         print("⚡ Using CUDA!")
@@ -52,6 +53,7 @@ def vec2list(vec):
 def folder_exec(dataset, path):
     global use_cuda
 
+    print("Initializing ...")
     init()
     files = (x for x in Path(path).iterdir() if x.is_file())
 

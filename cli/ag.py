@@ -14,7 +14,7 @@ def cli():
 def enroll(folder: str) -> None:
     folder_path = os.path.abspath(os.curdir + "/" + folder)
     folder_exec(folder, folder_path)
-    click.echo('Enroll')
+    click.echo('Enrollment finished!')
 
 
 @cli.command()
