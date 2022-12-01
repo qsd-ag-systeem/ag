@@ -1,12 +1,5 @@
 from click.testing import CliRunner
-
-from cli.ag import setup, enroll
-
-
-# def test_setup():
-#     runner = CliRunner()
-#     result = runner.invoke(setup)
-#     assert result.exit_code == 0
+from cli.ag import enroll
 
 
 def test_enrollment_folder():
