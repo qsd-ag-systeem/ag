@@ -1,21 +1,27 @@
 import os
+import sys
+from typing import Optional
+
 import dlib
 import cv2
 from pathlib import Path
 from core.DbConnection import DbConnection
+from collections.abc import Callable
 
 facerec = None
-shape_predictor = None
-face_detector = None
+shape_predictor: Optional[Callable] = None
+face_detector: Optional[Callable] = None
 use_cuda = False
 
 
-def insert_data(dataset, file_name, face_emb):
-    print("insert", dataset, file_name)
+def insert_data(dataset, file_name, face_emb, width, height, x, y):
+    print("insert", dataset, file_name, width, height, x, y)
+
     db = DbConnection()
     db_cursor = db.cursor
-    db_cursor.execute("INSERT INTO faces (dataset, file_name, face_embedding) VALUES (%s, %s, %s)",
-                      (dataset, file_name, face_emb))
+    db_cursor.execute(
+        "INSERT INTO faces (dataset, file_name, face_embedding, width, height, x, y) VALUES (%s, %s, %s, %s, %s, point(%s, %s), point(%s, %s))",
+        (dataset, file_name, face_emb, width, height, x[0], x[1], y[0], y[1]))
 
 
 def init():
@@ -56,20 +62,23 @@ def folder_exec(dataset, path):
         print("Processing file", file_name, "...")
 
         img = cv2.imread(file_name)
+        height, width, _ = img.shape
         face_locations = face_detector(img, 1)
         for (k, face) in enumerate(face_locations):
-            if use_cuda:
-                raw_shape = shape_predictor(img, face.rect)
-            else:
-                raw_shape = shape_predictor(img, face)
-            face_descriptor = facerec.compute_face_descriptor(img, raw_shape)
-            face_emb = vec2list(face_descriptor)
+            try:
+                rect = face.rect if use_cuda else face
+                raw_shape = shape_predictor(img, rect)
+                face_descriptor = facerec.compute_face_descriptor(img, raw_shape)
+                face_emb = vec2list(face_descriptor)
+                x = (face.left(), face.top())
+                y = (face.right(), face.bottom())
 
-            if len(face_emb) == 128:
-                file_name = file.name if k == 0 else f"{file.name}_{k + 1}"
-                insert_data(dataset, file_name, face_emb)
-        # try:
-        #     print()
-        # except:
-        #     print(f"Processing error! {file_name}")
-        return
+                if len(face_emb) == 128:
+                    insert_data(dataset, file.name, face_emb, width, height, x, y)
+            except:
+                print(f"Face processing error! {file_name}")
+        try:
+            print()
+
+        except:
+            print(f"Processing error! {file_name}")

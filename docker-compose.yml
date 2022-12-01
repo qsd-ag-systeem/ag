@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   db:
-    image: postgis/postgis:14-master
+    image: postgres:15-alpine
     restart: unless-stopped
     shm_size: 1gb
     volumes:
