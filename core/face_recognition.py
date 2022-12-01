@@ -1,7 +1,5 @@
 import os
-import sys
 from typing import Optional
-
 import dlib
 import cv2
 from pathlib import Path
@@ -34,7 +32,7 @@ def init():
 
     facerec = dlib.face_recognition_model_v1(face_rec_model_path)
     shape_predictor = dlib.shape_predictor(predictor_path)
-    use_cuda = dlib.DLIB_USE_CUDA
+    # use_cuda = dlib.DLIB_USE_CUDA
 
     if use_cuda:
         print("⚡ Using CUDA!")
@@ -61,24 +59,22 @@ def folder_exec(dataset, path):
         file_name = str(file.resolve())
         print("Processing file", file_name, "...")
 
-        img = cv2.imread(file_name)
-        height, width, _ = img.shape
-        face_locations = face_detector(img, 1)
-        for (k, face) in enumerate(face_locations):
-            try:
-                rect = face.rect if use_cuda else face
-                raw_shape = shape_predictor(img, rect)
-                face_descriptor = facerec.compute_face_descriptor(img, raw_shape)
-                face_emb = vec2list(face_descriptor)
-                x = (face.left(), face.top())
-                y = (face.right(), face.bottom())
-
-                if len(face_emb) == 128:
-                    insert_data(dataset, file.name, face_emb, width, height, x, y)
-            except:
-                print(f"Face processing error! {file_name}")
         try:
-            print()
+            img = cv2.imread(file_name)
+            height, width, _ = img.shape
+            face_locations = face_detector(img, 1)
+            for (k, face) in enumerate(face_locations):
+                try:
+                    rect = face.rect if use_cuda else face
+                    raw_shape = shape_predictor(img, rect)
+                    face_descriptor = facerec.compute_face_descriptor(img, raw_shape)
+                    face_emb = vec2list(face_descriptor)
+                    x = (rect.left(), rect.top())
+                    y = (rect.right(), rect.bottom())
 
+                    if len(face_emb) == 128:
+                        insert_data(dataset, file.name, face_emb, width, height, x, y)
+                except:
+                    print(f"Face processing error! {file_name}")
         except:
             print(f"Processing error! {file_name}")
