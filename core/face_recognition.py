@@ -2,7 +2,6 @@ import os
 from typing import Optional
 import dlib
 import cv2
-from pathlib import Path
 from core.DbConnection import DbConnection
 from collections.abc import Callable
 
@@ -35,8 +34,7 @@ def init():
     shape_predictor = dlib.shape_predictor(predictor_path)
     use_cuda = dlib.DLIB_USE_CUDA
 
-    face_detector = dlib.cnn_face_detection_model_v1(
-        detector_path) if use_cuda else dlib.get_frontal_face_detector()
+    face_detector = dlib.cnn_face_detection_model_v1(detector_path) if use_cuda else dlib.get_frontal_face_detector()
 
 
 def vec2list(vec):
@@ -46,25 +44,31 @@ def vec2list(vec):
     return out_list
 
 
-def process_file(dataset, file, debug=False) -> bool:
+def process_file(dataset, file) -> bool:
     global use_cuda
 
     file_name = str(file.resolve())
     img = cv2.imread(file_name)
+
+    if img is None:
+        raise Exception("File not supported")
+
     height, width, _ = img.shape
-    face_locations = face_detector(img, 1)
+
+    try:
+        face_locations = face_detector(img, 1)
+    except RuntimeError:
+        raise Exception("Unable to detect face locations")
+
     for face in face_locations:
         rect = face.rect if use_cuda else face
         raw_shape = shape_predictor(img, rect)
-        face_descriptor = facerec.compute_face_descriptor(
-            img, raw_shape)
+        face_descriptor = facerec.compute_face_descriptor(img, raw_shape)
         face_emb = vec2list(face_descriptor)
         x = (rect.left(), rect.top())
         y = (rect.right(), rect.bottom())
 
         if len(face_emb) == 128:
-            if debug:
-                print("Inserting", dataset,
-                      file_name, width, height, x, y)
-            insert_data(dataset, file.name, face_emb,
-                        width, height, x, y)
+            insert_data(dataset, file.name, face_emb, width, height, x, y)
+
+    return True

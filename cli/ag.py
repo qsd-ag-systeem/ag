@@ -1,5 +1,6 @@
 import click
 import os
+import dlib
 from core.face_recognition import init, process_file
 from core.setup_db import setup_db
 from pathlib import Path
@@ -17,21 +18,30 @@ def enroll(folder: str, debug: bool) -> None:
     folder_path = os.path.abspath(os.curdir + "/" + folder)
 
     files = list((x for x in Path(folder_path).iterdir() if x.is_file()))
+    errors = []
 
-    with click.progressbar(files, label="Initializing...") as bar:
-        init()
+    init()
 
+    if dlib.DLIB_USE_CUDA:
+        print("⚡ Using CUDA!")
+    else:
+        print("🐢 CUDA not available, falling back to CPU processing!")
+
+    with click.progressbar(files, show_pos=True, show_percent=True, label="Initializing...") as bar:
         for file in bar:
-            process_file(folder, file, debug)
             try:
+                process_file(folder, file)
                 bar.label = f"Processing: {os.path.relpath(file)}"
             except Exception as error:
                 bar.label = f"Error processing: {os.path.relpath(file)}"
 
                 if debug:
-                    print(error)
+                    errors.append(error)
 
                 pass
+
+    for error in errors:
+        click.echo(error)
 
     click.echo('Enrollment finished!')
 
