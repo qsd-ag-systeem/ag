@@ -26,10 +26,10 @@ def insert_data(dataset, file_name, face_emb, width, height, x, y):
 def init():
     global facerec, shape_predictor, face_detector, use_cuda
 
-    root_dir = os.path.abspath(os.curdir)
-    face_rec_model_path = root_dir + '/core/data/dlib_face_recognition_resnet_model_v1.dat'
-    predictor_path = root_dir + '/core/data/shape_predictor_68_face_landmarks.dat'
-    detector_path = root_dir + '/core/data/mmod_human_face_detector.dat'
+    root_dir = os.path.abspath(os.path.dirname(__file__))
+    face_rec_model_path = root_dir + '/data/dlib_face_recognition_resnet_model_v1.dat'
+    predictor_path = root_dir + '/data/shape_predictor_68_face_landmarks.dat'
+    detector_path = root_dir + '/data/mmod_human_face_detector.dat'
 
     facerec = dlib.face_recognition_model_v1(face_rec_model_path)
     shape_predictor = dlib.shape_predictor(predictor_path)
@@ -50,7 +50,7 @@ def vec2list(vec):
     return out_list
 
 
-def folder_exec(dataset, path):
+def folder_exec(dataset, path, debug=False):
     global use_cuda
 
     print("Initializing ...")
@@ -75,6 +75,8 @@ def folder_exec(dataset, path):
                     y = (rect.right(), rect.bottom())
 
                     if len(face_emb) == 128:
+                        if debug:
+                            print("Inserting", dataset, file_name, width, height, x, y)
                         insert_data(dataset, file.name, face_emb, width, height, x, y)
                 except:
                     print(f"Face processing error! {file_name}")

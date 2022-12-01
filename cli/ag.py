@@ -11,9 +11,10 @@ def cli():
 
 @cli.command()
 @click.argument('folder', type=click.Path(exists=True))
-def enroll(folder: str) -> None:
+@click.option('--debug/--no-debug', default=False)
+def enroll(folder: str, debug: bool) -> None:
     folder_path = os.path.abspath(os.curdir + "/" + folder)
-    folder_exec(folder, folder_path)
+    folder_exec(folder, folder_path, debug)
     click.echo('Enrollment finished!')
 
 
@@ -27,3 +28,8 @@ def search(dataset: str) -> None:
 def setup() -> None:
     setup_db()
     click.echo(f'Done')
+
+
+@cli.command()
+def test() -> None:
+    click.echo(f'Test!')
