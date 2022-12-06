@@ -10,7 +10,7 @@ def cli():
     pass
 
 
-@cli.command()
+@cli.command(help="Voegt een dataset toe aan de database en verwerkt alle gezichten hierin")
 @click.argument('folder', type=click.Path(exists=True))
 @click.option('--debug/--no-debug', default=False)
 def enroll(folder: str, debug: bool) -> None:
@@ -19,10 +19,10 @@ def enroll(folder: str, debug: bool) -> None:
     click.echo('Enrollment finished!')
 
 
-@cli.command()
+@cli.command(help="Zoekt een gelijkend gezicht in de database van de meegegeven foto(s)")
 @click.argument('folder', type=click.Path(exists=True))
-@click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True, help="De naam van een bestaande dataset. In het geval dat bij de enrollment een naam is gekozen anders dan de folder naam kan ook de folder naam alsnog gebruikt worden bij het verwijderen.")
-@click.option("--limit", "-l", "limit", type=int, required=False, default=10, help="Het maximaal aantal matches dat tegelijk wordt getoond, standaard 10")
+@click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True, help="Kan meerdere keren gebruikt worden. De naam van een dataset waarin gezocht word. Als er geen dataset wordt aangegeven worden alle beschikbare datasets gebruikt.")
+@click.option("--limit", "-l", "limit", type=int, required=False, default=10, help="Het maximaal aantal matches dat tegelijk wordt getoond, default 10.")
 def search(folder: str, dataset: str, limit: int) -> None:
     path = os.path.abspath(folder)
     click.echo(f'Search: {dataset}')
@@ -53,7 +53,7 @@ def search(folder: str, dataset: str, limit: int) -> None:
 
             results_table.print_results(rows * limit, limit)
 
-@cli.command()
+@cli.command(help="Geeft een lijst met alle beschikbare datasets")
 def list() -> None:
     click.echo(retrieve_datasets())
 
