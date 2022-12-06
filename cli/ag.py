@@ -5,7 +5,6 @@ from core.face_recognition import folder_enroll, folder_search, retrieve_dataset
 from core.setup_db import setup_db
 from cli.search_results import SearchResults, SearchResult
 
-
 @click.group()
 def cli():
     pass
@@ -31,6 +30,9 @@ def search(folder: str, dataset: str, limit: int) -> None:
     all_results = folder_search(path, dataset)
     
     for results in all_results:
+        if all_results.index(results) > 0:
+            click.confirm(f"Wil je de matches van het volgende bestand ({results[0]}) zien?", abort=True)
+
         class_results = []
 
         for result in results[1]:
@@ -40,8 +42,15 @@ def search(folder: str, dataset: str, limit: int) -> None:
         results_size = len(results_table.results)
 
         for rows in range(ceil(results_size / limit)):
+            continue_file = 'y'
+
             if rows > 0:
-                click.confirm(f"Matches {rows * limit} tot {min(rows * limit + limit, results_size)} van {results_size} zichtbaar. Will je de volgende {min(limit, results_size - rows * limit)} matches zien?", abort=True)
+                continue_file = click.prompt(f"Matches {rows * limit} tot {min(rows * limit + limit, results_size)} van {results_size} zichtbaar. Will je de volgende {min(limit, results_size - rows * limit)} matches zien?", 
+                                                default='y', show_default=False, type=click.Choice(['y', 'n']), show_choices=True)
+            
+            if continue_file == 'n':
+                break
+
             results_table.print_results(rows * limit, limit)
 
 @cli.command()
