@@ -1,6 +1,4 @@
 import click
-from faker import Faker
-fake = Faker()
 
 class SearchResult:
     name = ""
