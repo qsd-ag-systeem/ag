@@ -20,4 +20,4 @@ class DbConnection(object):
         self.cursor = con.cursor()
 
     def __str__(self):
-        return self.connection
+        return f"DbConnection: {self.connection}, {self.cursor}"
