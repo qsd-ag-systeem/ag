@@ -20,10 +20,10 @@ def enroll(folder: str, debug: bool) -> None:
 
 @cli.command()
 @click.argument('folder', type=click.Path(exists=True))
-@click.option("--dataset", "-d", "dataset", type=str, required=False, help="De naam van een bestaande dataset. In het geval dat bij de enrollment een naam is gekozen anders dan de folder naam kan ook de folder naam alsnog gebruikt worden bij het verwijderen.")
-def search(folder:str, dataset: str) -> None:
+@click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True, help="De naam van een bestaande dataset. In het geval dat bij de enrollment een naam is gekozen anders dan de folder naam kan ook de folder naam alsnog gebruikt worden bij het verwijderen.")
+def search(folder: str, dataset: str) -> None:
     click.echo(f'Search: {dataset}')
-    folder_search(folder, dataset)
+    print(folder_search(folder, dataset))
 
 @cli.command()
 def setup() -> None:

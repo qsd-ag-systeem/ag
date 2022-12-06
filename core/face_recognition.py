@@ -27,18 +27,27 @@ def retrieve_data(face_emb, datasets):
         db = DbConnection()
         db_cursor = db.cursor
 
+        where_string = ""
+
+        if (datasets != None):
+            where_string = """
+                WHERE dataset IN ('{0}')
+            """.format("','".join(datasets))
+        
+
         query_string = """
             SELECT id, file_name AS name,
                 euclidian('{0}', face_embedding) AS eucl 
             FROM faces
+            {1}
             ORDER BY eucl ASC
-            """.format(face_emb).replace('[','{').replace(']','}')
+            """.format(face_emb, where_string).replace('[','{').replace(']','}')
         
         db_cursor.execute(query_string)
         result = db_cursor.fetchall()
         return result
-    except:
-        print("Select error", face_emb)
+    except Exception as e:
+        print(f"Select error {face_emb} ", e)
 
 def init():
     global facerec, shape_predictor, face_detector, use_cuda
@@ -99,10 +108,10 @@ def folder_enroll(dataset, path, debug=False):
                                   file_name, width, height, x, y)
                         insert_data(dataset, file.name, face_emb,
                                     width, height, x, y)
-                except:
-                    print(f"Face processing error! {file_name}")
-        except:
-            print(f"Processing error! {file_name}")
+                except Exception as e:
+                    print(f"Face processing error! {file_name} ", e)
+        except Exception as e:
+            print(f"Processing error! {file_name} ", e)
 
 def folder_search(path, datasets, debug = False):
     global use_cuda
@@ -135,9 +144,9 @@ def folder_search(path, datasets, debug = False):
                             print("Inserting", datasets,
                                     file_name, width, height, x, y)
                         
-                        print(retrieve_data(face_emb, datasets))
+                        return retrieve_data(face_emb, datasets)
                         
-                except:
-                    print(f"Face processing error! {file_name}")
-        except:
-            print(f"Processing error! {file_name}")
+                except Exception as e:
+                    print(f"Face processing error! {file_name} ", e)
+        except Exception as e:
+            print(f"Processing error! {file_name} ", e)
