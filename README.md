@@ -1,4 +1,6 @@
-[![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/qsd-ag-systeem/ag)
+[![linting: pylint](https://img.shields.io/badge/linting-pylint-green)](https://github.com/qsd-ag-systeem/ag)
+
+[![Tests](https://github.com/qsd-ag-systeem/ag/actions/workflows/cli-tests.yml/badge.svg)](https://github.com/qsd-ag-systeem/ag/actions/workflows/cli-tests.yml)
 
 # Automatisch Gelaatsherkennings Systeem
 
