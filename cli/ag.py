@@ -1,7 +1,9 @@
 import click
 import os
+from math import ceil
 from core.face_recognition import folder_enroll, folder_search, retrieve_datasets
 from core.setup_db import setup_db
+from cli.search_results import SearchResults, SearchResult
 
 
 @click.group()
@@ -21,14 +23,30 @@ def enroll(folder: str, debug: bool) -> None:
 @cli.command()
 @click.argument('folder', type=click.Path(exists=True))
 @click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True, help="De naam van een bestaande dataset. In het geval dat bij de enrollment een naam is gekozen anders dan de folder naam kan ook de folder naam alsnog gebruikt worden bij het verwijderen.")
-def search(folder: str, dataset: str) -> None:
+@click.option("--limit", "-l", "limit", type=int, required=False, default=10, help="Het maximaal aantal matches dat tegelijk wordt getoond, standaard 10")
+def search(folder: str, dataset: str, limit: int) -> None:
     path = os.path.abspath(folder)
     click.echo(f'Search: {dataset}')
-    print(folder_search(path, dataset))
+
+    all_results = folder_search(path, dataset)
+    
+    for results in all_results:
+        class_results = []
+
+        for result in results[1]:
+            class_results.append(SearchResult(result[2], result[5], result[1]))
+
+        results_table = SearchResults(results[0], class_results)
+        results_size = len(results_table.results)
+
+        for rows in range(ceil(results_size / limit)):
+            if rows > 0:
+                click.confirm(f"Matches {rows * limit} tot {min(rows * limit + limit, results_size)} van {results_size} zichtbaar. Will je de volgende {min(limit, results_size - rows * limit)} matches zien?", abort=True)
+            results_table.print_results(rows * limit, limit)
 
 @cli.command()
 def list() -> None:
-    print(retrieve_datasets())
+    click.echo(retrieve_datasets())
 
 @cli.command()
 def setup() -> None:

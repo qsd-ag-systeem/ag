@@ -36,7 +36,7 @@ def retrieve_data(face_emb, datasets):
         
 
         query_string = """
-            SELECT id, file_name AS name,
+            SELECT id, dataset, file_name, x, y,
                 euclidian('{0}', face_embedding) AS eucl 
             FROM faces
             {1}
@@ -136,7 +136,10 @@ def detect_face_in_folder(path, dataset, command, debug = False):
                             insert_data(dataset, file.name, face_emb, width, height, x, y)
 
                         elif (command == 'search'):
-                            result.append(retrieve_data(face_emb, dataset))
+                            result.append([
+                                str(file.name),
+                                retrieve_data(face_emb, dataset)
+                                ])
                         
                 except Exception as e:
                     print(f"Face processing error! {file_name} ", e)
