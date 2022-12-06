@@ -29,7 +29,7 @@ def retrieve_data(face_emb, datasets):
 
         where_string = ""
 
-        if (datasets != None):
+        if (datasets != None and datasets != ()):
             where_string = """
                 WHERE dataset IN ('{0}')
             """.format("','".join(datasets))
@@ -42,7 +42,7 @@ def retrieve_data(face_emb, datasets):
             {1}
             ORDER BY eucl ASC
             """.format(face_emb, where_string).replace('[','{').replace(']','}')
-        
+        print(datasets)
         db_cursor.execute(query_string)
         result = db_cursor.fetchall()
         return result
@@ -93,12 +93,20 @@ def vec2list(vec):
     return out_list
 
 
-def folder_enroll(dataset, path, debug=False):
+def folder_enroll(dataset, path):
+    detect_face_in_folder(path, dataset, 'enroll')
+
+def folder_search(path, datasets):
+    return detect_face_in_folder(path, datasets, 'search')
+
+def detect_face_in_folder(path, dataset, command, debug = False):
     global use_cuda
 
     print("Initializing ...")
     init()
     files = (x for x in Path(path).iterdir() if x.is_file())
+
+    result = []
 
     for file in files:
         file_name = str(file.resolve())
@@ -121,49 +129,19 @@ def folder_enroll(dataset, path, debug=False):
 
                     if len(face_emb) == 128:
                         if debug:
-                            print("Inserting", dataset,
-                                  file_name, width, height, x, y)
-                        insert_data(dataset, file.name, face_emb,
-                                    width, height, x, y)
-                except Exception as e:
-                    print(f"Face processing error! {file_name} ", e)
-        except Exception as e:
-            print(f"Processing error! {file_name} ", e)
-
-def folder_search(path, datasets, debug = False):
-    global use_cuda
-
-    print("Initializing ...")
-    init()
-    files = (x for x in Path(path).iterdir() if x.is_file())
-
-    for file in files:
-        file_name = str(file.resolve())
-        print("Processing file", file_name, "...")
-
-        try:
-            img = cv2.imread(file_name)
-            height, width, _ = img.shape
-            face_locations = face_detector(img, 1)
-            for (k, face) in enumerate(face_locations):
-                try:
-                    rect = face.rect if use_cuda else face
-                    raw_shape = shape_predictor(img, rect)
-                    face_descriptor = facerec.compute_face_descriptor(
-                        img, raw_shape)
-                    face_emb = vec2list(face_descriptor)
-
-                    x = (rect.left(), rect.top())
-                    y = (rect.right(), rect.bottom())
-
-                    if len(face_emb) == 128:
-                        if debug:
-                            print("Inserting", datasets,
+                            print("Processing", dataset,
                                     file_name, width, height, x, y)
-                        
-                        return retrieve_data(face_emb, datasets)
+
+                        if (command == 'enroll'):
+                            insert_data(dataset, file.name, face_emb, width, height, x, y)
+
+                        elif (command == 'search'):
+                            result.append(retrieve_data(face_emb, dataset))
                         
                 except Exception as e:
                     print(f"Face processing error! {file_name} ", e)
         except Exception as e:
             print(f"Processing error! {file_name} ", e)
+
+    if (command == 'search'):
+        return result

@@ -13,7 +13,7 @@ def cli():
 @click.argument('folder', type=click.Path(exists=True))
 @click.option('--debug/--no-debug', default=False)
 def enroll(folder: str, debug: bool) -> None:
-    folder_path = os.path.abspath(os.curdir + "/" + folder)
+    folder_path = os.path.abspath(folder)
     folder_enroll(folder, folder_path, debug)
     click.echo('Enrollment finished!')
 
