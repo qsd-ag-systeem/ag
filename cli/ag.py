@@ -14,7 +14,8 @@ def cli():
 @cli.command()
 @click.argument('folder', type=click.Path(exists=True))
 @click.option('--debug/--no-debug', default=False)
-def enroll(folder: str, debug: bool) -> None:
+@click.option('--cuda/--no-cuda', default=True)
+def enroll(folder: str, debug: bool, cuda: bool) -> None:
     folder_path = os.path.abspath(os.curdir + "/" + folder)
 
     files = list((x for x in Path(folder_path).iterdir() if x.is_file()))
@@ -22,7 +23,7 @@ def enroll(folder: str, debug: bool) -> None:
 
     init()
 
-    if dlib.DLIB_USE_CUDA:
+    if dlib.DLIB_USE_CUDA and cuda:
         print("⚡ Using CUDA!")
     else:
         print("🐢 CUDA not available, falling back to CPU processing!")

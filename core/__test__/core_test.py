@@ -7,7 +7,7 @@ def test_enrollment_folder_no_arguments():
     runner = CliRunner()
     result = runner.invoke(enroll)
     assert "Error: Missing argument 'FOLDER'" in result.output
-    assert result.exit_code == 0
+    assert result.exit_code == 2
 
 
 def test_enrollment_folder_not_exists():
@@ -22,4 +22,4 @@ def test_enrollment_folder_not_exists():
     print(result.output)
 
     assert f"does not exist." in result.output
-    assert result.exit_code == 0
+    assert result.exit_code == 2
