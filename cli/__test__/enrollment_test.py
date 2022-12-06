@@ -45,10 +45,9 @@ def test_enrollment_wrong_file():
         os.mkdir('exists')
         with open('exists/test.txt', 'w') as f:
             f.write('test')
-        result = runner.invoke(enroll, ['exists'])
+        result = runner.invoke(enroll, ['exists', '--debug'])
 
         print(result.output)
 
-        assert "Error processing:" in result.output
         assert "File not supported" in result.output
         assert result.exit_code == 0
