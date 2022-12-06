@@ -21,7 +21,7 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
     files = list((x for x in Path(folder_path).iterdir() if x.is_file()))
     errors = []
 
-    init()
+    init(cuda)
 
     if dlib.DLIB_USE_CUDA and cuda:
         print("⚡ Using CUDA!")
