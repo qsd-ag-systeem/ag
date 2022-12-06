@@ -8,7 +8,7 @@
 python -m pip install --user virtualenv
 virtualenv venv
 
-. venv\\bin\\activate
+. .\venv\Scripts\activate
 # of
 source venv/bin/activate
 
