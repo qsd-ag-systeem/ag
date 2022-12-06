@@ -49,6 +49,23 @@ def retrieve_data(face_emb, datasets):
     except Exception as e:
         print(f"Select error {face_emb} ", e)
 
+def retrieve_datasets():
+    try:
+        db = DbConnection()
+        db_cursor = db.cursor
+
+
+        query_string = """
+            SELECT DISTINCT dataset
+            FROM faces
+            """
+        
+        db_cursor.execute(query_string)
+        result = db_cursor.fetchall()
+        return result
+    except Exception as e:
+        print(f"Select error ", e)
+
 def init():
     global facerec, shape_predictor, face_detector, use_cuda
 

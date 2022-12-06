@@ -1,6 +1,6 @@
 import click
 import os
-from core.face_recognition import folder_enroll, folder_search
+from core.face_recognition import folder_enroll, folder_search, retrieve_datasets
 from core.setup_db import setup_db
 
 
@@ -21,9 +21,13 @@ def enroll(folder: str, debug: bool) -> None:
 @cli.command()
 @click.argument('folder', type=click.Path(exists=True))
 @click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True, help="De naam van een bestaande dataset. In het geval dat bij de enrollment een naam is gekozen anders dan de folder naam kan ook de folder naam alsnog gebruikt worden bij het verwijderen.")
-def search(folder: str, dataset: str) -> None:
+def search(folder: str, dataset: str, list) -> None:
     click.echo(f'Search: {dataset}')
     print(folder_search(folder, dataset))
+
+@cli.command()
+def list() -> None:
+    print(retrieve_datasets())
 
 @cli.command()
 def setup() -> None:
