@@ -1,0 +1,18 @@
+version: '3.1'
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    shm_size: 1gb
+    volumes:
+     - ./pg-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+     - "5432:5432"
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
