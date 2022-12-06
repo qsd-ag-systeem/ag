@@ -22,6 +22,23 @@ def insert_data(dataset, file_name, face_emb, width, height, x, y):
     except:
         print("Insert error", dataset, file_name, width, height, x, y)
 
+def retrieve_data(face_emb, datasets):
+    try:
+        db = DbConnection()
+        db_cursor = db.cursor
+
+        query_string = """
+            SELECT id, file_name AS name,
+                euclidian('{0}', face_embedding) AS eucl 
+            FROM faces
+            ORDER BY eucl ASC
+            """.format(face_emb).replace('[','{').replace(']','}')
+        
+        db_cursor.execute(query_string)
+        result = db_cursor.fetchall()
+        return result
+    except:
+        print("Select error", face_emb)
 
 def init():
     global facerec, shape_predictor, face_detector, use_cuda
@@ -50,7 +67,7 @@ def vec2list(vec):
     return out_list
 
 
-def folder_exec(dataset, path, debug=False):
+def folder_enroll(dataset, path, debug=False):
     global use_cuda
 
     print("Initializing ...")
@@ -72,6 +89,7 @@ def folder_exec(dataset, path, debug=False):
                     face_descriptor = facerec.compute_face_descriptor(
                         img, raw_shape)
                     face_emb = vec2list(face_descriptor)
+
                     x = (rect.left(), rect.top())
                     y = (rect.right(), rect.bottom())
 
@@ -81,6 +99,44 @@ def folder_exec(dataset, path, debug=False):
                                   file_name, width, height, x, y)
                         insert_data(dataset, file.name, face_emb,
                                     width, height, x, y)
+                except:
+                    print(f"Face processing error! {file_name}")
+        except:
+            print(f"Processing error! {file_name}")
+
+def folder_search(path, datasets, debug = False):
+    global use_cuda
+
+    print("Initializing ...")
+    init()
+    files = (x for x in Path(path).iterdir() if x.is_file())
+
+    for file in files:
+        file_name = str(file.resolve())
+        print("Processing file", file_name, "...")
+
+        try:
+            img = cv2.imread(file_name)
+            height, width, _ = img.shape
+            face_locations = face_detector(img, 1)
+            for (k, face) in enumerate(face_locations):
+                try:
+                    rect = face.rect if use_cuda else face
+                    raw_shape = shape_predictor(img, rect)
+                    face_descriptor = facerec.compute_face_descriptor(
+                        img, raw_shape)
+                    face_emb = vec2list(face_descriptor)
+
+                    x = (rect.left(), rect.top())
+                    y = (rect.right(), rect.bottom())
+
+                    if len(face_emb) == 128:
+                        if debug:
+                            print("Inserting", datasets,
+                                    file_name, width, height, x, y)
+                        
+                        print(retrieve_data(face_emb, datasets))
+                        
                 except:
                     print(f"Face processing error! {file_name}")
         except:
