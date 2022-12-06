@@ -17,3 +17,4 @@ pycodestyle==2.10.0
 pyparsing==3.0.9
 pytest==7.2.0
 tomli==2.0.1
+Faker==15.3.3
