@@ -62,3 +62,7 @@ def setup() -> None:
 @cli.command()
 def test() -> None:
     click.echo(f'Test!')
+
+
+if __name__ == "__main__":
+    cli()
