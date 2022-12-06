@@ -27,6 +27,10 @@ def enroll(folder: str, debug: bool) -> None:
     else:
         print("🐢 CUDA not available, falling back to CPU processing!")
 
+    if len(files) == 0:
+        click.echo(f"Folder {folder} is empty!")
+        return
+
     with click.progressbar(files, show_pos=True, show_percent=True, label="Initializing...") as bar:
         for file in bar:
             try:
@@ -58,6 +62,5 @@ def setup() -> None:
     click.echo(f'Done')
 
 
-@cli.command()
-def test() -> None:
-    click.echo(f'Test!')
+if __name__ == '__main__':
+    cli()
