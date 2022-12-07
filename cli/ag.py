@@ -1,6 +1,7 @@
 import click
 import os
 import cv2
+from math import ceil
 
 from core.common import get_files, print_table
 from core.search import retrieve_datasets, retrieve_data
@@ -53,8 +54,10 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
 
 @cli.command(help="Zoekt een gelijkend gezicht in de database van de meegegeven foto(s)")
 @click.argument('folder', type=click.Path(exists=True))
-@click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True, help="Kan meerdere keren gebruikt worden. De naam van een dataset waarin gezocht word. Als er geen dataset wordt aangegeven worden alle beschikbare datasets gebruikt.")
-@click.option("--limit", "-l", "limit", type=int, required=False, default=10, help="Het maximaal aantal matches dat tegelijk wordt getoond, default 10.")
+@click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True,
+              help="Kan meerdere keren gebruikt worden. De naam van een dataset waarin gezocht word. Als er geen dataset wordt aangegeven worden alle beschikbare datasets gebruikt.")
+@click.option("--limit", "-l", "limit", type=int, required=False, default=10,
+              help="Het maximaal aantal matches dat tegelijk wordt getoond, default 10.")
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
 def search(folder: str, dataset: str, limit: int, debug: bool, cuda: bool) -> None:
@@ -101,17 +104,28 @@ def search(folder: str, dataset: str, limit: int, debug: bool, cuda: bool) -> No
     for error in errors:
         click.echo(error)
 
-    if len(results) == 0:
+    results_size = len(results)
+
+    if results_size == 0:
         click.echo("No matches found")
         return
 
     # Sort results since it may contain results from multiple inputs
     results = sorted(results, key=lambda x: x[4], reverse=True)
 
-    columns = ["Input file", "ID", "Dataset", "File name", "Similarity (%)", "Left top", "Right bottom"]
-    print_table(columns, results)
+    for rows in range(ceil(results_size / limit)):
+        continue_file = 'y'
 
-    click.echo('Search finished!')
+        if rows > 0:
+            continue_file = click.prompt(
+                f"Resultaat {((rows - 1) * limit) + 1} t/m {min((rows - 1) * limit + limit, results_size)} van {results_size} worden weergegeven. Will je de volgende {min(limit, results_size - rows * limit)} matches zien?",
+                default='y', show_default=False, type=click.Choice(['y', 'n']), show_choices=True)
+
+        if continue_file == 'n':
+            break
+
+        columns = ["Input file", "ID", "Dataset", "File name", "Similarity (%)", "Left top", "Right bottom"]
+        print_table(columns, results[rows * limit:rows * limit + limit])
 
 
 @cli.command(help="Geeft een lijst met alle beschikbare datasets")
