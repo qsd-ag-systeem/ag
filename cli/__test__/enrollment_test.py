@@ -33,7 +33,7 @@ def test_enrollment_folder_exists():
 
         print(result.output)
 
-        assert "Enrollment finished!" in result.output
+        assert "is empty" in result.output
         assert result.exit_code == 0
 
 
