@@ -1,3 +1,4 @@
+
 [![linting: pylint](https://img.shields.io/badge/linting-pylint-green)](https://github.com/qsd-ag-systeem/ag)
 
 [![Tests](https://github.com/qsd-ag-systeem/ag/actions/workflows/cli-tests.yml/badge.svg)](https://github.com/qsd-ag-systeem/ag/actions/workflows/cli-tests.yml)
@@ -12,7 +13,7 @@
 python -m pip install --user virtualenv
 virtualenv venv
 
-. venv\\bin\\activate
+. .\venv\Scripts\activate
 # of
 source venv/bin/activate
 
