@@ -20,7 +20,7 @@ def insert_data(dataset, file_name, face_emb, width, height, x, y):
         (dataset, file_name, face_emb, width, height, x[0], x[1], y[0], y[1]))
 
 
-def init():
+def init(cuda: bool) -> None:
     global facerec, shape_predictor, face_detector, use_cuda
 
     root_dir = os.path.abspath(os.path.dirname(__file__))
@@ -30,7 +30,7 @@ def init():
 
     facerec = dlib.face_recognition_model_v1(face_rec_model_path)
     shape_predictor = dlib.shape_predictor(predictor_path)
-    use_cuda = dlib.DLIB_USE_CUDA
+    use_cuda = dlib.DLIB_USE_CUDA and cuda
 
     face_detector = dlib.cnn_face_detection_model_v1(
         detector_path) if use_cuda else dlib.get_frontal_face_detector()
