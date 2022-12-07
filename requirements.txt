@@ -1,9 +1,12 @@
 attrs==22.1.0
+<<<<<<< HEAD
 -e git+https://github.com/qsd-ag-systeem/ag.git@e77283709fb7fead7c06907222fa3f5c328f7955#egg=Automatisch_Gelaat_Herkenningssysteem
+=======
+>>>>>>> 1c8b504b9b1f419f5c696459684abaf8bc7e20a3
 autopep8==2.0.0
 click==8.1.3
-cmake==3.25.0
 colorama==0.4.6
+coverage==6.5.0
 dlib==19.24.0
 exceptiongroup==1.0.4
 imutils==0.5.4
