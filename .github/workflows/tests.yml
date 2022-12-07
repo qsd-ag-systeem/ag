@@ -1,4 +1,4 @@
-name: Tests (CLI)
+name: Tests
 on: [push]
 
 jobs:
