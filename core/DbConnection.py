@@ -19,7 +19,7 @@ class DbConnection(object):
             self.connection = con
             self.cursor = con.cursor()
         except Error as e:
-            print("Error while connecting to PostgreSQL: ", e)
+            print("\nError while connecting to PostgreSQL: ", e)
             exit(0)
 
     def __str__(self):
