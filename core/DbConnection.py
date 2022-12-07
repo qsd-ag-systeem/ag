@@ -1,4 +1,4 @@
-import psycopg2
+from psycopg2 import connect, Error
 
 
 class DbConnection(object):
@@ -6,18 +6,21 @@ class DbConnection(object):
     cursor = None
 
     def __init__(self):
-        con = psycopg2.connect(
-            host="127.0.0.1",
-            database="postgres",
-            user="postgres",
-            password="postgres",
-            connect_timeout=3
-        )
+        try:
+            con = connect(
+                host="127.0.0.1",
+                database="postgres",
+                user="postgres",
+                password="postgres",
+                connect_timeout=3
+            )
+            con.set_session(autocommit=True)
 
-        con.set_session(autocommit=True)
-
-        self.connection = con
-        self.cursor = con.cursor()
+            self.connection = con
+            self.cursor = con.cursor()
+        except Error as e:
+            print("Error while connecting to PostgreSQL: ", e)
+            exit(0)
 
     def __str__(self):
         return self.connection
