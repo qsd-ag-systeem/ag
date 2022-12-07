@@ -8,7 +8,10 @@ from collections.abc import Callable
 facerec = None
 shape_predictor: Optional[Callable] = None
 face_detector: Optional[Callable] = None
-use_cuda = False
+
+
+def use_cuda(enable_cuda: bool = False) -> bool:
+    return dlib.DLIB_USE_CUDA and enable_cuda
 
 
 def insert_data(dataset, file_name, face_emb, width, height, x, y):
@@ -20,7 +23,7 @@ def insert_data(dataset, file_name, face_emb, width, height, x, y):
 
 
 def init(cuda: bool) -> None:
-    global facerec, shape_predictor, face_detector, use_cuda
+    global facerec, shape_predictor, face_detector
 
     root_dir = os.path.abspath(os.path.dirname(__file__))
     face_rec_model_path = root_dir + '/data/dlib_face_recognition_resnet_model_v1.dat'
@@ -29,10 +32,8 @@ def init(cuda: bool) -> None:
 
     facerec = dlib.face_recognition_model_v1(face_rec_model_path)
     shape_predictor = dlib.shape_predictor(predictor_path)
-    use_cuda = dlib.DLIB_USE_CUDA and cuda
 
-    face_detector = dlib.cnn_face_detection_model_v1(
-        detector_path) if use_cuda else dlib.get_frontal_face_detector()
+    face_detector = dlib.cnn_face_detection_model_v1(detector_path) if cuda else dlib.get_frontal_face_detector()
 
 
 def vec2list(vec):
@@ -42,12 +43,10 @@ def vec2list(vec):
     return out_list
 
 
-def process_file(dataset, file) -> bool:
-    global use_cuda
-
+def process_file(dataset, file, cuda: bool = False) -> bool:
     file_name = str(file.resolve())
     img = cv2.imread(file_name)
-    face_embeddings = get_face_embeddings(img, use_cuda)
+    face_embeddings = get_face_embeddings(img, cuda)
 
     for face_emb in face_embeddings:
         insert_data(dataset, file.name, face_emb["face_embedding"], face_emb["width"], face_emb["height"], face_emb["x"], face_emb["y"])

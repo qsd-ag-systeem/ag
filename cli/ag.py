@@ -1,13 +1,8 @@
 import click
 import os
-from math import ceil
-
 import cv2
-
-from cli.search_results import SearchResults, SearchResult
-import dlib
-from core.search import retrieve_datasets, retrieve_data
-from core.face_recognition import init, process_file, get_face_embeddings
+from core.search import retrieve_datasets, retrieve_data, print_results
+from core.face_recognition import init, process_file, get_face_embeddings, use_cuda
 from core.setup_db import setup_db
 from pathlib import Path
 
@@ -27,12 +22,10 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
     files = list((x for x in Path(folder_path).iterdir() if x.is_file()))
     errors = []
 
+    cuda = use_cuda(cuda)
     init(cuda)
 
-    if dlib.DLIB_USE_CUDA and cuda:
-        print("⚡ Using CUDA!")
-    else:
-        print("🐢 CUDA not available, falling back to CPU processing!")
+    print("⚡ Using CUDA!" if cuda else "🐢 CUDA not available, falling back to CPU processing!")
 
     if len(files) == 0:
         click.echo(f"Folder {folder} is empty!")
@@ -41,7 +34,7 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
     with click.progressbar(files, show_pos=True, show_percent=True, label="Initializing...") as bar:
         for file in bar:
             try:
-                process_file(folder, file)
+                process_file(folder, file, cuda)
                 bar.label = f"Processing: {os.path.relpath(file)}"
             except Exception as error:
                 bar.label = f"Error processing: {os.path.relpath(file)}"
@@ -69,12 +62,10 @@ def search(folder: str, dataset: str, limit: int, debug: bool, cuda: bool) -> No
     files = list((x for x in Path(folder_path).iterdir() if x.is_file()))
     errors = []
 
+    cuda = use_cuda(cuda)
     init(cuda)
 
-    if dlib.DLIB_USE_CUDA and cuda:
-        print("⚡ Using CUDA!")
-    else:
-        print("🐢 CUDA not available, falling back to CPU processing!")
+    print("⚡ Using CUDA!" if cuda else "🐢 CUDA not available, falling back to CPU processing!")
 
     if len(files) == 0:
         click.echo(f"Folder {folder} is empty!")
@@ -86,7 +77,7 @@ def search(folder: str, dataset: str, limit: int, debug: bool, cuda: bool) -> No
         for file in bar:
             file_name = str(file.resolve())
             img = cv2.imread(file_name)
-            face_embeddings = get_face_embeddings(img, dlib.DLIB_USE_CUDA and cuda)
+            face_embeddings = get_face_embeddings(img, cuda)
 
             for face in face_embeddings:
                 results += retrieve_data(face["face_embedding"], dataset)
@@ -104,26 +95,11 @@ def search(folder: str, dataset: str, limit: int, debug: bool, cuda: bool) -> No
     for error in errors:
         click.echo(error)
 
-    class_results = []
+    if len(results) == 0:
+        click.echo("No matches found")
+        return
 
-    for result in results:
-        class_results.append(SearchResult(result[2], result[5], result[1]))
-
-    results_table = SearchResults(folder, class_results)
-    results_size = len(results_table.results)
-
-    for rows in range(ceil(results_size / limit)):
-        continue_file = 'y'
-
-        if rows > 0:
-            continue_file = click.prompt(
-                f"Matches {rows * limit} tot {min(rows * limit + limit, results_size)} van {results_size} zichtbaar. Will je de volgende {min(limit, results_size - rows * limit)} matches zien?",
-                default='y', show_default=False, type=click.Choice(['y', 'n']), show_choices=True)
-
-        if continue_file == 'n':
-            break
-
-        results_table.print_results(rows * limit, limit)
+    print_results(results, file_name, limit)
 
     click.echo('Search finished!')
 
