@@ -4,7 +4,6 @@ import dlib
 import cv2
 from core.DbConnection import DbConnection
 from collections.abc import Callable
-from psycopg2 import Error
 
 facerec = None
 shape_predictor: Optional[Callable] = None
@@ -51,7 +50,7 @@ def process_file(dataset, file) -> bool:
     face_embeddings = get_face_embeddings(img, use_cuda)
 
     for face_emb in face_embeddings:
-        insert_data(dataset, file.name, face_emb.face_embedding, face_emb.width, face_emb.height, face_emb.x, face_emb.y)
+        insert_data(dataset, file.name, face_emb["face_embedding"], face_emb["width"], face_emb["height"], face_emb["x"], face_emb["y"])
 
     return True
 

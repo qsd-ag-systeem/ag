@@ -86,7 +86,7 @@ def search(folder: str, dataset: str, limit: int, debug: bool, cuda: bool) -> No
         for file in bar:
             file_name = str(file.resolve())
             img = cv2.imread(file_name)
-            face_embeddings = get_face_embeddings(img, cuda)
+            face_embeddings = get_face_embeddings(img, dlib.DLIB_USE_CUDA and cuda)
 
             for face in face_embeddings:
                 results += retrieve_data(face["face_embedding"], dataset)
