@@ -1,9 +1,9 @@
 
 [![linting: pylint](https://img.shields.io/badge/linting-pylint-green)](https://github.com/qsd-ag-systeem/ag)
 
-[![Tests](https://github.com/qsd-ag-systeem/ag/actions/workflows/cli-tests.yml/badge.svg)](https://github.com/qsd-ag-systeem/ag/actions/workflows/cli-tests.yml)
+[![Tests](https://github.com/qsd-ag-systeem/ag/actions/workflows/tests.yml/badge.svg)](https://github.com/qsd-ag-systeem/ag/actions/workflows/tests.yml)
 
-# Automatisch Gelaatsherkennings Systeem
+# Automatisch Gelaat Herkenningssysteem
 
 [Convential Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
