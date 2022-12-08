@@ -85,24 +85,26 @@ def search(folder: str, dataset: str, limit: int, debug: bool, cuda: bool) -> No
                 img = cv2.imread(file_path)
                 face_embeddings = get_face_embeddings(img, cuda)
 
-                for face in face_embeddings:
-                    data = retrieve_data(face["face_embedding"], dataset)
+                for (key, face) in enumerate(face_embeddings):
+                    try:
+                        data = retrieve_data(face["face_embedding"], dataset)
 
-                    for row in data:
-                        results.append(
-                            [file_name, row[0], row[1], row[2], round(100 - (row[5] * 100), 2), row[3], row[4]])
+                        for row in data:
+                            results.append(
+                                [file_name, row[0], row[1], row[2], round(100 - (row[5] * 100), 2), row[3], row[4]])
+                    except:
+                        errors.append(f"An error occurred while retrieving the data of face #{key + 1} in image {file_name}")
 
                 bar.label = f"Processing: {os.path.relpath(file)}"
             except Exception as error:
                 bar.label = f"Error processing: {os.path.relpath(file)}"
-
-                if debug:
-                    errors.append(error)
+                errors.append(error)
 
                 pass
 
-    for error in errors:
-        click.echo(error)
+    if debug:
+        for error in errors:
+            click.echo(error)
 
     results_size = len(results)
 
@@ -129,9 +131,14 @@ def search(folder: str, dataset: str, limit: int, debug: bool, cuda: bool) -> No
 
 
 @cli.command(help="Geeft een lijst met alle beschikbare datasets")
-def datasets() -> None:
-    rows = retrieve_datasets()
-    print_table(["Name", "Enrolled images"], rows)
+@click.option('--debug/--no-debug', default=False)
+def datasets(debug: bool) -> None:
+    try:
+        rows = retrieve_datasets()
+        print_table(["Name", "Enrolled images"], rows)
+    except Exception as err:
+        error = f": {err}" if debug else ""
+        click.echo(f"An error occurred while fetching the datasets{error}", err=True)
 
 
 @cli.command()
