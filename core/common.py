@@ -8,3 +8,10 @@ def get_files(abs_path):
 
 def print_table(columns, values):
     print(tabulate(values, columns, tablefmt="grid"))
+
+
+def vec2list(vec):
+    out_list = []
+    for i in vec:
+        out_list.append(i)
+    return out_list

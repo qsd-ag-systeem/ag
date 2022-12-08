@@ -4,7 +4,7 @@ import cv2
 from math import ceil
 
 from core.common import get_files, print_table
-from core.search import retrieve_datasets, retrieve_data
+from core.search import retrieve_datasets, retrieve_data, retrieve_all_data
 from core.face_recognition import init, process_file, get_face_embeddings, use_cuda
 from core.setup_db import setup_db
 
@@ -60,7 +60,7 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
               help="Het maximaal aantal matches dat tegelijk wordt getoond, default 10.")
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
-def search(folder: str, dataset: str, limit: int, debug: bool, cuda: bool) -> None:
+def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool) -> None:
     folder_path = os.path.abspath(os.curdir + "/" + folder)
     files = get_files(folder_path)
 
@@ -87,13 +87,14 @@ def search(folder: str, dataset: str, limit: int, debug: bool, cuda: bool) -> No
 
                 for (key, face) in enumerate(face_embeddings):
                     try:
-                        data = retrieve_data(face["face_embedding"], dataset)
+                        data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(face["face_embedding"])
 
                         for row in data:
                             results.append(
                                 [file_name, row[0], row[1], row[2], round(100 - (row[5] * 100), 2), row[3], row[4]])
-                    except:
-                        errors.append(f"An error occurred while retrieving the data of face #{key + 1} in image {file_name}")
+                    except Exception as err:
+                        errors.append(
+                            f"An error occurred while retrieving the data of face #{key + 1} in image {file_name}: {err}")
 
                 bar.label = f"Processing: {os.path.relpath(file)}"
             except Exception as error:

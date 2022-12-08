@@ -5,6 +5,8 @@ import cv2
 from core.DbConnection import DbConnection
 from collections.abc import Callable
 
+from core.common import vec2list
+
 facerec = None
 shape_predictor: Optional[Callable] = None
 face_detector: Optional[Callable] = None
@@ -34,13 +36,6 @@ def init(cuda: bool) -> None:
     shape_predictor = dlib.shape_predictor(predictor_path)
 
     face_detector = dlib.cnn_face_detection_model_v1(detector_path) if cuda else dlib.get_frontal_face_detector()
-
-
-def vec2list(vec):
-    out_list = []
-    for i in vec:
-        out_list.append(i)
-    return out_list
 
 
 def process_file(dataset, file, cuda: bool = False) -> bool:
