@@ -2,9 +2,10 @@ import os
 from typing import Optional
 import dlib
 import cv2
-from core.DbConnection import DbConnection
 from collections.abc import Callable
 from psycopg2 import Error
+import core.db as db
+from core.model.face import Face
 
 facerec = None
 shape_predictor: Optional[Callable] = None
@@ -13,12 +14,11 @@ use_cuda = False
 
 
 def insert_data(dataset, file_name, face_emb, width, height, x, y):
-    db = DbConnection()
-    db_cursor = db.cursor
-    db_cursor.execute(
-        "INSERT INTO faces (dataset, file_name, face_embedding, width, height, x, y) VALUES (%s, %s, %s, %s, %s, point(%s, %s), point(%s, %s))",
-        (dataset, file_name, face_emb, width, height, x[0], x[1], y[0], y[1]))
-
+    session = db.Session()
+    face = Face(dataset, file_name, width, height, x, y, face_emb)
+    session.add(face)
+    session.commit()
+    session.close()
 
 def init(cuda: bool) -> None:
     global facerec, shape_predictor, face_detector, use_cuda
