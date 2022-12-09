@@ -27,6 +27,7 @@ def insert_data(dataset, file_name, face_emb, width, height, x, y):
 def init(cuda: bool) -> None:
     global facerec, shape_predictor, face_detector
 
+
     root_dir = os.path.abspath(os.path.dirname(__file__))
     face_rec_model_path = root_dir + '/data/dlib_face_recognition_resnet_model_v1.dat'
     predictor_path = root_dir + '/data/shape_predictor_68_face_landmarks.dat'

@@ -1,0 +1,40 @@
+name: Tests
+on: [push]
+
+jobs:
+  cli-tests:
+    runs-on: [self-hosted, linux]
+
+    services:
+      postgresql:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - uses: lukka/get-cmake@latest
+
+      - name: Install dependencies
+        run: |
+          apt update && apt install --yes libgl1-mesa-dev
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Setup AG command
+        run: pip install --editable .
+
+      - name: Setup AG database
+        run: ag setup
+
+      - name: Test with pytest
+        run: pytest

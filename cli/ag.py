@@ -29,6 +29,7 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
 
     print("⚡ Using CUDA!" if cuda else "🐢 CUDA not available, falling back to CPU processing!")
 
+
     if len(files) == 0:
         click.echo(f"Folder {folder} is empty!")
         return
@@ -146,6 +147,7 @@ def datasets(debug: bool) -> None:
 def setup() -> None:
     setup_db()
     click.echo(f'Done')
+
 
 
 if __name__ == '__main__':
