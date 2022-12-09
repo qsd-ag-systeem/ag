@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   cli-tests:
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-18.04
 
     services:
       postgresql:
