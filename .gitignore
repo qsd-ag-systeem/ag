@@ -162,5 +162,8 @@ cython_debug/
 input/*
 !input/.gitkeep
 
+output/*
+!output/.gitkeep
+
 # Docker Compose data
 pg-data/

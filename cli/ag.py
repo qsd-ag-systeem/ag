@@ -1,9 +1,12 @@
+from pathlib import Path
+
 import click
 import os
 import cv2
 from math import ceil
 
 from core.common import get_files, print_table
+from core.export import export_all, export_dataset
 from core.search import retrieve_datasets, retrieve_data, retrieve_all_data
 from core.face_recognition import init, process_file, get_face_embeddings, use_cuda
 from core.setup_db import setup_db
@@ -148,6 +151,23 @@ def setup() -> None:
     setup_db()
     click.echo(f'Done')
 
+
+@cli.command()
+@click.argument('file_name', type=str)
+@click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True, help="Kan meerdere keren gebruikt worden. De naam van een dataset waarin gezocht word. Als er geen dataset wordt aangegeven worden alle beschikbare datasets gebruikt.")
+def export(file_name: str, dataset: tuple) -> None:
+    file_path = os.path.abspath(f"{os.curdir}/output/{file_name}.csv")
+
+    if Path(file_path).is_file():
+        click.echo("Error: a file with this name already exists.", err=True)
+        return
+
+    if not dataset:
+        export_all(file_path)
+    else:
+        export_dataset(file_path, dataset)
+
+    click.echo(f'Done')
 
 
 if __name__ == '__main__':
