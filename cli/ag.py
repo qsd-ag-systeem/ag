@@ -5,11 +5,12 @@ import os
 import cv2
 from math import ceil
 
+from core.setup_db import setup_db
 from core.common import get_files, print_table
-from core.export import export_all, export_dataset
+from core.export_dataset import export_all, export_dataset
+from core.import_dataset import import_all
 from core.search import retrieve_datasets, retrieve_data, retrieve_all_data
 from core.face_recognition import init, process_file, get_face_embeddings, use_cuda
-from core.setup_db import setup_db
 
 
 @click.group()
@@ -166,6 +167,21 @@ def export(file_name: str, dataset: tuple) -> None:
         export_all(file_path)
     else:
         export_dataset(file_path, dataset)
+
+    click.echo(f'Done')
+
+
+@cli.command("import")
+@click.argument('file_name', type=str)
+def import_dataset(file_name: str) -> None:
+    file_path = os.path.abspath(f"{os.curdir}/input/{file_name}.csv")
+    file = Path(file_path)
+
+    if not file.is_file():
+        click.echo(f"Error: a file with this name '{file_path}' doesn't exist.", err=True)
+        return
+
+    import_all(file_path)
 
     click.echo(f'Done')
 
