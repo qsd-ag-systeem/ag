@@ -30,3 +30,10 @@ def retrieve_datasets():
     db_cursor.execute(query_string)
     result = db_cursor.fetchall()
     return result
+
+def delete_dataset(dataset: str):
+    db = DbConnection()
+    db_cursor = db.cursor
+
+    query_string = "DELETE FROM faces WHERE dataset = %s"
+    db_cursor.execute(query_string, (dataset,))
