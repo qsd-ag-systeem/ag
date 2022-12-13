@@ -168,8 +168,8 @@ def search(folder: Path, dataset: tuple, limit: int, debug: bool, cuda: bool, ex
             click.echo(error)
 
 
-@ cli.command(help="Geeft een lijst met alle beschikbare datasets")
-@ click.option('--debug/--no-debug', default=False)
+@cli.command(help="Geeft een lijst met alle beschikbare datasets")
+@click.option('--debug/--no-debug', default=False)
 def datasets(debug: bool) -> None:
     try:
         rows = retrieve_datasets()
@@ -180,7 +180,7 @@ def datasets(debug: bool) -> None:
             f"An error occurred while fetching the datasets{error}", err=True)
 
 
-@ cli.command()
+@cli.command()
 def setup() -> None:
     setup_db()
     click.echo(f'Done')
