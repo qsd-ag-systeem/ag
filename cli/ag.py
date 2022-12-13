@@ -4,7 +4,7 @@ import cv2
 from math import ceil
 
 from core.common import get_files, print_table
-from core.search import retrieve_datasets, retrieve_data, retrieve_all_data
+from core.search import retrieve_datasets, retrieve_data, retrieve_all_data, delete_dataset
 from core.face_recognition import init, process_file, get_face_embeddings, use_cuda
 from core.setup_db import setup_db
 
@@ -142,6 +142,17 @@ def datasets(debug: bool) -> None:
         error = f": {err}" if debug else ""
         click.echo(f"An error occurred while fetching the datasets{error}", err=True)
 
+@cli.command(help="Verwijdert een dataset")
+@click.argument('dataset', type=str)
+@click.option('--debug/--no-debug', default=False)
+@click.option('--delete-files/--no-delete-files', default=False)
+def delete(dataset: str, debug: bool, delete_files: bool) -> None:
+    try:
+        delete_dataset(dataset, delete_files)
+        click.echo(f"Dataset \"{dataset}\" removed successfully")
+    except Exception as err:
+        error = f": {err}" if debug else ""
+        click.echo(f"An error occurred while deleting the dataset{error}", err=True)
 
 @cli.command()
 def setup() -> None:

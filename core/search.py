@@ -1,5 +1,6 @@
 from core.DbConnection import DbConnection
-
+import shutil
+import os
 
 def retrieve_data(face_emb: list, datasets: tuple):
     db = DbConnection()
@@ -30,3 +31,21 @@ def retrieve_datasets():
     db_cursor.execute(query_string)
     result = db_cursor.fetchall()
     return result
+
+def delete_dataset(dataset: str, delete_files: bool):
+    db = DbConnection()
+    db_cursor = db.cursor
+    
+    query_string = "SELECT COUNT(*) FROM faces WHERE dataset = %s;"
+    db_cursor.execute(query_string, (dataset,))
+    result = db_cursor.fetchone()
+    
+    if result[0] == 0:
+        raise Exception("Dataset not found")
+
+    if delete_files:
+        folder_path = os.path.abspath(os.curdir + "/" + dataset)
+        shutil.rmtree(folder_path)
+
+    query_string = "DELETE FROM faces WHERE dataset = %s"
+    db_cursor.execute(query_string, (dataset,))
