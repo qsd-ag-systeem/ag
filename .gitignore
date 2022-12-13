@@ -160,6 +160,7 @@ cython_debug/
 .idea/
 
 input/*
+output/*
 !input/.gitkeep
 
 # Docker Compose data

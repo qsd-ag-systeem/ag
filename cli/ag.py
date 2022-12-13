@@ -1,6 +1,8 @@
+from datetime import datetime
 import click
 import os
 import cv2
+import csv
 from math import ceil
 
 from core.common import get_files, print_table
@@ -28,7 +30,6 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
     errors = []
 
     print("⚡ Using CUDA!" if cuda else "🐢 CUDA not available, falling back to CPU processing!")
-
 
     if len(files) == 0:
         click.echo(f"Folder {folder} is empty!")
@@ -61,7 +62,8 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
               help="Het maximaal aantal matches dat tegelijk wordt getoond, default 10.")
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
-def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool) -> None:
+@click.option('--export', '-E', type=bool, default=False, is_flag=True, help="Exporteer de resultaten naar een csv bestand")
+def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, export: bool) -> None:
     folder_path = os.path.abspath(os.curdir + "/" + folder)
     files = get_files(folder_path)
 
@@ -88,7 +90,8 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool) -> 
 
                 for (key, face) in enumerate(face_embeddings):
                     try:
-                        data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(face["face_embedding"])
+                        data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(
+                            face["face_embedding"])
 
                         for row in data:
                             results.append(
@@ -104,50 +107,81 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool) -> 
 
                 pass
 
-    if debug:
-        for error in errors:
-            click.echo(error)
-
     results_size = len(results)
 
     if results_size == 0:
         click.echo("No matches found")
         return
 
-    # Sort results since it may contain results from multiple inputs
+    columns = ["Input file", "ID", "Dataset", "File name",
+               "Similarity (%)", "Left top", "Right bottom"]
+
     results = sorted(results, key=lambda x: x[4], reverse=True)
 
-    for rows in range(ceil(results_size / limit)):
-        continue_file = 'y'
+    if export:
+        try:
+            # Get todays date and time
+            now = datetime.now()
 
-        if rows > 0:
-            continue_file = click.prompt(
-                f"Resultaat {((rows - 1) * limit) + 1} t/m {min((rows - 1) * limit + limit, results_size)} van {results_size} worden weergegeven. Will je de volgende {min(limit, results_size - rows * limit)} matches zien?",
-                default='y', show_default=False, type=click.Choice(['y', 'n']), show_choices=True)
+            date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
 
-        if continue_file == 'n':
-            break
+            output_folder = os.path.abspath(os.path.join(os.curdir, "output"))
 
-        columns = ["Input file", "ID", "Dataset", "File name", "Similarity (%)", "Left top", "Right bottom"]
-        print_table(columns, results[rows * limit:rows * limit + limit])
+            if not os.path.exists(output_folder):
+                os.mkdir(output_folder)
+
+            file = f"{date_time}_search-results.csv"
+
+            bar.label = f"Exporting results to {file}"
+
+            path = os.path.join(
+                output_folder, file)
+
+            with open(path, 'w', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                writer.writerow(columns)
+                writer.writerows(results)
+        except Exception as err:
+            errors.append(err)
+            click.echo(
+                f"An error occurred while exporting the results", err=True)
+    else:
+        # Sort results since it may contain results from multiple inputs
+
+        for rows in range(ceil(results_size / limit)):
+            continue_file = 'y'
+
+            if rows > 0:
+                continue_file = click.prompt(
+                    f"Resultaat {((rows - 1) * limit) + 1} t/m {min((rows - 1) * limit + limit, results_size)} van {results_size} worden weergegeven. Will je de volgende {min(limit, results_size - rows * limit)} matches zien?",
+                    default='y', show_default=False, type=click.Choice(['y', 'n']), show_choices=True)
+
+            if continue_file == 'n':
+                break
+
+            print_table(columns, results[rows * limit:rows * limit + limit])
+
+    if debug:
+        for error in errors:
+            click.echo(error)
 
 
-@cli.command(help="Geeft een lijst met alle beschikbare datasets")
-@click.option('--debug/--no-debug', default=False)
+@ cli.command(help="Geeft een lijst met alle beschikbare datasets")
+@ click.option('--debug/--no-debug', default=False)
 def datasets(debug: bool) -> None:
     try:
         rows = retrieve_datasets()
         print_table(["Name", "Enrolled images"], rows)
     except Exception as err:
         error = f": {err}" if debug else ""
-        click.echo(f"An error occurred while fetching the datasets{error}", err=True)
+        click.echo(
+            f"An error occurred while fetching the datasets{error}", err=True)
 
 
-@cli.command()
+@ cli.command()
 def setup() -> None:
     setup_db()
     click.echo(f'Done')
-
 
 
 if __name__ == '__main__':
