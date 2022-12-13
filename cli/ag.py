@@ -1,4 +1,6 @@
 from datetime import datetime
+from pathlib import Path
+from pydoc import resolve
 import click
 import os
 import cv2
@@ -17,12 +19,11 @@ def cli():
 
 
 @cli.command()
-@click.argument('folder', type=click.Path(exists=True))
+@click.argument('folder', type=click.Path(exists=True, resolve_path=True, path_type=Path))
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
 def enroll(folder: str, debug: bool, cuda: bool) -> None:
-    folder_path = os.path.abspath(os.curdir + "/" + folder)
-    files = get_files(folder_path)
+    files = get_files(folder)
 
     cuda = use_cuda(cuda)
     init(cuda)
@@ -55,7 +56,7 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
 
 
 @cli.command(help="Zoekt een gelijkend gezicht in de database van de meegegeven foto(s)")
-@click.argument('folder', type=click.Path(exists=True))
+@click.argument('folder', type=click.Path(exists=True, resolve_path=True, path_type=Path))
 @click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True,
               help="Kan meerdere keren gebruikt worden. De naam van een dataset waarin gezocht word. Als er geen dataset wordt aangegeven worden alle beschikbare datasets gebruikt.")
 @click.option("--limit", "-l", "limit", type=int, required=False, default=10,
@@ -63,9 +64,9 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
 @click.option('--export', '-E', type=bool, default=False, is_flag=True, help="Exporteer de resultaten naar een csv bestand")
-def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, export: bool) -> None:
-    folder_path = os.path.abspath(os.curdir + "/" + folder)
-    files = get_files(folder_path)
+def search(folder: Path, dataset: tuple, limit: int, debug: bool, cuda: bool, export: bool) -> None:
+    # folder_path = os.path.abspath(os.curdir + "/" + folder)
+    files = get_files(folder)
 
     cuda = use_cuda(cuda)
     init(cuda)
@@ -107,59 +108,60 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
 
                 pass
 
-    results_size = len(results)
+        results_size = len(results)
 
-    if results_size == 0:
-        click.echo("No matches found")
-        return
+        if results_size == 0:
+            click.echo("No matches found")
+            return
 
-    columns = ["Input file", "ID", "Dataset", "File name",
-               "Similarity (%)", "Left top", "Right bottom"]
+        columns = ["Input file", "ID", "Dataset", "File name",
+                   "Similarity (%)", "Left top", "Right bottom"]
 
-    results = sorted(results, key=lambda x: x[4], reverse=True)
+        results = sorted(results, key=lambda x: x[4], reverse=True)
 
-    if export:
-        try:
-            # Get todays date and time
-            now = datetime.now()
+        if export:
+            try:
+                # Get todays date and time
+                now = datetime.now()
 
-            date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
+                date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
 
-            output_folder = os.path.abspath(os.path.join(os.curdir, "output"))
+                output_folder = Path(os.path.join(os.path.curdir, "output"))
 
-            if not os.path.exists(output_folder):
-                os.mkdir(output_folder)
+                if not os.path.exists(output_folder):
+                    os.mkdir(output_folder)
 
-            file = f"{date_time}_search-results.csv"
+                file = f"{date_time}_search-results.csv"
 
-            bar.label = f"Exporting results to {file}"
+                bar.label = f"Exporting results to {click.format_filename(file)}"
 
-            path = os.path.join(
-                output_folder, file)
+                path = os.path.join(
+                    output_folder, file)
 
-            with open(path, 'w', newline='', encoding='utf-8') as file:
-                writer = csv.writer(file)
-                writer.writerow(columns)
-                writer.writerows(results)
-        except Exception as err:
-            errors.append(err)
-            click.echo(
-                f"An error occurred while exporting the results", err=True)
-    else:
-        # Sort results since it may contain results from multiple inputs
+                with open(path, 'w', newline='', encoding='utf-8') as file:
+                    writer = csv.writer(file)
+                    writer.writerow(columns)
+                    writer.writerows(results)
+            except Exception as err:
+                errors.append(err)
+                click.echo(
+                    f"Something went wrong while exporting the results", err=True)
+        else:
+            # Sort results since it may contain results from multiple inputs
 
-        for rows in range(ceil(results_size / limit)):
-            continue_file = 'y'
+            for rows in range(ceil(results_size / limit)):
+                continue_file = 'y'
 
-            if rows > 0:
-                continue_file = click.prompt(
-                    f"Resultaat {((rows - 1) * limit) + 1} t/m {min((rows - 1) * limit + limit, results_size)} van {results_size} worden weergegeven. Will je de volgende {min(limit, results_size - rows * limit)} matches zien?",
-                    default='y', show_default=False, type=click.Choice(['y', 'n']), show_choices=True)
+                if rows > 0:
+                    continue_file = click.prompt(
+                        f"Resultaat {((rows - 1) * limit) + 1} t/m {min((rows - 1) * limit + limit, results_size)} van {results_size} worden weergegeven. Will je de volgende {min(limit, results_size - rows * limit)} matches zien?",
+                        default='y', show_default=False, type=click.Choice(['y', 'n']), show_choices=True)
 
-            if continue_file == 'n':
-                break
+                if continue_file == 'n':
+                    break
 
-            print_table(columns, results[rows * limit:rows * limit + limit])
+                print_table(
+                    columns, results[rows * limit:rows * limit + limit])
 
     if debug:
         for error in errors:
