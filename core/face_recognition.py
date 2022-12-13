@@ -6,11 +6,15 @@ from collections.abc import Callable
 from psycopg2 import Error
 import core.db as db
 from core.model.face import Face
+from core.common import vec2list
 
 facerec = None
 shape_predictor: Optional[Callable] = None
 face_detector: Optional[Callable] = None
-use_cuda = False
+
+
+def use_cuda(enable_cuda: bool = False) -> bool:
+    return dlib.DLIB_USE_CUDA and enable_cuda
 
 
 def insert_data(dataset, file_name, face_emb, width, height, x, y):
@@ -21,7 +25,8 @@ def insert_data(dataset, file_name, face_emb, width, height, x, y):
     session.close()
 
 def init(cuda: bool) -> None:
-    global facerec, shape_predictor, face_detector, use_cuda
+    global facerec, shape_predictor, face_detector
+
 
     root_dir = os.path.abspath(os.path.dirname(__file__))
     face_rec_model_path = root_dir + '/data/dlib_face_recognition_resnet_model_v1.dat'
@@ -30,24 +35,23 @@ def init(cuda: bool) -> None:
 
     facerec = dlib.face_recognition_model_v1(face_rec_model_path)
     shape_predictor = dlib.shape_predictor(predictor_path)
-    use_cuda = dlib.DLIB_USE_CUDA and cuda
 
-    face_detector = dlib.cnn_face_detection_model_v1(
-        detector_path) if use_cuda else dlib.get_frontal_face_detector()
+    face_detector = dlib.cnn_face_detection_model_v1(detector_path) if cuda else dlib.get_frontal_face_detector()
 
 
-def vec2list(vec):
-    out_list = []
-    for i in vec:
-        out_list.append(i)
-    return out_list
-
-
-def process_file(dataset, file) -> bool:
-    global use_cuda
-
+def process_file(dataset, file, cuda: bool = False) -> bool:
     file_name = str(file.resolve())
     img = cv2.imread(file_name)
+    face_embeddings = get_face_embeddings(img, cuda)
+
+    for face_emb in face_embeddings:
+        insert_data(dataset, file.name, face_emb["face_embedding"], face_emb["width"], face_emb["height"], face_emb["x"], face_emb["y"])
+
+    return True
+
+
+def get_face_embeddings(img, cuda: bool):
+    face_embeddings = []
 
     if img is None:
         raise Exception("File not supported")
@@ -60,7 +64,7 @@ def process_file(dataset, file) -> bool:
         raise Exception("Unable to detect face locations")
 
     for face in face_locations:
-        rect = face.rect if use_cuda else face
+        rect = face.rect if cuda else face
         raw_shape = shape_predictor(img, rect)
         face_descriptor = facerec.compute_face_descriptor(img, raw_shape)
         face_emb = vec2list(face_descriptor)
@@ -68,6 +72,6 @@ def process_file(dataset, file) -> bool:
         y = (rect.right(), rect.bottom())
 
         if len(face_emb) == 128:
-            insert_data(dataset, file.name, face_emb, width, height, x, y)
+            face_embeddings.append({"face_embedding": face_emb, "width": width, "height": height, "x": x, "y": y})
 
-    return True
+    return face_embeddings
