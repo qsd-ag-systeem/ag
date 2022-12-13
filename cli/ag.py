@@ -145,9 +145,10 @@ def datasets(debug: bool) -> None:
 @cli.command(help="Verwijdert een dataset")
 @click.argument('dataset', type=str)
 @click.option('--debug/--no-debug', default=False)
-def delete(dataset: str, debug: bool) -> None:
+@click.option('--delete-files/--no-delete-files', default=False)
+def delete(dataset: str, debug: bool, delete_files: bool) -> None:
     try:
-        delete_dataset(dataset)
+        delete_dataset(dataset, delete_files)
         click.echo(f"Dataset \"{dataset}\" removed successfully")
     except Exception as err:
         error = f": {err}" if debug else ""
