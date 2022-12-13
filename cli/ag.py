@@ -133,7 +133,8 @@ def search(folder: Path, dataset: tuple, limit: int, debug: bool, cuda: bool, ex
 
                 file = f"{date_time}_search-results.csv"
 
-                bar.label = f"Exporting results to {click.format_filename(file)}"
+                click.echo(
+                    f"\nExporting results to {click.format_filename(file)}", nl=True)
 
                 path = os.path.join(
                     output_folder, file)
