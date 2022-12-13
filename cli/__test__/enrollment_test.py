@@ -1,20 +1,22 @@
 from click.testing import CliRunner
 from cli.ag import enroll
 import os
+from pytest import fixture
 
 
-def test_enrollment_folder_no_arguments():
-    runner = CliRunner()
+@fixture
+def runner():
+    return CliRunner()
 
+
+def test_enrollment_folder_no_arguments(runner: CliRunner):
     with runner.isolated_filesystem():
         result = runner.invoke(enroll)
         assert "Error: Missing argument 'FOLDER'" in result.output
         assert result.exit_code == 2
 
 
-def test_enrollment_folder_not_exists():
-    runner = CliRunner()
-
+def test_enrollment_folder_not_exists(runner: CliRunner):
     # Create a temporary directory
     with runner.isolated_filesystem():
         result = runner.invoke(enroll, ['not_exists', '--debug'])
@@ -23,9 +25,7 @@ def test_enrollment_folder_not_exists():
         assert result.exit_code == 2
 
 
-def test_enrollment_folder_exists():
-    runner = CliRunner()
-
+def test_enrollment_folder_exists(runner: CliRunner):
     # Create a temporary directory
     with runner.isolated_filesystem():
         os.mkdir('exists')
@@ -37,9 +37,7 @@ def test_enrollment_folder_exists():
         assert result.exit_code == 0
 
 
-def test_enrollment_wrong_file():
-    runner = CliRunner()
-
+def test_enrollment_wrong_file(runner: CliRunner):
     # Create a temporary directory
     with runner.isolated_filesystem():
         os.mkdir('exists')
@@ -53,9 +51,7 @@ def test_enrollment_wrong_file():
         assert result.exit_code == 0
 
 
-def test_enrollment_folder_with_valid_image_files():
-    runner = CliRunner()
-
+def test_enrollment_folder_with_valid_image_files(runner: CliRunner):
     # Create a temporary directory and add some valid image files
     with runner.isolated_filesystem():
         os.mkdir('exists')
@@ -71,9 +67,7 @@ def test_enrollment_folder_with_valid_image_files():
         assert result.exit_code == 0
 
 
-def test_enrollment_folder_with_invalid_image_files():
-    runner = CliRunner()
-
+def test_enrollment_folder_with_invalid_image_files(runner: CliRunner):
     # Create a temporary directory and add some invalid image files
     with runner.isolated_filesystem():
         os.mkdir('exists')
