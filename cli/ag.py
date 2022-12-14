@@ -1,6 +1,5 @@
 from datetime import datetime
 from pathlib import Path
-from pydoc import resolve
 import click
 import os
 import cv2
