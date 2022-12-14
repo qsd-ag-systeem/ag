@@ -1,8 +1,5 @@
-from core.face_recognition import insert_data, init, vec2list, process_file
+from core.face_recognition import insert_data, init, vec2list
 from dlib import vector
-from click.testing import CliRunner
-import os
-from pathlib import Path
 
 
 def test_insert_data():
