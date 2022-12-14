@@ -1,8 +1,9 @@
+import os
 from pathlib import Path
 from tabulate import tabulate
 
 
-def get_files(abs_path):
+def get_files(abs_path: str):
     return list((x for x in Path(abs_path).iterdir() if x.is_file() and not x.name.startswith(".")))
 
 

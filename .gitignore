@@ -160,7 +160,11 @@ cython_debug/
 .idea/
 
 input/*
+!input/pytest
 !input/.gitkeep
+
+output/*
+!output/.gitkeep
 
 # Docker Compose data
 pg-data/

@@ -1,16 +1,27 @@
-import click
+"""
+CLI for the face recognition application.
+"""
 import os
+from pathlib import Path
+
+import click
 import cv2
 from math import ceil
+from slugify import slugify
 
 from core.common import get_files, print_table
-from core.search import retrieve_datasets, retrieve_data, retrieve_all_data
-from core.face_recognition import init, process_file, get_face_embeddings, use_cuda
+from core.face_recognition import get_face_embeddings, init, process_file, use_cuda
+from core.search import delete_dataset, retrieve_all_data, retrieve_data, retrieve_datasets
 from core.setup_db import setup_db
+from core.export_dataset import export_all, export_dataset
+from core.import_dataset import import_all
 
 
 @click.group()
 def cli():
+    """
+    CLI group for the face recognition application.
+    """
     pass
 
 
@@ -19,7 +30,10 @@ def cli():
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
 def enroll(folder: str, debug: bool, cuda: bool) -> None:
-    folder_path = os.path.abspath(os.curdir + "/" + folder)
+    """
+    Enroll the images from the given folder into the database.
+    """
+    folder_path = os.path.abspath(os.path.join(os.getcwd(), folder))
     files = get_files(folder_path)
 
     cuda = use_cuda(cuda)
@@ -28,7 +42,6 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
     errors = []
 
     print("⚡ Using CUDA!" if cuda else "🐢 CUDA not available, falling back to CPU processing!")
-
 
     if len(files) == 0:
         click.echo(f"Folder {folder} is empty!")
@@ -62,7 +75,10 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
 def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool) -> None:
-    folder_path = os.path.abspath(os.curdir + "/" + folder)
+    """
+    Search for similar faces in the database of the given image(s).
+    """
+    folder_path = os.path.abspath(os.path.join(os.getcwd(), folder))
     files = get_files(folder_path)
 
     cuda = use_cuda(cuda)
@@ -83,12 +99,14 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool) -> 
             try:
                 file_path = str(file.resolve())
                 file_name = str(file.name)
+                # pylint: disable=E1101
                 img = cv2.imread(file_path)
                 face_embeddings = get_face_embeddings(img, cuda)
 
                 for (key, face) in enumerate(face_embeddings):
                     try:
-                        data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(face["face_embedding"])
+                        data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(
+                            face["face_embedding"])
 
                         for row in data:
                             results.append(
@@ -128,26 +146,94 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool) -> 
         if continue_file == 'n':
             break
 
-        columns = ["Input file", "ID", "Dataset", "File name", "Similarity (%)", "Left top", "Right bottom"]
+        columns = ["Input file", "ID", "Dataset", "File name",
+                   "Similarity (%)", "Left top", "Right bottom"]
         print_table(columns, results[rows * limit:rows * limit + limit])
 
 
 @cli.command(help="Geeft een lijst met alle beschikbare datasets")
 @click.option('--debug/--no-debug', default=False)
 def datasets(debug: bool) -> None:
+    """
+    This command lists all available datasets.
+    """
     try:
         rows = retrieve_datasets()
         print_table(["Name", "Enrolled images"], rows)
     except Exception as err:
         error = f": {err}" if debug else ""
-        click.echo(f"An error occurred while fetching the datasets{error}", err=True)
+        click.echo(
+            f"An error occurred while fetching the datasets{error}", err=True)
+
+
+@cli.command(help="Verwijdert een dataset")
+@click.argument('dataset', type=str)
+@click.option('--debug/--no-debug', default=False)
+@click.option('--delete-files/--no-delete-files', default=False)
+def delete(dataset: str, debug: bool, delete_files: bool) -> None:
+    """
+    This command deletes a dataset.
+    """
+    try:
+        delete_dataset(dataset, delete_files)
+        click.echo(f"Dataset \"{dataset}\" removed successfully")
+    except Exception as err:
+        error = f": {err}" if debug else ""
+        click.echo(
+            f"An error occurred while deleting the dataset{error}", err=True)
 
 
 @cli.command()
 def setup() -> None:
+    """
+    This command sets up the database.
+    """
     setup_db()
+    click.echo('Done')
+
+@cli.command()
+@click.argument('file_name', type=str)
+@click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True, help="Kan meerdere keren gebruikt worden. De naam van een dataset waarin gezocht word. Als er geen dataset wordt aangegeven worden alle beschikbare datasets gebruikt.")
+@click.option('--debug/--no-debug', default=False)
+def export(file_name: str, dataset: tuple, debug: bool) -> None:
+    output_dir = os.path.abspath(os.path.join(os.getcwd(), "output"))
+    file_path = os.path.join(output_dir, f"{slugify(file_name)}.csv")
+
+    if debug:
+        click.echo(f"Output directory: {output_dir}")
+        click.echo(f"File path: {file_path}")
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    if Path(file_path).is_file():
+        click.echo("Error: a file with this name already exists.", err=True)
+        return
+
+    if debug:
+        click.echo(f"Exporting to {file_path}")
+
+    if not dataset:
+        export_all(file_path)
+    else:
+        export_dataset(file_path, dataset)
+
     click.echo(f'Done')
 
+
+@cli.command("import")
+@click.argument('file_name', type=str)
+def import_dataset(file_name: str) -> None:
+    file_path = os.path.join(os.getcwd(), "input", f"{file_name}.csv")
+    file = Path(file_path)
+
+    if not file.is_file():
+        click.echo(f"Error: a file with this name '{file_path}' doesn't exist.", err=True)
+        return
+
+    import_all(file_path)
+
+    click.echo(f'Done')
 
 
 if __name__ == '__main__':
