@@ -1,9 +1,10 @@
 from pathlib import Path
+from typing import List
 from tabulate import tabulate
 
 
-def get_files(abs_path: Path):
-    return list((x for x in abs_path.iterdir() if x.is_file() and not x.name.startswith(".")))
+def get_files(abs_path: str):
+    return list((x for x in Path(abs_path).iterdir() if x.is_file() and not x.name.startswith(".")))
 
 
 def print_table(columns, values):

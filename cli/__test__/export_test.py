@@ -18,6 +18,23 @@ def test_search_export_fails(runner: CliRunner):
         assert "Usage: search [OPTIONS] FOLDER" in result.output
 
 
+def test_search_export_output_created(runner: CliRunner):
+    # Create test folder with fake images
+    result = runner.invoke(enroll, ['input/pytest'])
+
+    assert "Enrollment finished!" in result.output
+    assert result.exit_code == 0
+
+    result = runner.invoke(
+        search, ['input/pytest', "-d", "input/pytest", '--export'])
+
+    output_folder = Path(os.path.join(os.path.curdir, "output"))
+
+    assert "Exporting results to" in result.output
+    assert result.exit_code == 0
+    assert os.path.exists(output_folder)
+
+
 def test_search_export_no_match(runner: CliRunner):
     # Create test folder with fake images
     with runner.isolated_filesystem():

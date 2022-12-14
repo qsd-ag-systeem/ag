@@ -19,7 +19,7 @@ def cli():
 
 
 @cli.command()
-@click.argument('folder', type=click.Path(exists=True, resolve_path=True, path_type=Path))
+@click.argument('folder', type=click.Path(exists=True))
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
 def enroll(folder: str, debug: bool, cuda: bool) -> None:
@@ -56,7 +56,7 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
 
 
 @cli.command(help="Zoekt een gelijkend gezicht in de database van de meegegeven foto(s)")
-@click.argument('folder', type=click.Path(exists=True, resolve_path=True, path_type=Path))
+@click.argument('folder', type=click.Path(exists=True))
 @click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True,
               help="Kan meerdere keren gebruikt worden. De naam van een dataset waarin gezocht word. Als er geen dataset wordt aangegeven worden alle beschikbare datasets gebruikt.")
 @click.option("--limit", "-l", "limit", type=int, required=False, default=10,
@@ -64,7 +64,7 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
 @click.option('--export', '-E', type=bool, default=False, is_flag=True, help="Exporteer de resultaten naar een csv bestand")
-def search(folder: Path, dataset: tuple, limit: int, debug: bool, cuda: bool, export: bool) -> None:
+def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, export: bool) -> None:
     # folder_path = os.path.abspath(os.curdir + "/" + folder)
     files = get_files(folder)
 
