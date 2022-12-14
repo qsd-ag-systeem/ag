@@ -1,19 +1,21 @@
 """
 CLI for the face recognition application.
 """
-import os
-from pathlib import Path
-import click
-import cv2
-from math import ceil
+from core.import_dataset import import_all
+from core.export_dataset import export_all, export_dataset
+from core.setup_db import setup_db
+from core.search import delete_dataset, retrieve_all_data, retrieve_data, retrieve_datasets
+from core.face_recognition import get_face_embeddings, init, process_file, use_cuda
+from core.common import get_files, print_table
 from slugify import slugify
 
-from core.common import get_files, print_table
-from core.face_recognition import get_face_embeddings, init, process_file, use_cuda
-from core.search import delete_dataset, retrieve_all_data, retrieve_data, retrieve_datasets
-from core.setup_db import setup_db
-from core.export_dataset import export_all, export_dataset
-from core.import_dataset import import_all
+import cv2
+import click
+from pathlib import Path
+from math import ceil
+from datetime import datetime
+import os
+import csv
 
 
 @click.group()
@@ -31,8 +33,8 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
     """
     Enroll the images from the given folder into the database.
     """
-    folder_path = os.path.abspath(os.path.join(os.getcwd(), folder))
-    files = get_files(folder_path)
+
+    files = get_files(folder)
 
     cuda = use_cuda(cuda)
     init(cuda)
@@ -70,12 +72,13 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
               help="Het maximaal aantal matches dat tegelijk wordt getoond, default 10.")
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
-def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool) -> None:
+@click.option('--export', '-E', type=bool, default=False, is_flag=True, help="Exporteer de resultaten naar een csv bestand")
+def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, export: bool) -> None:
     """
     Search for similar faces in the database of the given image(s).
     """
-    folder_path = os.path.abspath(os.path.join(os.getcwd(), folder))
-    files = get_files(folder_path)
+
+    files = get_files(folder)
 
     cuda = use_cuda(cuda)
     init(cuda)
@@ -118,33 +121,64 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool) -> 
 
                 pass
 
-    if debug:
-        for error in errors:
-            click.echo(error)
+        results_size = len(results)
 
-    results_size = len(results)
-
-    if results_size == 0:
-        click.echo("No matches found")
-        return
-
-    # Sort results since it may contain results from multiple inputs
-    results = sorted(results, key=lambda x: x[4], reverse=True)
-
-    for rows in range(ceil(results_size / limit)):
-        continue_file = 'y'
-
-        if rows > 0:
-            continue_file = click.prompt(
-                f"Resultaat {((rows - 1) * limit) + 1} t/m {min((rows - 1) * limit + limit, results_size)} van {results_size} worden weergegeven. Will je de volgende {min(limit, results_size - rows * limit)} matches zien?",
-                default='y', show_default=False, type=click.Choice(['y', 'n']), show_choices=True)
-
-        if continue_file == 'n':
-            break
+        if results_size == 0:
+            click.echo("No matches found")
+            return
 
         columns = ["Input file", "ID", "Dataset", "File name",
                    "Similarity (%)", "Left top", "Right bottom"]
-        print_table(columns, results[rows * limit:rows * limit + limit])
+
+        results = sorted(results, key=lambda x: x[4], reverse=True)
+
+        if export:
+            try:
+                # Get todays date and time
+                now = datetime.now()
+
+                date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
+
+                output_folder = os.path.abspath(
+                    os.path.join(os.getcwd(), "output"))
+
+                if not os.path.exists(output_folder):
+                    os.mkdir(output_folder)
+
+                file = f"{date_time}_search-results.csv"
+
+                click.echo(
+                    f"\nExporting results to {click.format_filename(file)}", nl=True)
+
+                path = os.path.join(
+                    output_folder, file)
+
+                with open(path, 'w', newline='', encoding='utf-8') as file:
+                    writer = csv.writer(file)
+                    writer.writerow(columns)
+                    writer.writerows(results)
+            except Exception as err:
+                errors.append(err)
+                click.echo(
+                    "Something went wrong while exporting the results", err=True)
+        else:
+            for rows in range(ceil(results_size / limit)):
+                continue_file = 'y'
+
+                if rows > 0:
+                    continue_file = click.prompt(
+                        f"Resultaat {((rows - 1) * limit) + 1} t/m {min((rows - 1) * limit + limit, results_size)} van {results_size} worden weergegeven. Will je de volgende {min(limit, results_size - rows * limit)} matches zien?",
+                        default='y', show_default=False, type=click.Choice(['y', 'n']), show_choices=True)
+
+                if continue_file == 'n':
+                    break
+
+                print_table(
+                    columns, results[rows * limit:rows * limit + limit])
+
+    if debug:
+        for error in errors:
+            click.echo(error)
 
 
 @cli.command(help="Geeft een lijst met alle beschikbare datasets")
@@ -187,6 +221,7 @@ def setup() -> None:
     setup_db()
     click.echo('Done')
 
+
 @cli.command()
 @click.argument('file_name', type=str)
 @click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True, help="Kan meerdere keren gebruikt worden. De naam van een dataset waarin gezocht word. Als er geen dataset wordt aangegeven worden alle beschikbare datasets gebruikt.")
@@ -224,7 +259,8 @@ def import_dataset(file_name: str) -> None:
     file = Path(file_path)
 
     if not file.is_file():
-        click.echo(f"Error: a file with this name '{file_path}' doesn't exist.", err=True)
+        click.echo(
+            f"Error: a file with this name '{file_path}' doesn't exist.", err=True)
         return
 
     import_all(file_path)
