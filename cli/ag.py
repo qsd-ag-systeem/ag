@@ -1,23 +1,21 @@
-from core.setup_db import setup_db
-from core.search import (delete_dataset, retrieve_all_data, retrieve_data,
-                         retrieve_datasets)
-from core.face_recognition import (get_face_embeddings, init, process_file,
-                                   use_cuda)
-from core.common import get_files, print_table
-from math import ceil
-import csv
-import cv2
-import os
-import click
-from pathlib import Path
-from datetime import datetime
-<< << << < HEAD
-== == == =
 """
 CLI for the face recognition application.
 """
+import csv
+import os
+from datetime import datetime
+from math import ceil
+from pathlib import Path
 
->>>>>> > 47aa256859a215e691e29b06758bdbdf9b1cdfff
+import click
+import cv2
+
+from core.common import get_files, print_table
+from core.face_recognition import (get_face_embeddings, init, process_file,
+                                   use_cuda)
+from core.search import (delete_dataset, retrieve_all_data, retrieve_data,
+                         retrieve_datasets)
+from core.setup_db import setup_db
 
 
 @click.group()
