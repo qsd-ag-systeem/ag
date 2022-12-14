@@ -5,7 +5,6 @@ from distutils.dir_util import copy_tree
 from click.testing import CliRunner
 
 from cli.ag import export, enroll
-from core.common import get_abs_path_from_rel_folder
 
 
 # Test that the command creates the 'output' directory if it doesn't already exist

@@ -8,7 +8,7 @@ from math import ceil
 from slugify import slugify
 
 from core.setup_db import setup_db
-from core.common import get_files, print_table, get_abs_path_from_rel_folder
+from core.common import get_files, print_table
 from core.export_dataset import export_all, export_dataset
 from core.import_dataset import import_all
 from core.search import retrieve_datasets, retrieve_data, retrieve_all_data
