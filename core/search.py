@@ -1,6 +1,7 @@
-from core.DbConnection import DbConnection
 import shutil
 import os
+
+from core.DbConnection import DbConnection
 
 def retrieve_data(face_emb: list, datasets: tuple):
     db = DbConnection()
