@@ -21,7 +21,8 @@ def insert_data(dataset, file_name, face_emb, width, height, x, y):
     db_cursor = db.cursor
     db_cursor.execute(
         "INSERT INTO faces (dataset, file_name, face_embedding, width, height, x, y) VALUES (%s, %s, %s, %s, %s, point(%s, %s), point(%s, %s))",
-        (dataset, file_name, face_emb, width, height, x[0], x[1], y[0], y[1]))
+        (dataset, file_name, face_emb, width, height, x[0], x[1], y[0], y[1])
+    )
 
 
 def init(cuda: bool) -> None:

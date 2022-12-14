@@ -8,6 +8,7 @@ from core.search import delete_dataset, retrieve_all_data, retrieve_data, retrie
 from core.face_recognition import get_face_embeddings, init, process_file, use_cuda
 from core.common import get_files, print_table
 from slugify import slugify
+
 import cv2
 import click
 from pathlib import Path
@@ -22,7 +23,6 @@ def cli():
     """
     CLI group for the face recognition application.
     """
-    pass
 
 
 @cli.command()
@@ -57,8 +57,6 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
 
                 if debug:
                     errors.append(error)
-
-                pass
 
     for error in errors:
         click.echo(error)
