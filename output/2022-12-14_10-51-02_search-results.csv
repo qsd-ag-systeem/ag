@@ -1,2 +1,0 @@
-Input file,ID,Dataset,File name,Similarity (%),Left top,Right bottom
-1.jpg,28,input/pytest,1.jpg,100.0,"(233,357)","(788,911)"
