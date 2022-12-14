@@ -141,7 +141,8 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
 
                 date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
 
-                output_folder = Path(os.path.join(os.path.curdir, "output"))
+                output_folder = os.path.abspath(
+                    os.path.join(os.getcwd(), "output"))
 
                 if not os.path.exists(output_folder):
                     os.mkdir(output_folder)
