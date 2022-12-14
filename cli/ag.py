@@ -3,7 +3,6 @@ CLI for the face recognition application.
 """
 import os
 from pathlib import Path
-
 import click
 import cv2
 from math import ceil
@@ -22,7 +21,6 @@ def cli():
     """
     CLI group for the face recognition application.
     """
-    pass
 
 
 @cli.command()
@@ -57,8 +55,6 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
 
                 if debug:
                     errors.append(error)
-
-                pass
 
     for error in errors:
         click.echo(error)
