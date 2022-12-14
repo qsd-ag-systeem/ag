@@ -1,19 +1,30 @@
-from datetime import datetime
-from pathlib import Path
-import click
-import os
-import cv2
-import csv
-from math import ceil
-
-from core.common import get_files, print_table
-from core.search import retrieve_datasets, retrieve_data, retrieve_all_data
-from core.face_recognition import init, process_file, get_face_embeddings, use_cuda
 from core.setup_db import setup_db
+from core.search import (delete_dataset, retrieve_all_data, retrieve_data,
+                         retrieve_datasets)
+from core.face_recognition import (get_face_embeddings, init, process_file,
+                                   use_cuda)
+from core.common import get_files, print_table
+from math import ceil
+import csv
+import cv2
+import os
+import click
+from pathlib import Path
+from datetime import datetime
+<< << << < HEAD
+== == == =
+"""
+CLI for the face recognition application.
+"""
+
+>>>>>> > 47aa256859a215e691e29b06758bdbdf9b1cdfff
 
 
 @click.group()
 def cli():
+    """
+    CLI group for the face recognition application.
+    """
     pass
 
 
@@ -22,6 +33,9 @@ def cli():
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
 def enroll(folder: str, debug: bool, cuda: bool) -> None:
+    """
+    Enroll the images from the given folder into the database.
+    """
     files = get_files(folder)
 
     cuda = use_cuda(cuda)
@@ -64,7 +78,9 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
 @click.option('--cuda/--no-cuda', default=True)
 @click.option('--export', '-E', type=bool, default=False, is_flag=True, help="Exporteer de resultaten naar een csv bestand")
 def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, export: bool) -> None:
-    # folder_path = os.path.abspath(os.curdir + "/" + folder)
+    """
+    Search for similar faces in the database of the given image(s).
+    """
     files = get_files(folder)
 
     cuda = use_cuda(cuda)
@@ -85,6 +101,7 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
             try:
                 file_path = str(file.resolve())
                 file_name = str(file.name)
+                # pylint: disable=E1101
                 img = cv2.imread(file_path)
                 face_embeddings = get_face_embeddings(img, cuda)
 
@@ -171,6 +188,9 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
 @cli.command(help="Geeft een lijst met alle beschikbare datasets")
 @click.option('--debug/--no-debug', default=False)
 def datasets(debug: bool) -> None:
+    """
+    This command lists all available datasets.
+    """
     try:
         rows = retrieve_datasets()
         print_table(["Name", "Enrolled images"], rows)
@@ -180,10 +200,30 @@ def datasets(debug: bool) -> None:
             f"An error occurred while fetching the datasets{error}", err=True)
 
 
+@cli.command(help="Verwijdert een dataset")
+@click.argument('dataset', type=str)
+@click.option('--debug/--no-debug', default=False)
+@click.option('--delete-files/--no-delete-files', default=False)
+def delete(dataset: str, debug: bool, delete_files: bool) -> None:
+    """
+    This command deletes a dataset.
+    """
+    try:
+        delete_dataset(dataset, delete_files)
+        click.echo(f"Dataset \"{dataset}\" removed successfully")
+    except Exception as err:
+        error = f": {err}" if debug else ""
+        click.echo(
+            f"An error occurred while deleting the dataset{error}", err=True)
+
+
 @cli.command()
 def setup() -> None:
+    """
+    This command sets up the database.
+    """
     setup_db()
-    click.echo(f'Done')
+    click.echo('Done')
 
 
 if __name__ == '__main__':
