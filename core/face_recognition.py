@@ -24,9 +24,9 @@ def insert_data(dataset, file_name, face_emb, width, height, x, y):
     session.commit()
     session.close()
 
+
 def init(cuda: bool) -> None:
     global facerec, shape_predictor, face_detector
-
 
     root_dir = os.path.abspath(os.path.dirname(__file__))
     face_rec_model_path = root_dir + '/data/dlib_face_recognition_resnet_model_v1.dat'
@@ -36,7 +36,8 @@ def init(cuda: bool) -> None:
     facerec = dlib.face_recognition_model_v1(face_rec_model_path)
     shape_predictor = dlib.shape_predictor(predictor_path)
 
-    face_detector = dlib.cnn_face_detection_model_v1(detector_path) if cuda else dlib.get_frontal_face_detector()
+    face_detector = dlib.cnn_face_detection_model_v1(
+        detector_path) if cuda else dlib.get_frontal_face_detector()
 
 
 def process_file(dataset, file, cuda: bool = False) -> bool:
@@ -45,7 +46,8 @@ def process_file(dataset, file, cuda: bool = False) -> bool:
     face_embeddings = get_face_embeddings(img, cuda)
 
     for face_emb in face_embeddings:
-        insert_data(dataset, file.name, face_emb["face_embedding"], face_emb["width"], face_emb["height"], face_emb["x"], face_emb["y"])
+        insert_data(dataset, file.name, face_emb["face_embedding"],
+                    face_emb["width"], face_emb["height"], face_emb["x"], face_emb["y"])
 
     return True
 
@@ -72,6 +74,7 @@ def get_face_embeddings(img, cuda: bool):
         y = (rect.right(), rect.bottom())
 
         if len(face_emb) == 128:
-            face_embeddings.append({"face_embedding": face_emb, "width": width, "height": height, "x": x, "y": y})
+            face_embeddings.append(
+                {"face_embedding": face_emb, "width": width, "height": height, "x": x, "y": y})
 
     return face_embeddings

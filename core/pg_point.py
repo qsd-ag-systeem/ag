@@ -1,6 +1,7 @@
 from sqlalchemy import func
 import sqlalchemy.types as types
 
+
 class Point(types.UserDefinedType):
     cache_ok = True
 

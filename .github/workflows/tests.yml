@@ -1,8 +1,8 @@
-name: Tests
+name: Lint and Test
 on: [push]
 
 jobs:
-  cli-tests:
+  tests:
     runs-on: ubuntu-18.04
 
     services:
