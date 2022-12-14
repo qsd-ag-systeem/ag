@@ -21,19 +21,11 @@ def cli():
 
 
 @cli.command()
-@click.argument('folder', type=str)
+@click.argument('folder', type=click.Path(exists=True))
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
 def enroll(folder: str, debug: bool, cuda: bool) -> None:
-    folder_path = os.path.join(get_abs_path_from_rel_folder(), folder)
-
-    if debug:
-        click.echo(f"Folder path: {folder_path}")
-
-    if not os.path.exists(folder_path):
-        click.echo("Folder {folder_path} does not exist.", err=True)
-        return
-
+    folder_path = os.path.abspath(os.path.join(os.getcwd(), folder))
     files = get_files(folder_path)
 
     cuda = use_cuda(cuda)
@@ -76,11 +68,7 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
 def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool) -> None:
-    folder_path = get_abs_path_from_rel_folder(folder)
-
-    if debug:
-        click.echo(f"Folder path: {folder_path}")
-
+    folder_path = os.path.abspath(os.path.join(os.getcwd(), folder))
     files = get_files(folder_path)
 
     cuda = use_cuda(cuda)
@@ -172,7 +160,7 @@ def setup() -> None:
 @click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True, help="Kan meerdere keren gebruikt worden. De naam van een dataset waarin gezocht word. Als er geen dataset wordt aangegeven worden alle beschikbare datasets gebruikt.")
 @click.option('--debug/--no-debug', default=False)
 def export(file_name: str, dataset: tuple, debug: bool) -> None:
-    output_dir = get_abs_path_from_rel_folder("output")
+    output_dir = os.path.abspath(os.path.join(os.getcwd(), "output"))
     file_path = os.path.join(output_dir, f"{slugify(file_name)}.csv")
 
     if debug:
@@ -200,7 +188,7 @@ def export(file_name: str, dataset: tuple, debug: bool) -> None:
 @cli.command("import")
 @click.argument('file_name', type=str)
 def import_dataset(file_name: str) -> None:
-    file_path = os.path.join(get_abs_path_from_rel_folder("input"), f"{file_name}.csv")
+    file_path = os.path.join(os.getcwd(), "input", f"{file_name}.csv")
     file = Path(file_path)
 
     if not file.is_file():
