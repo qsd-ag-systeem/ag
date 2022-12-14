@@ -164,8 +164,6 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
                 click.echo(
                     "Something went wrong while exporting the results", err=True)
         else:
-            # Sort results since it may contain results from multiple inputs
-
             for rows in range(ceil(results_size / limit)):
                 continue_file = 'y'
 
