@@ -2,7 +2,7 @@ name: Tests
 on: [push]
 
 jobs:
-  cli-tests:
+  tests:
     runs-on: ubuntu-18.04
 
     services:
