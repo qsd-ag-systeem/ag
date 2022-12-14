@@ -145,7 +145,7 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
             except Exception as err:
                 errors.append(err)
                 click.echo(
-                    f"Something went wrong while exporting the results", err=True)
+                    "Something went wrong while exporting the results", err=True)
         else:
             # Sort results since it may contain results from multiple inputs
 
