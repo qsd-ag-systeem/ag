@@ -33,5 +33,6 @@ def setup() -> None:
     setup_db()
     click.echo('Done')
 
+
 if __name__ == '__main__':
     cli()
