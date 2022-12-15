@@ -15,5 +15,4 @@ def get_subdirs(dir: str = ""):
         return []
 
 def directories(subpath = ""):
-    subdirs = get_subdirs(subpath)
-    return subdirs
+    return get_subdirs(subpath)
