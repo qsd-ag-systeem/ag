@@ -1,5 +1,17 @@
 {
   "python.testing.pytestArgs": ["."],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
+  "python.testing.pytestEnabled": true,
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "127.0.0.1",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "AG",
+      "database": "postgres",
+      "username": "postgres",
+      "password": "postgres"
+    }
+  ]
 }

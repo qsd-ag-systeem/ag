@@ -15,8 +15,6 @@ def cli():
     """
     CLI group for the face recognition application.
     """
-    pass
-
 
 cli.add_command(enroll)
 cli.add_command(search)
@@ -24,7 +22,6 @@ cli.add_command(get_datasets)
 cli.add_command(delete_dataset)
 cli.add_command(export)
 cli.add_command(import_dataset)
-
 
 # since it is not much, I decided to leave it in here
 @cli.command()
@@ -34,7 +31,6 @@ def setup() -> None:
     """
     setup_db()
     click.echo('Done')
-
 
 if __name__ == '__main__':
     cli()
