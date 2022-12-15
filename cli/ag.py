@@ -16,6 +16,7 @@ def cli():
     CLI group for the face recognition application.
     """
 
+
 cli.add_command(enroll)
 cli.add_command(search)
 cli.add_command(get_datasets)

@@ -3,7 +3,7 @@ from core.common import print_table
 from core.search import retrieve_datasets, delete_dataset
 
 
-@click.command(help="Geeft een lijst met alle beschikbare datasets")
+@click.command("datasets", help="Geeft een lijst met alle beschikbare datasets")
 @click.option('--debug/--no-debug', default=False)
 def get_datasets(debug: bool) -> None:
     """
@@ -18,7 +18,7 @@ def get_datasets(debug: bool) -> None:
             f"An error occurred while fetching the datasets{error}", err=True)
 
 
-@click.command(help="Verwijdert een dataset")
+@click.command("delete", help="Verwijdert een dataset")
 @click.argument('dataset', type=str)
 @click.option('--debug/--no-debug', default=False)
 @click.option('--delete-files/--no-delete-files', default=False)
