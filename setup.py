@@ -11,6 +11,7 @@ setup(
     entry_points={
         'console_scripts': [
             'ag = cli.ag:cli',
+            'api = api.app:run',
         ],
     },
 )

@@ -25,4 +25,5 @@ pytest-xdist==3.1.0
 tomli==2.0.1
 tabulate~=0.9.0
 setuptools~=60.2.0
+Flask==2.2.2
 python-slugify~=7.0.0
