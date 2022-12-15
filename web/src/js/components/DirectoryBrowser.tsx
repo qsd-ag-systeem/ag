@@ -27,14 +27,16 @@ export default function DirectoryBrowser() {
       ) : (
         <>
           <Title order={5}>{currentDir}</Title>
-          <Text>
-            <Anchor onClick={goToParentDir}>
-              <Group spacing={5}>
-                <IconArrowBack />
-                <Text>Parent directory</Text>
-              </Group>
-            </Anchor>
-          </Text>
+          {currentDir && (
+            <Text>
+              <Anchor onClick={goToParentDir}>
+                <Group spacing={5}>
+                  <IconArrowBack />
+                  <Text>Parent directory</Text>
+                </Group>
+              </Anchor>
+            </Text>
+          )}
           {data.map((item: string) => (
             <Text>
               <Anchor onClick={() => setCurrentDir(item)}>{item}</Anchor>
