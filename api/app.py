@@ -1,5 +1,5 @@
 from flask import Flask
-from api.routes.hello import index
+from api.routes.index import index
 from api.routes.enroll import enroll
 
 app = Flask(__name__)
