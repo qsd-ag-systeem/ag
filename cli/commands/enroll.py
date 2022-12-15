@@ -12,15 +12,15 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
     """
     Enroll the images from the given folder into the database.
     """
-    folder_path = os.path.abspath(os.path.join(os.getcwd(), folder))
-    files = get_files(folder_path)
+
+    files = get_files(folder)
 
     cuda = use_cuda(cuda)
     init(cuda)
 
     errors = []
 
-    click.echo("⚡ Using CUDA!" if cuda else "🐢 CUDA not available, falling back to CPU processing!")
+    print("⚡ Using CUDA!" if cuda else "🐢 CUDA not available, falling back to CPU processing!")
 
     if len(files) == 0:
         click.echo(f"Folder {folder} is empty!")
@@ -36,8 +36,6 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
 
                 if debug:
                     errors.append(error)
-
-                pass
 
     for error in errors:
         click.echo(error)
