@@ -10,7 +10,7 @@ from cli.commands.export import export
 from cli.commands.import_dataset import import_dataset
 
 
-@click.group()
+@click.group(help="Dit is de command line interface (CLI) voor het gebruiken van het automatisch gelaat herkenningssysteem")
 def cli():
     """
     CLI group for the face recognition application.
@@ -26,7 +26,7 @@ cli.add_command(import_dataset)
 
 
 # since it is not much, I decided to leave it in here
-@cli.command()
+@cli.command(help="Zet de database klaar voor gebruik")
 def setup() -> None:
     """
     This command sets up the database.

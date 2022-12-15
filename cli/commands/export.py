@@ -7,11 +7,14 @@ from slugify import slugify
 from core.export_dataset import export_all, export_dataset
 
 
-@click.command()
+@click.command(help="Exporteert een csv bestand van één of meerdere specifieke datasets uit de database.")
 @click.argument('file_name', type=str)
 @click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True, help="Kan meerdere keren gebruikt worden. De naam van een dataset waarin gezocht word. Als er geen dataset wordt aangegeven worden alle beschikbare datasets gebruikt.")
 @click.option('--debug/--no-debug', default=False)
 def export(file_name: str, dataset: tuple, debug: bool) -> None:
+    """
+    Exports a csv file from a specific or multiple datasets from the database.
+    """
     output_dir = os.path.abspath(os.path.join(os.getcwd(), "output"))
     file_path = os.path.join(output_dir, f"{slugify(file_name)}.csv")
 

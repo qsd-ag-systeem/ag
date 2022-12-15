@@ -9,7 +9,7 @@ from core.face_recognition import init, use_cuda, get_face_embeddings
 from core.search import retrieve_data, retrieve_all_data
 
 
-@click.command(help="Zoekt een gelijkend gezicht in de database van de meegegeven foto(s)")
+@click.command(help="Zoekt een gelijkend gezicht in de database van de meegegeven foto(s).")
 @click.argument('folder', type=click.Path(exists=True))
 @click.option("--dataset", "-d", "dataset", type=str, required=False, multiple=True,
               help="Kan meerdere keren gebruikt worden. De naam van een dataset waarin gezocht word. Als er geen dataset wordt aangegeven worden alle beschikbare datasets gebruikt.")

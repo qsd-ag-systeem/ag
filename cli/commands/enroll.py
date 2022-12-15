@@ -4,7 +4,7 @@ from core.common import get_files
 from core.face_recognition import init, process_file, use_cuda
 
 
-@click.command()
+@click.command(help="Geef een folder met afbeeldingen aan die opgeslagen moeten worden in de database.")
 @click.argument('folder', type=click.Path(exists=True))
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)

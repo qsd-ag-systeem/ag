@@ -4,9 +4,12 @@ import os
 from core.import_dataset import import_all
 
 
-@click.command("import")
+@click.command("import", help="Importeert een dataset van een csv bestand naar de database.")
 @click.argument('file_name', type=str)
 def import_dataset(file_name: str) -> None:
+    """
+    Imports datasets from a csv file into the database.
+    """
     file_path = os.path.join(os.getcwd(), "input", f"{file_name}.csv")
     file = Path(file_path)
 
