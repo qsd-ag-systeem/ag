@@ -1,18 +1,8 @@
-from core.DbConnection import DbConnection
+import core.db as db
 from pytest import fixture
 
-
-@fixture
-def db():
-    return DbConnection()
-
-
-def test_db_connection(db: DbConnection):
+def test_db_connection():
     assert db is not None
-    assert db.connection is not None
-    assert db.cursor is not None
-
-
-def test_db_connection_string(db: DbConnection):
-    assert str(db) is not None
-    assert "DbConnection" in str(db)
+    assert db.engine is not None
+    assert db.Session is not None
+    assert db.Base is not None

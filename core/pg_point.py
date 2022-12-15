@@ -22,8 +22,15 @@ class Point(types.UserDefinedType):
         def process(value):
             if value is None:
                 return None
+
+            if value.startswith('('):
+                value = value[1:]
+            if value.endswith(')'):
+                value = value[:-1]
+
             lng, lat = value.split(',')
             lng = lng.strip()
             lat = lat.strip()
+            
             return (float(lat), float(lng))
         return process
