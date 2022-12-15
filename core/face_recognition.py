@@ -6,6 +6,7 @@ from core.DbConnection import DbConnection
 from collections.abc import Callable
 
 from core.common import vec2list
+from core.search import retrieve_all_data, retrieve_data
 
 facerec = None
 shape_predictor: Optional[Callable] = None
@@ -49,6 +50,20 @@ def process_file(dataset, file, cuda: bool = False) -> bool:
 
     return True
 
+def search_file(file, dataset, cuda = False):
+    result = []
+    file_path = str(file.resolve())
+    file_name = str(file.name)
+    img = cv2.imread(file_path)
+    face_embeddings = get_face_embeddings(img, cuda)
+
+    for (key, face) in enumerate(face_embeddings):
+        data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(face["face_embedding"])
+
+        for row in data:
+            result.append([file_name, row[0], row[1], row[2], round(100 - (row[5] * 100), 2), row[3], row[4]])
+            
+    return result
 
 def get_face_embeddings(img, cuda: bool):
     face_embeddings = []
