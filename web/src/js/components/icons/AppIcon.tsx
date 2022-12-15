@@ -8,7 +8,7 @@ export default function AppIcon(props: React.SVGProps<SVGSVGElement>) {
       x="0px"
       y="0px"
       viewBox="0 0 190 70"
-      enable-background="new 0 0 190 70"
+      enableBackground="new 0 0 190 70"
       xmlSpace="preserve"
       {...props}
     >
