@@ -6,7 +6,6 @@ from sqlalchemy import func, text, column
 
 import core.db as db
 
-
 def retrieve_data(face_emb: list, datasets: tuple):
     session = db.Session()
     q = session.query(Face, column("eucl")).from_statement(text("SELECT id, dataset, file_name, x, y, euclidian(:points, face_embedding) AS eucl FROM faces WHERE dataset IN (:datasets) ORDER BY eucl ASC LIMIT 1000;")).params(points=str(face_emb).replace('[', '{').replace(']', '}'), datasets=datasets)
@@ -15,15 +14,6 @@ def retrieve_data(face_emb: list, datasets: tuple):
 
 
 def retrieve_all_data(face_emb: list):
-    # db = DbConnection()
-    # db_cursor = db.cursor
-
-    # query_string = "SELECT id, dataset, file_name, x, y, euclidian(%s, face_embedding) AS eucl FROM faces ORDER BY eucl ASC LIMIT 1000;"
-    # db_cursor.execute(
-    #     query_string, (str(face_emb).replace('[', '{').replace(']', '}'),))
-    # result = db_cursor.fetchall()
-    # return result
-
     session = db.Session()
     q = session.query(Face, column("eucl")).from_statement(text("SELECT id, dataset, file_name, x, y, euclidian(:points, face_embedding) AS eucl FROM faces ORDER BY eucl ASC LIMIT 1000;")).params(points=str(face_emb).replace('[', '{').replace(']', '}'))
     result = q.all()
