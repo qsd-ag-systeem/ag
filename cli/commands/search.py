@@ -52,9 +52,11 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
                         data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(
                             face["face_embedding"])
 
-                        for row in data:
+                        for i in range(0, min(limit, len(data))):
+                            row = data[i][0]
+                            score = data[i][1]
                             results.append(
-                                [file_name, row[0], row[1], row[2], round(100 - (row[5] * 100), 2), row[3], row[4]])
+                                [file_name, row.id, row.dataset, row.file_name, round(100 - (score * 100), 2), row.x, row.y])
                     except Exception as err:
                         errors.append(
                             f"An error occurred while retrieving the data of face #{key + 1} in image {file_name}: {err}")
