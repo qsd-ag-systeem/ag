@@ -1,4 +1,5 @@
+from api.helpers.response import success_response, error_response
+
+
 def index():
-    return {
-        "Message": "Hello World!"
-    }
+    return success_response("Hello WORLD")
