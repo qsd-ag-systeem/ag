@@ -4,7 +4,7 @@ import { useState } from "react";
 import { fetchDirectories } from "../api/directories";
 import { IconArrowBack } from "@tabler/icons";
 
-export default function DirectoryBrowser() {
+export default function DirectoryBrowser(props: any) {
   const [currentDir, setCurrentDir] = useState("");
 
   const { data, isFetching } = useQuery(
@@ -17,8 +17,15 @@ export default function DirectoryBrowser() {
 
   const goToParentDir = () => {
     let parentDir = currentDir.replace(/\\/g, "/").split("/").slice(0, -1).join("/");
-    setCurrentDir(parentDir);
+    setDir(parentDir);
   };
+
+  const setDir = (dir: string) => {
+    setCurrentDir(dir)
+    if (props.onChange) {
+      props.onChange(dir)
+    }
+  }
 
   return (
     <>
@@ -39,7 +46,7 @@ export default function DirectoryBrowser() {
           )}
           {data.map((item: string) => (
             <Text>
-              <Anchor onClick={() => setCurrentDir(item)}>{item}</Anchor>
+              <Anchor onClick={() => setDir(item)}>{item}</Anchor>
             </Text>
           ))}
         </>
