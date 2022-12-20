@@ -168,3 +168,4 @@ output/*
 
 # Docker Compose data
 pg-data/
+node_modules/

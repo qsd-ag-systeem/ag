@@ -5,8 +5,7 @@ from math import ceil
 import click
 import cv2
 from core.common import get_files, print_table
-from core.face_recognition import init, use_cuda, get_face_embeddings
-from core.search import retrieve_data, retrieve_all_data
+from core.face_recognition import init, use_cuda, search_file
 
 
 @click.command(help="Zoekt een gelijkend gezicht in de database van de meegegeven foto(s).")
@@ -41,23 +40,7 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
     with click.progressbar(files, show_pos=True, show_percent=True, label="Initializing...") as bar:
         for file in bar:
             try:
-                file_path = str(file.resolve())
-                file_name = str(file.name)
-                # pylint: disable=E1101
-                img = cv2.imread(file_path)
-                face_embeddings = get_face_embeddings(img, cuda)
-
-                for (key, face) in enumerate(face_embeddings):
-                    try:
-                        data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(
-                            face["face_embedding"])
-
-                        for row in data:
-                            results.append(
-                                [file_name, row[0], row[1], row[2], round(100 - (row[5] * 100), 2), row[3], row[4]])
-                    except Exception as err:
-                        errors.append(
-                            f"An error occurred while retrieving the data of face #{key + 1} in image {file_name}: {err}")
+                results.extend(search_file(file, dataset, cuda))
 
                 bar.label = f"Processing: {os.path.relpath(file)}"
             except Exception as error:
