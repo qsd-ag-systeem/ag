@@ -1,13 +1,11 @@
 from flask import request
 from core.export_dataset import export_all, export_dataset
+from api.helpers.response import error_response, success_response
 
 def export():
     data = request.get_json()
     if not "path" in data:
-        return {
-            "success": False,
-            "message": "Export path is required"
-        }
+        return error_response("Export file path is required!")
     
     export_path = data["path"]
 
@@ -25,9 +23,5 @@ def export():
     except Exception as error:
         errors.append(str(error))
 
-    return {
-        "success": True,
-        "errors": errors,
-        "message": f"export finished to {export_path}"
-    }
+    return success_response(errors=errors)
     
