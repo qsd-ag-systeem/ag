@@ -19,15 +19,14 @@ export default function Enroll() {
   const [enrollStatus, setEnrollStatus] = useState(EnrollStatus.Idle);
   const [enrollError, setEnrollError] = useState<string | null>(null);
   const [enrollData, setEnrollData] = useState<any>(null);
-  const [failedFiles, setFailedFiles] = useState<string[]>([]);
   const [enrollFolder, setEnrollFolder] = useState<string>("");
-
+  const [enrollLog, setEnrollLog] = useState<string[]>([]);
 
   const handleEnroll = async () => {
     setEnrollStatus(EnrollStatus.Enrolling);
     setEnrollError(null);
     setEnrollData(null);
-    setFailedFiles([]);
+    setEnrollLog([]);
     setEnrollFolder(location + "");
 
     console.log("Enroll folder " + enrollFolder + ", location: " + location);
@@ -59,13 +58,12 @@ export default function Enroll() {
       //   console.log(data.folder + " !== " + enrollFolder)
       //   return;
       // }
-
-      if (data.success === false) {
-        setFailedFiles((prev) => [...prev, data.file]);
-      }
+      
+      setEnrollLog((prev) => [...prev, (data.success ? "Enrolled" : "Failed to enroll") + " " + data.file + " (" + data.current + "/" + data.total + ")"]);
 
       if (data.current === data.total) {
         setEnrollStatus(EnrollStatus.Enrolled);
+        setEnrollLog((prev) => [...prev, "✅ Enrollment voltooid."]);
       }
       
       setEnrollData(data);
@@ -126,12 +124,11 @@ export default function Enroll() {
             } striped animate />
           </div>
 
-          <Text>Failed files:</Text>
-          <div style={{ marginTop: 15, overflowY: "auto", maxHeight: 300, backgroundColor: "#CCC", borderRadius: "15px", padding: "10px" }}>
+          <div style={{ marginTop: 15, overflowY: "auto", maxHeight: 300, backgroundColor: "#F9F9F9", borderRadius: "15px", padding: "10px" }}>
             <Text>
-              {failedFiles.map((file, i) => (
+              {enrollLog.slice().reverse().map((log, i) => (
                 <div key={i}>
-                  {file}
+                  {log}
                 </div>
               ))}
             </Text>
