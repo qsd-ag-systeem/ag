@@ -20,24 +20,31 @@ def test_search_export_fails(runner: CliRunner):
 
 
 def test_search_export_output_created(runner: CliRunner):
+    # Create a temporary directory to run the test in
     with runner.isolated_filesystem():
+        # Create a directory to store the input images
         input_folder = os.path.join(os.getcwd(), "input", "pytest")
         os.makedirs(input_folder)
 
+        # Copy the test images to the input folder
         copy_tree(os.path.abspath(os.path.join(__file__, "..",
                   "..", "..", "input", "pytest")), input_folder)
 
-        result = runner.invoke(enroll, ['input/pytest'])
+        # Run the enrollment command to create the enrollment data
+        enroll_result = runner.invoke(enroll, [input_folder])
 
-        assert "Enrollment finished!" in result.output
-        assert result.exit_code == 0
+        # Check that the enrollment command completed successfully
+        assert "Enrollment finished!" in enroll_result.output
+        assert enroll_result.exit_code == 0
 
-        result = runner.invoke(
-            search, ['input/pytest', "-d", "input/pytest", '--export'])
-
+        # Create a directory to store the output data
         output_folder = os.path.abspath(os.path.join(os.getcwd(), "output"))
 
-        assert result.exit_code == 0
+        # Run the search command again to check that the output is not overwritten
+        search_result = runner.invoke(
+            search, [input_folder, "-d", input_folder, '--export'])
+
+        assert search_result.exit_code == 0
         assert os.path.exists(output_folder)
 
 # Temporary disabled
