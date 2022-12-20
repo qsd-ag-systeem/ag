@@ -7,6 +7,9 @@ def export_all(file):
 
     query = "COPY (SELECT dataset,file_name,width,height,x,y,face_embedding FROM faces) TO STDOUT WITH CSV"
 
+    if not file.endswith('.csv'):
+        file = f"{file}.csv"
+
     with open(file, 'w') as f:
         db_cursor.copy_expert(query, f)
 
@@ -19,6 +22,9 @@ def export_dataset(file, datasets: tuple):
         "COPY (SELECT dataset,file_name,width,height,x,y,face_embedding FROM faces WHERE dataset in (%s)) TO STDOUT WITH CSV",
         datasets
     )
+
+    if not file.endswith('.csv'):
+        file = f"{file}.csv"
 
     with open(file, 'w') as f:
         db_cursor.copy_expert(query, f)
