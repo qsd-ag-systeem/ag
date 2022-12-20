@@ -48,6 +48,9 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
                 face_embeddings = get_face_embeddings(img, cuda)
 
                 for (key, face) in enumerate(face_embeddings):
+                    print(face["face_embedding"])
+                    exit(0)
+
                     try:
                         data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(
                             face["face_embedding"])

@@ -28,8 +28,8 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
 
     with click.progressbar(files, show_pos=True, show_percent=True, label="Initializing...") as bar:
         for file in bar:
+            process_file(folder, file, cuda)
             try:
-                process_file(folder, file, cuda)
                 bar.label = f"Processing: {os.path.relpath(file)}"
             except Exception as error:
                 bar.label = f"Error processing: {os.path.relpath(file)}"

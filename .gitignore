@@ -167,4 +167,4 @@ output/*
 !output/.gitkeep
 
 # Docker Compose data
-pg-data/
+*-data/

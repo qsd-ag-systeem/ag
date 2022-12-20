@@ -28,3 +28,4 @@ setuptools~=60.2.0
 Flask==2.2.2
 Flask-Cors==3.0.10
 python-slugify~=7.0.0
+elasticsearch~=8.5.3

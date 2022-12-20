@@ -1,10 +1,12 @@
 import os
+import time
 from typing import Optional
 import dlib
 import cv2
 from core.DbConnection import DbConnection
 from collections.abc import Callable
 
+from core.EsConnection import EsConnection
 from core.common import vec2list
 
 facerec = None
@@ -17,12 +19,32 @@ def use_cuda(enable_cuda: bool = False) -> bool:
 
 
 def insert_data(dataset, file_name, face_emb, width, height, x, y):
+    insert_data_es(dataset, file_name, face_emb, width, height, x, y)
+
+def insert_data_sql(dataset, file_name, face_emb, width, height, x, y):
     db = DbConnection()
     db_cursor = db.cursor
     db_cursor.execute(
         "INSERT INTO faces (dataset, file_name, face_embedding, width, height, x, y) VALUES (%s, %s, %s, %s, %s, point(%s, %s), point(%s, %s))",
         (dataset, file_name, face_emb, width, height, x[0], x[1], y[0], y[1])
     )
+
+def insert_data_es(dataset, file_name, face_emb, width, height, x, y):
+    es = EsConnection()
+
+    doc = {
+        "dataset": dataset,
+        "file_name": file_name,
+        "width": width,
+        "height": height,
+        "pos_top": x[0],
+        "pos_left": x[1],
+        "pos_right": x[0],
+        "pos_bottom": y[1],
+        "face_embedding": face_emb,
+    }
+
+    es.connection.create(index="face_recognition_v2", id=f"{dataset}-{file_name}-{str(time.time()).replace('.', '')}", body=doc)
 
 
 def init(cuda: bool) -> None:
