@@ -1,12 +1,22 @@
 from flask import Flask
+from flask_cors import CORS
+
 from api.routes.index import index
 from api.routes.enroll import enroll
+from api.routes.search import search
+from api.routes.directories import directories
 
 app = Flask(__name__)
+CORS(app)
 
 # API routes
 app.add_url_rule('/', 'index', index)
 app.add_url_rule('/enroll', 'enroll', enroll, methods=['POST'])
+app.add_url_rule('/search', 'search', search, methods=['POST'])
+
+app.add_url_rule('/directories', 'directories', directories)
+app.add_url_rule('/directories/', 'directories', directories)
+app.add_url_rule('/directories/<path:subpath>', 'directories', directories)
 
 
 @app.errorhandler(404)
