@@ -2,17 +2,13 @@ from flask import request
 from core.face_recognition import init, process_file, use_cuda
 from core.common import get_files
 import os
+from api.helpers.response import error_response, success_response
 
 
 def enroll():
     data = request.get_json()
-    if not "folder" in data:
-        return {
-            "success": False,
-            "message": "Folder is required"
-        }
-
-    res = {}
+    if "folder" not in data:
+        return error_response("Folder is required")
 
     folder = data["folder"]
     cuda = data["cuda"] if "cuda" in data else False
@@ -20,9 +16,7 @@ def enroll():
     folder_path = os.path.abspath(os.curdir + "/" + folder)
 
     if not os.path.exists(folder_path):
-        res["success"] = False
-        res["message"] = f"Folder \"{folder}\" does not exist!"
-        return res
+        return error_response(f"Folder \"{folder}\" does not exist!")
 
     files = get_files(folder_path)
 
@@ -31,12 +25,8 @@ def enroll():
 
     errors = []
 
-    res["success"] = True
-
     if len(files) == 0:
-        res["success"] = False
-        res["message"] = f"Folder {folder} is empty!"
-        return res
+        return error_response(f"Folder {folder} is empty!")
 
     for file in files:
         try:
@@ -45,7 +35,5 @@ def enroll():
             errors.append(error)
             pass
 
-    res["errors"] = errors
-    res["message"] = "Enrollment finished"
-
-    return res
+    # it is a success response but could still contain errors
+    return success_response(errors=errors)
