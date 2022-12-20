@@ -1,6 +1,6 @@
 import click
 from core.common import print_table
-from core.search import retrieve_datasets, delete_dataset
+from core.search import retrieve_datasets, delete
 
 
 @click.command("datasets", help="Geeft een lijst met alle beschikbare datasets.")
@@ -27,7 +27,7 @@ def delete_dataset(dataset: str, debug: bool, delete_files: bool) -> None:
     This command deletes a dataset.
     """
     try:
-        delete_dataset(dataset, delete_files)
+        delete(dataset, delete_files)
         click.echo(f"Dataset \"{dataset}\" removed successfully")
     except Exception as err:
         error = f": {err}" if debug else ""
