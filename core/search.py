@@ -50,3 +50,22 @@ def delete_dataset(dataset: str, delete_files: bool):
 
     query_string = "DELETE FROM faces WHERE dataset = %s"
     db_cursor.execute(query_string, (dataset,))
+
+
+def delete_img(img: str, delete_files: bool):
+    db = DbConnection()
+    db_cursor = db.cursor
+
+    query_string = "SELECT * FROM faces WHERE file_name = %s;"
+    db_cursor.execute(query_string, (img,))
+    result = db_cursor.fetchone()
+
+    if result[0] == 0:
+        raise Exception("Dataset not found")
+
+    if delete_files:
+        folder_path = os.path.abspath(os.curdir + "/" + img)
+        shutil.rmtree(folder_path)
+
+    query_string = "DELETE FROM faces WHERE file_name = %s"
+    db_cursor.execute(query_string, (img,))
