@@ -5,7 +5,7 @@ from core.search import retrieve_datasets, delete_dataset
 
 @click.command("datasets", help="Geeft een lijst met alle beschikbare datasets.")
 @click.option('--debug/--no-debug', default=False)
-def get_datasets(debug: bool) -> None:
+def get(debug: bool) -> None:
     """
     This command lists all available datasets.
     """

@@ -5,7 +5,7 @@ import click
 from core.setup_db import setup_db
 from cli.commands.enroll import enroll
 from cli.commands.search import search
-from cli.commands.datasets import delete_dataset, get_datasets
+from cli.commands.datasets import delete, get
 from cli.commands.export import export
 from cli.commands.import_dataset import import_dataset
 
@@ -20,7 +20,7 @@ def cli():
 cli.add_command(enroll)
 cli.add_command(search)
 cli.add_command(get_datasets)
-cli.add_command(delete_dataset)
+cli.add_command(delete)
 cli.add_command(export)
 cli.add_command(import_dataset)
 
