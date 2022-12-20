@@ -8,11 +8,9 @@ def get():
         data = [{'name': ds[0], 'count': ds[1]} for ds in datasets]
         return success_response(data)
     except:
-        errors = ['An error occurred while fetching the datasets']
-        return error_response(errors)
+        return error_response('An error occurred while fetching the datasets')
 
 
 # delete datasets here as well
 def delete():
-    errors = ['Not yet implemented']
-    return error_response(errors)
+    return error_response('Not yet implemented')
