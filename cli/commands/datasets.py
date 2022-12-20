@@ -22,7 +22,7 @@ def get_datasets(debug: bool) -> None:
 @click.argument('dataset', type=str)
 @click.option('--debug/--no-debug', default=False)
 @click.option('--delete-files/--no-delete-files', default=False)
-def delete_dataset(dataset: str, debug: bool, delete_files: bool) -> None:
+def delete(dataset: str, debug: bool, delete_files: bool) -> None:
     """
     This command deletes a dataset.
     """
