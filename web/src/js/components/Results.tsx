@@ -10,6 +10,7 @@ const useStyles = createStyles(theme => ({
     borderRadius: theme.radius.md,
     gap: theme.spacing.sm,
     overflowX: "scroll",
+    gridArea: "results",
   },
 }));
 
