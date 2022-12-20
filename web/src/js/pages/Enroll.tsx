@@ -1,8 +1,11 @@
-import { Container, Title, Input, Text, Button, SimpleGrid, Transition, Paper } from "@mantine/core";
+import { Container, Title, Input, Text, Button, SimpleGrid, Transition, Paper, Progress } from "@mantine/core";
 import DirectoryBrowser from "../components/DirectoryBrowser";
 import { enroll } from "../api/enroll";
 import { IconPlus, IconX } from "@tabler/icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import io from "socket.io-client";
+
+const socket = io("http://localhost:5000");
 
 export default function Enroll() {
   const EnrollStatus = {
@@ -15,17 +18,22 @@ export default function Enroll() {
   const [location, setLocation] = useState("");
   const [enrollStatus, setEnrollStatus] = useState(EnrollStatus.Idle);
   const [enrollError, setEnrollError] = useState<string | null>(null);
+  const [enrollData, setEnrollData] = useState<any>(null);
+  const [failedFiles, setFailedFiles] = useState<string[]>([]);
+  const [enrollFolder, setEnrollFolder] = useState<string>("");
+
 
   const handleEnroll = async () => {
     setEnrollStatus(EnrollStatus.Enrolling);
     setEnrollError(null);
+    setEnrollData(null);
+    setFailedFiles([]);
+    setEnrollFolder(location + "");
+
+    console.log("Enroll folder " + enrollFolder + ", location: " + location);
 
     try {
       const data = await enroll(location);
-      if (data.success === false) {
-        throw new Error(data.message);
-      }
-      setEnrollStatus(EnrollStatus.Enrolled);
       console.log(data);
     } catch (e: any) {
       setEnrollStatus(EnrollStatus.Idle);
@@ -38,6 +46,37 @@ export default function Enroll() {
   const onDirectoryChange = (dir: string) => {
     setLocation(dir);
   };
+
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("connected to socket");
+    })
+
+    socket.on("enroll", (data: any) => {
+      console.log(data);
+
+      // if (data.folder !== enrollFolder) {
+      //   console.log(data.folder + " !== " + enrollFolder)
+      //   return;
+      // }
+
+      if (data.success === false) {
+        setFailedFiles((prev) => [...prev, data.file]);
+      }
+
+      if (data.current === data.total) {
+        setEnrollStatus(EnrollStatus.Enrolled);
+      }
+      
+      setEnrollData(data);
+    })
+
+    return () => {
+      socket.off("connect");
+      socket.off("enroll");
+    }
+  }, []);
+
 
   return (
     <Container fluid>
@@ -74,6 +113,31 @@ export default function Enroll() {
         </Button>
         <Button color="red" variant="outline" leftIcon={<IconX size={14} />}>Annuleren</Button>
       </SimpleGrid>
+      {enrollStatus !== EnrollStatus.Idle && enrollData !== null && (
+        <div>
+          <div style={{ marginTop: 15 }}>
+            <div style={{ marginBottom: 10 }}>
+              <Text>
+                File: {enrollData?.file}
+              </Text>
+            </div>
+            <Progress size="xl" value={
+              enrollData?.current !== undefined ? (enrollData.current / enrollData.total) * 100 : 0
+            } striped animate />
+          </div>
+
+          <Text>Failed files:</Text>
+          <div style={{ marginTop: 15, overflowY: "auto", maxHeight: 300, backgroundColor: "#CCC", borderRadius: "15px", padding: "10px" }}>
+            <Text>
+              {failedFiles.map((file, i) => (
+                <div key={i}>
+                  {file}
+                </div>
+              ))}
+            </Text>
+          </div>
+        </div>
+      )}
     </Container>
   );
 }

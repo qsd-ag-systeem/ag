@@ -1,6 +1,7 @@
 from flask import request
 from core.face_recognition import init, process_file, use_cuda
 from core.common import get_files
+from flask import current_app
 import os
 
 
@@ -37,15 +38,30 @@ def enroll():
         res["success"] = False
         res["message"] = f"Folder {folder} is empty!"
         return res
+    
+    total = len(files)
+    current = 0
 
     for file in files:
+        success = True
+        current += 1
+
         try:
             process_file(folder, file, cuda)
         except Exception as error:
             errors.append(error)
+            success = False
             pass
-
-    res["errors"] = errors
+        
+        socketio = current_app.extensions['socketio']
+        socketio.emit('enroll', {
+            "success": success,
+            "current": current,
+            "total": total,
+            "file": file.name,
+            "folder": folder
+        })
+    
     res["message"] = "Enrollment finished"
 
     return res
