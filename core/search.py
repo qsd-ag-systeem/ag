@@ -33,7 +33,7 @@ def retrieve_datasets():
     result = db_cursor.fetchall()
     return result
 
-def delete(dataset: str, delete_files: bool):
+def delete_dataset(dataset: str, delete_files: bool):
     db = DbConnection()
     db_cursor = db.cursor
     
