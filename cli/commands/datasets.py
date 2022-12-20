@@ -5,7 +5,7 @@ from core.search import retrieve_datasets, delete
 
 @click.command("datasets", help="Geeft een lijst met alle beschikbare datasets.")
 @click.option('--debug/--no-debug', default=False)
-def get_datasets(debug: bool) -> None:
+def get(debug: bool) -> None:
     """
     This command lists all available datasets.
     """
@@ -22,7 +22,7 @@ def get_datasets(debug: bool) -> None:
 @click.argument('dataset', type=str)
 @click.option('--debug/--no-debug', default=False)
 @click.option('--delete-files/--no-delete-files', default=False)
-def delete_dataset(dataset: str, debug: bool, delete_files: bool) -> None:
+def delete(dataset: str, debug: bool, delete_files: bool) -> None:
     """
     This command deletes a dataset.
     """
