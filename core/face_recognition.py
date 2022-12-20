@@ -37,7 +37,8 @@ def init(cuda: bool) -> None:
     facerec = dlib.face_recognition_model_v1(face_rec_model_path)
     shape_predictor = dlib.shape_predictor(predictor_path)
 
-    face_detector = dlib.cnn_face_detection_model_v1(detector_path) if cuda else dlib.get_frontal_face_detector()
+    face_detector = dlib.cnn_face_detection_model_v1(
+        detector_path) if cuda else dlib.get_frontal_face_detector()
 
 
 def process_file(dataset, file, cuda: bool = False) -> bool:
@@ -46,11 +47,13 @@ def process_file(dataset, file, cuda: bool = False) -> bool:
     face_embeddings = get_face_embeddings(img, cuda)
 
     for face_emb in face_embeddings:
-        insert_data(dataset, file.name, face_emb["face_embedding"], face_emb["width"], face_emb["height"], face_emb["x"], face_emb["y"])
+        insert_data(dataset, file.name, face_emb["face_embedding"],
+                    face_emb["width"], face_emb["height"], face_emb["x"], face_emb["y"])
 
     return True
 
-def search_file(file, dataset, cuda = False):
+
+def search_file(file, dataset, cuda=False):
     result = []
     file_path = str(file.resolve())
     file_name = str(file.name)
@@ -58,12 +61,15 @@ def search_file(file, dataset, cuda = False):
     face_embeddings = get_face_embeddings(img, cuda)
 
     for (key, face) in enumerate(face_embeddings):
-        data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(face["face_embedding"])
+        data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(
+            face["face_embedding"])
 
         for row in data:
-            result.append([file_name, row[0], row[1], row[2], round(100 - (row[5] * 100), 2), row[3], row[4]])
-            
+            result.append([file_name, row[0], row[1], row[2], round(
+                100 - (row[5] * 100), 2), row[3], row[4]])
+
     return result
+
 
 def get_face_embeddings(img, cuda: bool):
     face_embeddings = []
@@ -87,6 +93,7 @@ def get_face_embeddings(img, cuda: bool):
         y = (rect.right(), rect.bottom())
 
         if len(face_emb) == 128:
-            face_embeddings.append({"face_embedding": face_emb, "width": width, "height": height, "x": x, "y": y})
+            face_embeddings.append(
+                {"face_embedding": face_emb, "width": width, "height": height, "x": x, "y": y})
 
     return face_embeddings
