@@ -39,15 +39,15 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
 
     with click.progressbar(files, show_pos=True, show_percent=True, label="Initializing...") as bar:
         for file in bar:
-            # try:
+            try:
                 results.extend(search_file(file, dataset, cuda))
 
                 bar.label = f"Processing: {os.path.relpath(file)}"
-            # except Exception as error:
-            #     bar.label = f"Error processing: {os.path.relpath(file)}"
-            #     errors.append(error)
+            except Exception as error:
+                bar.label = f"Error processing: {os.path.relpath(file)}"
+                errors.append(error)
 
-            #     pass
+                pass
 
         results_size = len(results)
 
