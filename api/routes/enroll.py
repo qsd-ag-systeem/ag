@@ -36,4 +36,4 @@ def enroll():
             pass
 
     # it is a success response but could still contain errors
-    return success_response({"errors": errors})
+    return success_response(errors=errors)

@@ -49,4 +49,4 @@ def search():
             errors.append(str(error))
             pass
 
-    return success_response({"result": result, "errors": errors})
+    return success_response(result, errors)
