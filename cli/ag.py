@@ -19,7 +19,7 @@ def cli():
 
 cli.add_command(enroll)
 cli.add_command(search)
-cli.add_command(get_datasets)
+cli.add_command(get)
 cli.add_command(delete)
 cli.add_command(export)
 cli.add_command(import_dataset)
