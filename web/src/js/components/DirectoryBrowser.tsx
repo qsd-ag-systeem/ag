@@ -37,8 +37,8 @@ export default function DirectoryBrowser() {
               </Anchor>
             </Text>
           )}
-          {data.map((item: string) => (
-            <Text>
+          {data.data.map((item: string) => (
+            <Text key={Math.random()}>
               <Anchor onClick={() => setCurrentDir(item)}>{item}</Anchor>
             </Text>
           ))}

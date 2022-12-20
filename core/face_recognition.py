@@ -2,9 +2,10 @@ import os
 from typing import Optional
 import dlib
 import cv2
-from core.DbConnection import DbConnection
 from collections.abc import Callable
-
+from psycopg2 import Error
+import core.db as db
+from core.model.face import Face
 from core.common import vec2list
 from core.search import retrieve_all_data, retrieve_data
 
@@ -18,12 +19,11 @@ def use_cuda(enable_cuda: bool = False) -> bool:
 
 
 def insert_data(dataset, file_name, face_emb, width, height, x, y):
-    db = DbConnection()
-    db_cursor = db.cursor
-    db_cursor.execute(
-        "INSERT INTO faces (dataset, file_name, face_embedding, width, height, x, y) VALUES (%s, %s, %s, %s, %s, point(%s, %s), point(%s, %s))",
-        (dataset, file_name, face_emb, width, height, x[0], x[1], y[0], y[1])
-    )
+    session = db.Session()
+    face = Face(dataset, file_name, width, height, x, y, face_emb)
+    session.add(face)
+    session.commit()
+    session.close()
 
 
 def init(cuda: bool) -> None:
@@ -64,9 +64,11 @@ def search_file(file, dataset, cuda=False):
         data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(
             face["face_embedding"])
 
-        for row in data:
-            result.append([file_name, row[0], row[1], row[2], round(
-                100 - (row[5] * 100), 2), row[3], row[4]])
+        for (i, row) in enumerate(data):
+            row = data[i][0]
+            score = data[i][1]
+            result.append([file_name, row.id, row.dataset, row.file_name, round(
+                100 - (score * 100), 2), row.x, row.y])
 
     return result
 
