@@ -10,7 +10,11 @@ def import_dataset(file_name: str) -> None:
     """
     Imports datasets from a csv file into the database.
     """
-    file_path = os.path.join(os.getcwd(), "input", f"{file_name}.csv")
+
+    if not file_name.endswith('.csv'):
+        file_name = f"{file_name}.csv"
+
+    file_path = os.path.join(os.getcwd(), f"{file_name}")
     file = Path(file_path)
 
     if not file.is_file():
