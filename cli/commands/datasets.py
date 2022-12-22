@@ -20,15 +20,20 @@ def get(debug: bool) -> None:
 
 @click.command("delete", help="Verwijdert een dataset.")
 @click.argument('dataset', type=str)
+@click.option('-f', '--file', type=str, default=None)
 @click.option('--debug/--no-debug', default=False)
 @click.option('--delete-files/--no-delete-files', default=False)
-def delete(dataset: str, debug: bool, delete_files: bool) -> None:
+def delete(dataset: str, file: str, debug: bool, delete_files: bool) -> None:
     """
     This command deletes a dataset.
     """
     try:
-        delete_dataset(dataset, delete_files)
-        click.echo(f"Dataset \"{dataset}\" removed successfully")
+        delete_dataset(dataset, file, delete_files)
+
+        if file:
+            click.echo(f"File \"{file}\" in dataset \"{dataset}\" removed successfully")
+        else:
+            click.echo(f"Dataset \"{dataset}\" removed successfully")
     except Exception as err:
         error = f": {err}" if debug else ""
         click.echo(
