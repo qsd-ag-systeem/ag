@@ -31,11 +31,20 @@ def search():
 
     for file in files:
         try:
-            search_results = search_file(
+            get_file_result(cuda, dataset, result, file)
+
+        except Exception as error:
+            errors.append(str(error))
+            pass
+
+    return success_response(result, errors)
+
+def get_file_result(cuda, dataset, result, file):
+    search_results = search_file(
                 file, dataset, cuda)
 
-            for search_result in search_results:
-                result.append({
+    for search_result in search_results:
+        result.append({
                     "input_file": search_result[0],
                     "id": search_result[1],
                     "dataset": search_result[2],
@@ -44,9 +53,3 @@ def search():
                     "left_bound": search_result[5],
                     "right_bound": search_result[6],
                 })
-
-        except Exception as error:
-            errors.append(str(error))
-            pass
-
-    return success_response(result, errors)

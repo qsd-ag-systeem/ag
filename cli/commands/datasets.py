@@ -12,6 +12,7 @@ def get(debug: bool) -> None:
     try:
         rows = retrieve_datasets()
         print_table(["Name", "Enrolled images"], rows)
+        
     except Exception as err:
         error = f": {err}" if debug else ""
         click.echo(

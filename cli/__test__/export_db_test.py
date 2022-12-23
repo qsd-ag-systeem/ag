@@ -18,6 +18,7 @@ def runner():
 def test_export_creates_output_dir(runner: CliRunner):
     with runner.isolated_filesystem():
         result = runner.invoke(export, ['example'])
+
         assert result.exit_code == 0
         assert os.path.isdir(os.path.join(os.getcwd(), "output"))
 
@@ -53,12 +54,14 @@ def test_export_generates_expected_output(runner: CliRunner):
         # Enrolling test dataset with one image
         enroll_result = runner.invoke(
             enroll, [dataset, '--no-cuda', "--debug"])
+
         assert enroll_result.exit_code == 0
 
         date = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
         # Running export command with variable date as argument, using only dataset input/pytest in debug mode.
         export_result = runner.invoke(export, [date, "-d", dataset, "--debug"])
+        
         assert export_result.exit_code == 0
 
         output_file = os.path.join(os.getcwd(), "output", f"{date}.csv")
@@ -75,5 +78,6 @@ def test_export_generates_expected_output(runner: CliRunner):
 
 def test_export_handles_errors(runner: CliRunner):
     result = runner.invoke(export)
+
     assert result.exit_code == 2  # exit code 2 indicates a user error
     assert "Error: Missing argument 'FILE_NAME'." in result.output

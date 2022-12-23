@@ -41,19 +41,13 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
         for file in bar:
             try:
                 results.extend(search_file(file, dataset, cuda))
-
                 bar.label = f"Processing: {os.path.relpath(file)}"
+
             except Exception as error:
                 bar.label = f"Error processing: {os.path.relpath(file)}"
                 errors.append(error)
 
                 pass
-
-        results_size = len(results)
-
-        if results_size == 0:
-            click.echo("No matches found")
-            return
 
         columns = ["Input file", "ID", "Dataset", "File name",
                    "Similarity (%)", "Left top", "Right bottom"]
@@ -62,48 +56,61 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
 
         if export:
             try:
-                # Get todays date and time
-                now = datetime.now()
+                export_results(results, columns)
 
-                date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
-
-                output_folder = os.path.abspath(
-                    os.path.join(os.getcwd(), "output"))
-
-                if not os.path.exists(output_folder):
-                    os.mkdir(output_folder)
-
-                file = f"{date_time}_search-results.csv"
-
-                click.echo(
-                    f"\nExporting results to {click.format_filename(file)}", nl=True)
-
-                path = os.path.join(
-                    output_folder, file)
-
-                with open(path, 'w', newline='', encoding='utf-8') as file:
-                    writer = csv.writer(file)
-                    writer.writerow(columns)
-                    writer.writerows(results)
             except Exception as err:
                 errors.append(err)
                 click.echo(
                     "Something went wrong while exporting the results", err=True)
+
         else:
-            for rows in range(ceil(results_size / limit)):
-                continue_file = 'y'
-
-                if rows > 0:
-                    continue_file = click.prompt(
-                        f"Resultaat {((rows - 1) * limit) + 1} t/m {min((rows - 1) * limit + limit, results_size)} van {results_size} worden weergegeven. Will je de volgende {min(limit, results_size - rows * limit)} matches zien?",
-                        default='y', show_default=False, type=click.Choice(['y', 'n']), show_choices=True)
-
-                if continue_file == 'n':
-                    break
-
-                print_table(
-                    columns, results[rows * limit:rows * limit + limit])
+            print_results(limit, results, columns)
 
     if debug:
         for error in errors:
             click.echo(error)
+
+def print_results(limit, results, columns):
+    results_size = len(results)
+
+    if results_size == 0:
+        click.echo("No matches found")
+        return
+
+    for rows in range(ceil(results_size / limit)):
+        continue_file = 'y'
+
+        if rows > 0:
+            continue_file = click.prompt(
+                        f"Resultaat {((rows - 1) * limit) + 1} t/m {min((rows - 1) * limit + limit, results_size)} van {results_size} worden weergegeven. Will je de volgende {min(limit, results_size - rows * limit)} matches zien?",
+                        default='y', show_default=False, type=click.Choice(['y', 'n']), show_choices=True)
+
+        if continue_file == 'n':
+            break
+
+        print_table(
+                    columns, results[rows * limit:rows * limit + limit])
+
+def export_results(results, columns):
+    now = datetime.now()
+
+    date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
+
+    output_folder = os.path.abspath(
+                    os.path.join(os.getcwd(), "output"))
+
+    if not os.path.exists(output_folder):
+        os.mkdir(output_folder)
+
+    file = f"{date_time}_search-results.csv"
+
+    click.echo(
+                    f"\nExporting results to {click.format_filename(file)}", nl=True)
+
+    path = os.path.join(
+                    output_folder, file)
+
+    with open(path, 'w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow(columns)
+        writer.writerows(results)
