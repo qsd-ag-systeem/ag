@@ -1,5 +1,4 @@
 from distutils.dir_util import copy_tree
-from pathlib import Path
 from click.testing import CliRunner
 from cli.ag import enroll, search
 import os
@@ -29,7 +28,7 @@ def test_search_export_output_created(runner: CliRunner):
 
         result = runner.invoke(enroll, ['input/pytest'])
 
-        assert "Enrollment finished!" in result.output
+        assert "Enrollment finished" in result.output
         assert result.exit_code == 0
 
         result = runner.invoke(
@@ -61,7 +60,7 @@ def test_search_export_no_match(runner: CliRunner):
 
         result = runner.invoke(enroll, ['input/pytest'])
 
-        assert "Enrollment finished!" in result.output
+        assert "Enrollment finished" in result.output
         assert result.exit_code == 0
 
         result = runner.invoke(

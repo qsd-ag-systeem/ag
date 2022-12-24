@@ -1,9 +1,7 @@
 import os
-import time
 from typing import Optional
 import dlib
 import cv2
-from core.DbConnection import DbConnection
 from collections.abc import Callable
 
 from core.EsConnection import EsConnection
@@ -18,33 +16,20 @@ def use_cuda(enable_cuda: bool = False) -> bool:
     return dlib.DLIB_USE_CUDA and enable_cuda
 
 
-def insert_data(dataset, file_name, face_emb, width, height, x, y):
-    insert_data_es(dataset, file_name, face_emb, width, height, x, y)
-
-def insert_data_sql(dataset, file_name, face_emb, width, height, x, y):
-    db = DbConnection()
-    db_cursor = db.cursor
-    db_cursor.execute(
-        "INSERT INTO faces (dataset, file_name, face_embedding, width, height, x, y) VALUES (%s, %s, %s, %s, %s, point(%s, %s), point(%s, %s))",
-        (dataset, file_name, face_emb, width, height, x[0], x[1], y[0], y[1])
-    )
-
-def insert_data_es(dataset, file_name, face_emb, width, height, x, y):
+def insert_data(dataset, file_name, face_emb, width, height, x, y, key=0):
     es = EsConnection()
 
+    doc_id = f"{dataset}/{file_name}-{key}"
     doc = {
         "dataset": dataset,
         "file_name": file_name,
         "width": width,
         "height": height,
-        "pos_top": x[0],
-        "pos_left": x[1],
-        "pos_right": x[0],
-        "pos_bottom": y[1],
+        "top_left": x,
+        "bottom_right": y,
         "face_embedding": face_emb,
     }
-
-    es.connection.create(index="face_recognition_v2", id=f"{dataset}-{file_name}-{str(time.time()).replace('.', '')}", body=doc)
+    es.connection.update(index=es.index_name, id=doc_id, doc=doc, doc_as_upsert=True)
 
 
 def init(cuda: bool) -> None:
@@ -58,7 +43,8 @@ def init(cuda: bool) -> None:
     facerec = dlib.face_recognition_model_v1(face_rec_model_path)
     shape_predictor = dlib.shape_predictor(predictor_path)
 
-    face_detector = dlib.cnn_face_detection_model_v1(detector_path) if cuda else dlib.get_frontal_face_detector()
+    face_detector = dlib.cnn_face_detection_model_v1(
+        detector_path) if cuda else dlib.get_frontal_face_detector()
 
 
 def process_file(dataset, file, cuda: bool = False) -> bool:
@@ -66,8 +52,17 @@ def process_file(dataset, file, cuda: bool = False) -> bool:
     img = cv2.imread(file_name)
     face_embeddings = get_face_embeddings(img, cuda)
 
-    for face_emb in face_embeddings:
-        insert_data(dataset, file.name, face_emb["face_embedding"], face_emb["width"], face_emb["height"], face_emb["x"], face_emb["y"])
+    for (key, face_emb) in enumerate(face_embeddings):
+        insert_data(
+            dataset,
+            file.name,
+            face_emb["face_embedding"],
+            face_emb["width"],
+            face_emb["height"],
+            face_emb["x"],
+            face_emb["y"],
+            key
+        )
 
     return True
 
@@ -94,6 +89,7 @@ def get_face_embeddings(img, cuda: bool):
         y = (rect.right(), rect.bottom())
 
         if len(face_emb) == 128:
-            face_embeddings.append({"face_embedding": face_emb, "width": width, "height": height, "x": x, "y": y})
+            face_embeddings.append(
+                {"face_embedding": face_emb, "width": width, "height": height, "x": x, "y": y})
 
     return face_embeddings

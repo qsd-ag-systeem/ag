@@ -1,7 +1,11 @@
 from elasticsearch import Elasticsearch
 
+
 class EsConnection(object):
     connection = None
+    index_name = "face_recognition"
+    default_size = 100
+    default_scroll_time = "1m"
 
     def __init__(self):
         try:

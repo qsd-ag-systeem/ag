@@ -17,7 +17,8 @@ from core.search import retrieve_data, retrieve_all_data
               help="Het maximaal aantal matches dat tegelijk wordt getoond, default 10.")
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
-@click.option('--export', '-E', type=bool, default=False, is_flag=True, help="Exporteer de resultaten naar een csv bestand")
+@click.option('--export', '-E', type=bool, default=False, is_flag=True,
+              help="Exporteer de resultaten naar een csv bestand")
 def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, export: bool) -> None:
     """
     Search for similar faces in the database of the given image(s).
@@ -43,26 +44,29 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
             try:
                 file_path = str(file.resolve())
                 file_name = str(file.name)
-                # pylint: disable=E1101
                 img = cv2.imread(file_path)
                 face_embeddings = get_face_embeddings(img, cuda)
 
                 for (key, face) in enumerate(face_embeddings):
-                    print(face["face_embedding"])
-                    exit(0)
-
                     try:
-                        data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(
-                            face["face_embedding"])
+                        data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(face["face_embedding"])
 
-                        for row in data:
-                            results.append(
-                                [file_name, row[0], row[1], row[2], round(100 - (row[5] * 100), 2), row[3], row[4]])
+                        for row in data["hits"]["hits"]:
+                            results.append([
+                                file_name,
+                                row["_id"],
+                                row["_source"]["dataset"],
+                                row["_source"]["file_name"],
+                                round(row["_score"] * 100),
+                                str(row["_source"]["top_left"]),
+                                str(row["_source"]["bottom_right"]),
+                            ])
                     except Exception as err:
                         errors.append(
-                            f"An error occurred while retrieving the data of face #{key + 1} in image {file_name}: {err}")
+                            f"An error occurred while retrieving the data of face #{key + 1} in image {file_name}: {err}"
+                        )
 
-                bar.label = f"Processing: {os.path.relpath(file)}"
+                    bar.label = f"Processing: {os.path.relpath(file)}"
             except Exception as error:
                 bar.label = f"Error processing: {os.path.relpath(file)}"
                 errors.append(error)
@@ -75,14 +79,13 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
             click.echo("No matches found")
             return
 
-        columns = ["Input file", "ID", "Dataset", "File name",
-                   "Similarity (%)", "Left top", "Right bottom"]
+        columns = ["Input file", "ID", "Dataset", "File name", "Similarity (%)", "Left top", "Right bottom"]
 
         results = sorted(results, key=lambda x: x[4], reverse=True)
 
         if export:
             try:
-                # Get todays date and time
+                # Get today's date and time
                 now = datetime.now()
 
                 date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
@@ -95,8 +98,7 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
 
                 file = f"{date_time}_search-results.csv"
 
-                click.echo(
-                    f"\nExporting results to {click.format_filename(file)}", nl=True)
+                click.echo(f"\nExporting results to {click.format_filename(file)}", nl=True)
 
                 path = os.path.join(
                     output_folder, file)
@@ -121,8 +123,9 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
                 if continue_file == 'n':
                     break
 
-                print_table(
-                    columns, results[rows * limit:rows * limit + limit])
+                print()
+                print()
+                print_table(columns, results[rows * limit:rows * limit + limit])
 
     if debug:
         for error in errors:

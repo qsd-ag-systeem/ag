@@ -6,14 +6,21 @@ jobs:
     runs-on: ubuntu-18.04
 
     services:
-      postgresql:
-        image: postgres:15-alpine
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.5.3
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          xpack.security.enabled: false
+          discovery.type: single-node
+          ELASTIC_PASSWORD: elastic
+          LICENSE: basic
         ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+          - "9200:9200"
+          - "9300:9300"
+        options: >-
+          --health-cmd "curl http://localhost:9200/_cluster/health"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - uses: actions/checkout@v3
