@@ -7,7 +7,7 @@ cmake==3.25.0
 colorama==0.4.6
 coverage==6.5.0
 dlib==19.24.0
-exceptiongroup==1.0.4
+exceptiongroup==1.1.0
 execnet==1.9.0
 grapheme==0.6.0
 imutils==0.5.4
