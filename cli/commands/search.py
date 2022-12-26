@@ -5,7 +5,7 @@ from math import ceil
 import click
 import cv2
 from core.common import get_files, print_table
-from core.face_recognition import init, use_cuda, get_face_embeddings
+from core.face_recognition import init, use_cuda, get_face_embeddings, search_file
 from core.search import retrieve_data, retrieve_all_data
 
 
@@ -42,31 +42,8 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
     with click.progressbar(files, show_pos=True, show_percent=True, label="Initializing...") as bar:
         for file in bar:
             try:
-                file_path = str(file.resolve())
-                file_name = str(file.name)
-                img = cv2.imread(file_path)
-                face_embeddings = get_face_embeddings(img, cuda)
-
-                for (key, face) in enumerate(face_embeddings):
-                    try:
-                        data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(face["face_embedding"])
-
-                        for row in data["hits"]["hits"]:
-                            results.append([
-                                file_name,
-                                row["_id"],
-                                row["_source"]["dataset"],
-                                row["_source"]["file_name"],
-                                round(row["_score"] * 100),
-                                str(row["_source"]["top_left"]),
-                                str(row["_source"]["bottom_right"]),
-                            ])
-                    except Exception as err:
-                        errors.append(
-                            f"An error occurred while retrieving the data of face #{key + 1} in image {file_name}: {err}"
-                        )
-
-                    bar.label = f"Processing: {os.path.relpath(file)}"
+                bar.label = f"Processing: {os.path.relpath(file)}"
+                results.extend(search_file(file, dataset, cuda))
             except Exception as error:
                 bar.label = f"Error processing: {os.path.relpath(file)}"
                 errors.append(error)
@@ -86,12 +63,9 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
         if export:
             try:
                 # Get today's date and time
-                now = datetime.now()
+                date_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-                date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
-
-                output_folder = os.path.abspath(
-                    os.path.join(os.getcwd(), "output"))
+                output_folder = os.path.abspath(os.path.join(os.getcwd(), "output"))
 
                 if not os.path.exists(output_folder):
                     os.mkdir(output_folder)
@@ -100,8 +74,7 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
 
                 click.echo(f"\nExporting results to {click.format_filename(file)}", nl=True)
 
-                path = os.path.join(
-                    output_folder, file)
+                path = os.path.join(output_folder, file)
 
                 with open(path, 'w', newline='', encoding='utf-8') as file:
                     writer = csv.writer(file)
@@ -109,8 +82,7 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
                     writer.writerows(results)
             except Exception as err:
                 errors.append(err)
-                click.echo(
-                    "Something went wrong while exporting the results", err=True)
+                click.echo("Something went wrong while exporting the results", err=True)
         else:
             for rows in range(ceil(results_size / limit)):
                 continue_file = 'y'
@@ -125,7 +97,8 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
 
                 print()
                 print()
-                print_table(columns, results[rows * limit:rows * limit + limit])
+                print_table(
+                    columns, results[rows * limit:rows * limit + limit])
 
     if debug:
         for error in errors:

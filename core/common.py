@@ -6,7 +6,11 @@ from core.EsConnection import EsConnection
 
 
 def get_files(abs_path: str):
-    return list((x for x in Path(abs_path).iterdir() if x.is_file() and not x.name.startswith(".")))
+    path = Path(abs_path)
+    if (path.is_dir()):
+        return list((x for x in path.iterdir() if x.is_file() and not x.name.startswith(".")))
+    elif (path.is_file() and not path.name.startswith(".")):
+        return [path]
 
 
 def print_table(columns, values):

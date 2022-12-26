@@ -23,8 +23,9 @@ def test_search_export_output_created(runner: CliRunner):
         input_folder = os.path.join(os.getcwd(), "input", "pytest")
         os.makedirs(input_folder)
 
-        copy_tree(os.path.abspath(os.path.join(__file__, "..",
-                  "..", "..", "input", "pytest")), input_folder)
+        copy_tree(os.path.abspath(os.path.join(
+            __file__, "..", "..", "..", "input", "pytest"
+        )), input_folder)
 
         result = runner.invoke(enroll, ['input/pytest'])
 
@@ -38,32 +39,3 @@ def test_search_export_output_created(runner: CliRunner):
 
         assert result.exit_code == 0
         assert os.path.exists(output_folder)
-
-
-def test_search_export_no_match(runner: CliRunner):
-    # Create test folder with fake images
-    with runner.isolated_filesystem():
-        os.mkdir('exists')
-        with open('exists/test1.jpg', 'w') as f:
-            f.write('test')
-        with open('exists/test2.png', 'w') as f:
-            f.write('test')
-        with open('exists/test3.jpeg', 'w') as f:
-            f.write('test')
-        result = runner.invoke(enroll, ['exists'])
-
-        input_folder = os.path.join(os.getcwd(), "input", "pytest")
-        os.makedirs(input_folder)
-
-        copy_tree(os.path.abspath(os.path.join(__file__, "..",
-                  "..", "..", "input", "pytest")), input_folder)
-
-        result = runner.invoke(enroll, ['input/pytest'])
-
-        assert "Enrollment finished" in result.output
-        assert result.exit_code == 0
-
-        result = runner.invoke(
-            search, ['exists', "-d", "input/pytest", '--export'])
-
-        assert "No matches found" in result.output

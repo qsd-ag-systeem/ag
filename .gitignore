@@ -165,6 +165,3 @@ input/*
 
 output/*
 !output/.gitkeep
-
-# Docker Compose data
-*-data/

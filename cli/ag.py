@@ -7,7 +7,7 @@ from halo import Halo
 from core.setup_db import ensure_index_exists, ensure_db_running
 from cli.commands.enroll import enroll
 from cli.commands.search import search
-from cli.commands.datasets import delete_dataset, get_datasets
+from cli.commands.datasets import get_datasets, delete_dataset
 from cli.commands.export_dataset import export_dataset
 from cli.commands.import_dataset import import_dataset
 
@@ -18,6 +18,7 @@ def cli():
     CLI group for the face recognition application.
     """
     init_app()
+
 
 @cli.command(hidden=True)
 def setup():
@@ -32,7 +33,7 @@ def init_app():
         ensure_db_running()
         ensure_index_exists()
     except Exception as e:
-        spinner.fail("Failed to initialize application.")
+        spinner.fail("Failed to initialize application. Is Docker running?")
         click.echo(e, err=True)
         exit(1)
 

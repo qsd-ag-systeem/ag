@@ -6,6 +6,7 @@ from collections.abc import Callable
 
 from core.EsConnection import EsConnection
 from core.common import vec2list
+from core.search import retrieve_all_data, retrieve_data
 
 facerec = None
 shape_predictor: Optional[Callable] = None
@@ -67,6 +68,36 @@ def process_file(dataset, file, cuda: bool = False) -> bool:
     return True
 
 
+def search_file(file, dataset, cuda=False):
+    results = []
+    file_path = str(file.resolve())
+    file_name = str(file.name)
+    img = cv2.imread(file_path)
+    face_embeddings = get_face_embeddings(img, cuda)
+
+    for (key, face) in enumerate(face_embeddings):
+        try:
+            if dataset:
+                data = retrieve_data(face["face_embedding"], dataset)
+            else:
+                data = retrieve_all_data(face["face_embedding"])
+
+            for row in data["hits"]["hits"]:
+                results.append([
+                    file_name,
+                    row["_id"],
+                    row["_source"]["dataset"],
+                    row["_source"]["file_name"],
+                    round(row["_score"] * 100),
+                    str(row["_source"]["top_left"]),
+                    str(row["_source"]["bottom_right"]),
+                ])
+        except:
+            pass
+
+    return results
+
+
 def get_face_embeddings(img, cuda: bool):
     face_embeddings = []
 
@@ -89,7 +120,12 @@ def get_face_embeddings(img, cuda: bool):
         y = (rect.right(), rect.bottom())
 
         if len(face_emb) == 128:
-            face_embeddings.append(
-                {"face_embedding": face_emb, "width": width, "height": height, "x": x, "y": y})
+            face_embeddings.append({
+                "face_embedding": face_emb,
+                "width": width,
+                "height": height,
+                "x": x,
+                "y": y
+            })
 
     return face_embeddings
