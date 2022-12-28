@@ -1,10 +1,8 @@
 import csv
-
 import numpy as np
-
-from core.EsConnection import EsConnection
 from elasticsearch import helpers
 
+from core.EsConnection import EsConnection
 from core.common import refresh_index
 
 

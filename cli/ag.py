@@ -10,6 +10,7 @@ from cli.commands.search import search
 from cli.commands.datasets import get_datasets, delete_dataset
 from cli.commands.export_dataset import export_dataset
 from cli.commands.import_dataset import import_dataset
+from api.app import run as run_api
 
 
 @click.group(help="Dit is de command line interface (CLI) voor het gebruiken van het automatisch gelaat herkenningssysteem")
@@ -18,6 +19,11 @@ def cli():
     CLI group for the face recognition application.
     """
     init_app()
+
+
+@cli.command(help="Start de web applicatie")
+def web():
+    run_api('127.0.0.1', 8080)
 
 
 @cli.command(hidden=True)

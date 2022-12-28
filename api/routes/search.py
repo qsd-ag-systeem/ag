@@ -1,5 +1,5 @@
 import os
-from flask import request, jsonify, json
+from flask import request
 from core.face_recognition import init, search_file, use_cuda
 from core.common import get_files
 from api.helpers.response import error_response, success_response
