@@ -58,7 +58,7 @@ def ensure_db_running():
         es_container.reload()
 
 
-def get_es_volume(es_container_name="esticsearch"):
+def get_es_volume(es_container_name="elasticsearch"):
     client = docker.from_env()
     es_volume_name = f"{es_container_name}-vol-1"
 
