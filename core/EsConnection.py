@@ -6,6 +6,7 @@ class EsConnection(object):
     index_name = "face_recognition"
     default_size = 100
     default_scroll_time = "1m"
+    default_timeout = 300
 
     def __init__(self):
         try:

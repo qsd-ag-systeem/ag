@@ -36,7 +36,7 @@ def import_all(file):
             action_list.append(record)
 
         # Bulk insert the documents
-        deque(helpers.parallel_bulk(es.connection, action_list), maxlen=0)
+        deque(helpers.parallel_bulk(es.connection, action_list, request_timeout=es.default_timeout), maxlen=0)
 
     # Refresh the index to make the documents available for search immediately
     refresh_index()

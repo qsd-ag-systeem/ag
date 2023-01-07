@@ -34,7 +34,7 @@ def export_datasets_by_name(file, datasets: tuple):
 
     documents = []
     response = es.connection.options(
-        request_timeout=5000,
+        request_timeout=es.default_timeout,
     ).search(
         index=es.index_name,
         query=query,

@@ -2,7 +2,7 @@ import click
 from halo import Halo
 
 from core.common import print_table, retrieve_datasets
-from core.delete_dataset import delete_dataset_by_name, delete_dataset_files_by_name
+from core.delete_dataset import delete_dataset_by_name, delete_dataset_files_by_name, delete_file_by_name, delete_dataset_file_by_name
 
 
 @click.command("datasets", help="Geeft een lijst met alle beschikbare datasets weer.")
@@ -27,9 +27,10 @@ def get_datasets(debug: bool) -> None:
 
 @click.command("delete", help="Verwijdert een dataset.")
 @click.argument('dataset', type=str)
+@click.option('-f', '--file', type=str, default=None)
 @click.option('--debug/--no-debug', default=False)
 @click.option('--delete-files/--no-delete-files', default=False)
-def delete_dataset(dataset: str, debug: bool, delete_files: bool) -> None:
+def delete_dataset(dataset: str, file: str, debug: bool, delete_files: bool) -> None:
     """
     This command deletes a dataset.
     """
@@ -37,10 +38,16 @@ def delete_dataset(dataset: str, debug: bool, delete_files: bool) -> None:
     spinner.start()
 
     try:
-        delete_dataset_by_name(dataset)
+        if file:
+            delete_file_by_name(dataset, file)
 
-        if delete_files:
-            delete_dataset_files_by_name(dataset)
+            if delete_files:
+                delete_dataset_file_by_name(dataset, file)
+        else:
+            delete_dataset_by_name(dataset)
+
+            if delete_files:
+                delete_dataset_files_by_name(dataset)
 
         spinner.succeed(f"Dataset '{dataset}' removed successfully.")
     except Exception as e:
