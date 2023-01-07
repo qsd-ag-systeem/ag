@@ -64,7 +64,5 @@ def write_es_export_to_file(file, rows):
 
         try:
             w.writerows((document['_source'] for document in rows))
-        except NotFoundError:
-            pass
-        except RequestError:
+        except (NotFoundError, RequestError):
             pass
