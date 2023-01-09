@@ -4,7 +4,7 @@ from api.helpers.response import error_response, success_response
 
 def import_dataset():
     data = request.get_json()
-    if not "path" in data:
+    if "path" not in data:
         return error_response("Import file path is required!")
 
     import_path = data["path"]

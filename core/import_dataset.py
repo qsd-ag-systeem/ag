@@ -35,8 +35,6 @@ def import_all(file):
 
             action_list.append(record)
 
-        print("Action List Complete")
-
         threads = int(multiprocessing.cpu_count() * 0.75)
         for success, info in helpers.parallel_bulk(es.connection, action_list, request_timeout=es.default_timeout, thread_count=threads, chunk_size=10000):
             if not success:
