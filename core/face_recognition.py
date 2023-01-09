@@ -3,9 +3,8 @@ from typing import Optional
 import dlib
 import cv2
 from collections.abc import Callable
-from psycopg2 import Error
-import core.db as db
-from core.model.face import Face
+
+from core.EsConnection import EsConnection
 from core.common import vec2list
 from core.search import retrieve_all_data, retrieve_data
 
@@ -18,12 +17,20 @@ def use_cuda(enable_cuda: bool = False) -> bool:
     return dlib.DLIB_USE_CUDA and enable_cuda
 
 
-def insert_data(dataset, file_name, face_emb, width, height, x, y):
-    session = db.Session()
-    face = Face(dataset, file_name, width, height, x, y, face_emb)
-    session.add(face)
-    session.commit()
-    session.close()
+def insert_data(dataset, file_name, face_emb, width, height, x, y, key=0):
+    es = EsConnection()
+
+    doc_id = f"{dataset}/{file_name}-{key}"
+    doc = {
+        "dataset": dataset,
+        "file_name": file_name,
+        "width": width,
+        "height": height,
+        "top_left": x,
+        "bottom_right": y,
+        "face_embedding": face_emb,
+    }
+    es.connection.update(index=es.index_name, id=doc_id, doc=doc, doc_as_upsert=True)
 
 
 def init(cuda: bool) -> None:
@@ -46,31 +53,49 @@ def process_file(dataset, file, cuda: bool = False) -> bool:
     img = cv2.imread(file_name)
     face_embeddings = get_face_embeddings(img, cuda)
 
-    for face_emb in face_embeddings:
-        insert_data(dataset, file.name, face_emb["face_embedding"],
-                    face_emb["width"], face_emb["height"], face_emb["x"], face_emb["y"])
+    for (key, face_emb) in enumerate(face_embeddings):
+        insert_data(
+            dataset,
+            file.name,
+            face_emb["face_embedding"],
+            face_emb["width"],
+            face_emb["height"],
+            face_emb["x"],
+            face_emb["y"],
+            key
+        )
 
     return True
 
 
 def search_file(file, dataset, cuda=False):
-    result = []
+    results = []
     file_path = str(file.resolve())
     file_name = str(file.name)
     img = cv2.imread(file_path)
     face_embeddings = get_face_embeddings(img, cuda)
 
     for (key, face) in enumerate(face_embeddings):
-        data = retrieve_data(face["face_embedding"], dataset) if dataset else retrieve_all_data(
-            face["face_embedding"])
+        try:
+            if dataset:
+                data = retrieve_data(face["face_embedding"], dataset)
+            else:
+                data = retrieve_all_data(face["face_embedding"])
 
-        for (i, row) in enumerate(data):
-            row = data[i][0]
-            score = data[i][1]
-            result.append([file_name, row.id, row.dataset, row.file_name, round(
-                100 - (score * 100), 2), row.x, row.y])
+            for row in data["hits"]["hits"]:
+                results.append([
+                    file_name,
+                    row["_id"],
+                    row["_source"]["dataset"],
+                    row["_source"]["file_name"],
+                    round(row["_score"] * 100),
+                    str(row["_source"]["top_left"]),
+                    str(row["_source"]["bottom_right"]),
+                ])
+        except:
+            pass
 
-    return result
+    return results
 
 
 def get_face_embeddings(img, cuda: bool):
@@ -95,7 +120,12 @@ def get_face_embeddings(img, cuda: bool):
         y = (rect.right(), rect.bottom())
 
         if len(face_emb) == 128:
-            face_embeddings.append(
-                {"face_embedding": face_emb, "width": width, "height": height, "x": x, "y": y})
+            face_embeddings.append({
+                "face_embedding": face_emb,
+                "width": width,
+                "height": height,
+                "x": x,
+                "y": y
+            })
 
     return face_embeddings

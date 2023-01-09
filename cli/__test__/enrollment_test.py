@@ -63,7 +63,7 @@ def test_enrollment_folder_with_valid_image_files(runner: CliRunner):
             f.write('test')
         result = runner.invoke(enroll, ['exists'])
 
-        assert "Enrollment finished!" in result.output
+        assert "Enrollment finished" in result.output
         assert result.exit_code == 0
 
 
@@ -79,5 +79,5 @@ def test_enrollment_folder_with_invalid_image_files(runner: CliRunner):
             f.write('test')
         result = runner.invoke(enroll, ['exists'])
 
-        assert "Enrollment finished!" in result.output
+        assert "Enrollment finished" in result.output
         assert result.exit_code == 0

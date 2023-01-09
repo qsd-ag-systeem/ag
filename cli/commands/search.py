@@ -5,7 +5,8 @@ from math import ceil
 import click
 import cv2
 from core.common import get_files, print_table
-from core.face_recognition import init, use_cuda, search_file
+from core.face_recognition import init, use_cuda, get_face_embeddings, search_file
+from core.search import retrieve_data, retrieve_all_data
 
 
 @click.command(help="Zoekt een gelijkend gezicht in de database van de meegegeven foto(s).")
@@ -16,7 +17,8 @@ from core.face_recognition import init, use_cuda, search_file
               help="Het maximaal aantal matches dat tegelijk wordt getoond, default 10.")
 @click.option('--debug/--no-debug', default=False)
 @click.option('--cuda/--no-cuda', default=True)
-@click.option('--export', '-E', type=bool, default=False, is_flag=True, help="Exporteer de resultaten naar een csv bestand")
+@click.option('--export', '-E', type=bool, default=False, is_flag=True,
+              help="Exporteer de resultaten naar een csv bestand")
 def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, export: bool) -> None:
     """
     Search for similar faces in the database of the given image(s).
@@ -40,9 +42,8 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
     with click.progressbar(files, show_pos=True, show_percent=True, label="Initializing...") as bar:
         for file in bar:
             try:
-                results.extend(search_file(file, dataset, cuda))
-
                 bar.label = f"Processing: {os.path.relpath(file)}"
+                results.extend(search_file(file, dataset, cuda))
             except Exception as error:
                 bar.label = f"Error processing: {os.path.relpath(file)}"
                 errors.append(error)
@@ -55,31 +56,25 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
             click.echo("No matches found")
             return
 
-        columns = ["Input file", "ID", "Dataset", "File name",
-                   "Similarity (%)", "Left top", "Right bottom"]
+        columns = ["Input file", "ID", "Dataset", "File name", "Similarity (%)", "Left top", "Right bottom"]
 
         results = sorted(results, key=lambda x: x[4], reverse=True)
 
         if export:
             try:
-                # Get todays date and time
-                now = datetime.now()
+                # Get today's date and time
+                date_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-                date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
-
-                output_folder = os.path.abspath(
-                    os.path.join(os.getcwd(), "output"))
+                output_folder = os.path.abspath(os.path.join(os.getcwd(), "output"))
 
                 if not os.path.exists(output_folder):
                     os.mkdir(output_folder)
 
                 file = f"{date_time}_search-results.csv"
 
-                click.echo(
-                    f"\nExporting results to {click.format_filename(file)}", nl=True)
+                click.echo(f"\nExporting results to {click.format_filename(file)}", nl=True)
 
-                path = os.path.join(
-                    output_folder, file)
+                path = os.path.join(output_folder, file)
 
                 with open(path, 'w', newline='', encoding='utf-8') as file:
                     writer = csv.writer(file)
@@ -87,8 +82,7 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
                     writer.writerows(results)
             except Exception as err:
                 errors.append(err)
-                click.echo(
-                    "Something went wrong while exporting the results", err=True)
+                click.echo("Something went wrong while exporting the results", err=True)
         else:
             for rows in range(ceil(results_size / limit)):
                 continue_file = 'y'
@@ -101,6 +95,8 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
                 if continue_file == 'n':
                     break
 
+                print()
+                print()
                 print_table(
                     columns, results[rows * limit:rows * limit + limit])
 

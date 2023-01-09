@@ -1,5 +1,6 @@
 import os
-from flask import request, jsonify, json
+import numpy as np
+from flask import request
 from core.face_recognition import init, search_file, use_cuda
 from core.common import get_files
 from api.helpers.response import error_response, success_response
@@ -32,17 +33,30 @@ def search():
     for file in files:
         try:
             search_results = search_file(
-                file, dataset, cuda)
+                file,
+                dataset,
+                cuda
+            )
 
             for search_result in search_results:
+                left_bound = np.fromstring(
+                    search_result[5].strip("[]"),
+                    sep=', '
+                )
+
+                right_bound = np.fromstring(
+                    search_result[6].strip("[]"),
+                    sep=', '
+                )
+
                 result.append({
                     "input_file": search_result[0],
                     "id": search_result[1],
                     "dataset": search_result[2],
                     "file_name": search_result[3],
                     "similarity": search_result[4],
-                    "left_bound": search_result[5],
-                    "right_bound": search_result[6],
+                    "left_bound": list(left_bound),
+                    "right_bound": list(right_bound),
                 })
 
         except Exception as error:
