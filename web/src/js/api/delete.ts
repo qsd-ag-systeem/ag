@@ -1,12 +1,13 @@
 import { API_URL, FETCH_HEADERS } from "../constants";
 
-type BodyEnroll = {
-    folder: string;
-    cuda?: boolean;
+type BodyDelete = {
+    dataset: string;
+    remove_file: boolean;
+    file: string;
 }
 
-export const fetchEnroll = async (data: BodyEnroll) => {
-    return await fetch(`${API_URL}/enroll`, {
+export const fetchDelete = async (data: BodyDelete) => {
+    return await fetch(`${API_URL}/delete`, {
         method: 'POST',
         body: JSON.stringify(data),
         ...FETCH_HEADERS()

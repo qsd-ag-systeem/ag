@@ -1,9 +1,9 @@
 import { API_URL, FETCH_HEADERS } from "../constants";
 
 type BodySearch = {
-    folder: string,
-    cuda?: boolean,
-    dataset?: string
+    folder: string;
+    cuda?: boolean;
+    dataset?: string;
 }
 
 export const fetchSearch = async (data: BodySearch) => {
