@@ -23,12 +23,12 @@ def export_datasets(file):
     write_es_export_to_file(file, documents)
 
 
-def export_datasets_by_name(file, datasets: tuple):
+def export_datasets_by_name(file, datasets: list):
     es = EsConnection()
 
     query = {
         "terms": {
-            "dataset": list(datasets)
+            "dataset": datasets
         }
     }
 

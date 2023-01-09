@@ -2,11 +2,12 @@ from flask import request
 from core.export_dataset import export_datasets, export_datasets_by_name
 from api.helpers.response import error_response, success_response
 
+
 def export():
     data = request.get_json()
-    if not "path" in data:
+    if "path" not in data:
         return error_response("Export file path is required!")
-    
+
     export_path = data["path"]
 
     dataset = []
@@ -15,7 +16,7 @@ def export():
     if "dataset" in data:
         dataset = data["dataset"]
 
-    try:    
+    try:
         if dataset:
             export_datasets_by_name(export_path, dataset)
         else:
@@ -24,4 +25,3 @@ def export():
         errors.append(str(error))
 
     return success_response(errors=errors)
-    
