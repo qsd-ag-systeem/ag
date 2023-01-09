@@ -1,6 +1,8 @@
 from pathlib import Path
 import click
 import os
+from halo import Halo
+
 from core.import_dataset import import_all
 
 
@@ -17,10 +19,19 @@ def import_dataset(file_name: str) -> None:
     file_path = os.path.join(os.getcwd(), f"{file_name}")
     file = Path(file_path)
 
+    spinner = Halo(text=f"Importing '{file_path}' ...", spinner='dots')
+    spinner.start()
+
     if not file.is_file():
+        spinner.fail(f"Import of '{file_path}' failed.")
         click.echo(f"Error: a file with this name '{file_path}' doesn't exist.", err=True)
-        return
+        exit(1)
 
-    import_all(file_path)
+    try:
+        import_all(file_path)
+    except Exception as e:
+        spinner.fail(f"Import of '{file_path}' failed")
+        click.echo(e, err=True)
+        exit(1)
 
-    click.echo(f'Done')
+    spinner.succeed(f"Import of '{file_path}' complete.")
