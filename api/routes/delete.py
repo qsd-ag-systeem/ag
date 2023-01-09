@@ -8,6 +8,10 @@ def delete():
         return error_response("Dataset name is required")
 
     dataset = data["dataset"]
+
+    if dataset == "":
+        return error_response("Dataset name is required")
+
     file = ""
     remove_file: bool = False
 
