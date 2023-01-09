@@ -30,5 +30,5 @@ def page_not_found(e):
     return error_response('Page not found', 404)
 
 
-def run():
-    app.run(host='0.0.0.0', port=5000, debug=True)
+def run(host: str = '0.0.0.0', port: int = 5000, debug: bool = False):
+    app.run(host=host, port=port, debug=debug)

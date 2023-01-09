@@ -1,3 +1,5 @@
+import numpy as np
+
 from core.face_recognition import insert_data, init, vec2list
 from dlib import vector
 
@@ -5,7 +7,7 @@ from dlib import vector
 def test_insert_data():
     dataset = "test"
     file_name = "test.jpg"
-    face_emb = vec2list([1, 2, 3])
+    face_emb = vec2list(np.arange(128))
     width = 100
     height = 100
     x = (0, 0)
