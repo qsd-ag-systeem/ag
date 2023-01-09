@@ -1,7 +1,7 @@
 import csv
 import numpy as np
 from elasticsearch import helpers
-from collections import deque
+import multiprocessing
 
 from core.EsConnection import EsConnection
 from core.common import refresh_index
@@ -35,8 +35,12 @@ def import_all(file):
 
             action_list.append(record)
 
-        # Bulk insert the documents
-        deque(helpers.parallel_bulk(es.connection, action_list, request_timeout=es.default_timeout), maxlen=0)
+        print("Action List Complete")
+
+        threads = int(multiprocessing.cpu_count() * 0.75)
+        for success, info in helpers.parallel_bulk(es.connection, action_list, request_timeout=es.default_timeout, thread_count=threads, chunk_size=10000):
+            if not success:
+                print("Insert failed: ", info)
 
     # Refresh the index to make the documents available for search immediately
     refresh_index()
