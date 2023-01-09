@@ -1,5 +1,5 @@
 from flask import request
-from core.export_dataset import export_all, export_dataset
+from core.export_dataset import export_datasets, export_datasets_by_name
 from api.helpers.response import error_response, success_response
 
 def export():
@@ -17,9 +17,9 @@ def export():
 
     try:    
         if dataset:
-            export_dataset(export_path, dataset)
+            export_datasets_by_name(export_path, dataset)
         else:
-            export_all(export_path)
+            export_datasets(export_path)
     except Exception as error:
         errors.append(str(error))
 
