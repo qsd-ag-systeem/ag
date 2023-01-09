@@ -12,7 +12,7 @@ execnet==1.9.0
 grapheme==0.6.0
 imutils==0.5.4
 iniconfig==1.1.1
-numpy==1.23.5
+numpy==1.24.1
 opencv-python==4.6.0.66
 packaging==21.3
 pluggy==1.0.0
