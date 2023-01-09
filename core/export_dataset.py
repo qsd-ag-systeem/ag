@@ -58,6 +58,9 @@ def write_es_export_to_file(file, rows):
     mapping = es.connection.indices.get_mapping(index=es.index_name)
     mapping = mapping[es.index_name]['mappings']['properties'].keys()
 
+    if not file.endswith('.csv'):
+        file = f"{file}.csv"
+
     with open(file, 'w') as f:
         w = csv.DictWriter(f, mapping, delimiter=",", quoting=csv.QUOTE_MINIMAL)
         w.writeheader()
