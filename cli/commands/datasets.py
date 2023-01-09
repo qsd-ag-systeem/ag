@@ -2,7 +2,7 @@ import click
 from halo import Halo
 
 from core.common import print_table, retrieve_datasets
-from core.delete_dataset import delete_dataset_by_name, delete_dataset_files_by_name, delete_file_by_name, delete_dataset_file_by_name
+from core.delete import delete_dataset_by_name, delete_dataset_files_by_name, delete_file_by_name, delete_dataset_file_by_name
 
 
 @click.command("datasets", help="Geeft een lijst met alle beschikbare datasets weer.")

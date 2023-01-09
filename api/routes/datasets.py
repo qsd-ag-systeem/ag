@@ -9,8 +9,3 @@ def get():
         return success_response(data)
     except:
         return error_response('An error occurred while fetching the datasets')
-
-
-# delete datasets here as well
-def delete():
-    return error_response('Not yet implemented')
