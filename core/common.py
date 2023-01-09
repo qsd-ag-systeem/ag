@@ -9,8 +9,10 @@ def get_files(abs_path: str):
     elif (path.is_file() and not path.name.startswith(".")):
         return [path]
 
+
 def print_table(columns, values):
     print(tabulate(values, columns, tablefmt="grid"))
+
 
 def vec2list(vec):
     out_list = []
