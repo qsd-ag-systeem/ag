@@ -7,6 +7,7 @@ from api.routes.enroll import enroll
 from api.routes.datasets import get
 from api.routes.search import search
 from api.routes.directories import directories
+from api.routes.export import export
 
 app = Flask(__name__)
 CORS(app)
@@ -16,6 +17,7 @@ app.add_url_rule('/', 'index', index)
 app.add_url_rule('/datasets', 'datasets', get)
 app.add_url_rule('/enroll', 'enroll', enroll, methods=['POST'])
 app.add_url_rule('/search', 'search', search, methods=['POST'])
+app.add_url_rule('/export', 'export', export, methods=['POST'])
 
 # Directories
 app.add_url_rule('/directories', 'directories', directories)
