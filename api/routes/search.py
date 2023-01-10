@@ -63,4 +63,6 @@ def search():
             errors.append(str(error))
             pass
 
-    return success_response(result, errors)
+    results = sorted(result, key=lambda k: k['similarity'], reverse=True)
+
+    return success_response(results, errors)
