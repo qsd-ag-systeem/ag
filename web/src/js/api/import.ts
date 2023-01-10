@@ -1,8 +1,5 @@
 import { API_URL, FETCH_HEADERS } from "../constants";
-
-type BodyImport = {
-    path: string;
-}
+import { BodyImport } from "../../types";
 
 export const fetchImport = async (data: BodyImport) => {
     return await fetch(`${API_URL}/import`, {

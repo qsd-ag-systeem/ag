@@ -1,10 +1,5 @@
 import { API_URL, FETCH_HEADERS } from "../constants";
-
-type BodySearch = {
-    folder: string;
-    cuda?: boolean;
-    dataset?: string;
-}
+import { BodySearch } from "../../types";
 
 export const fetchSearch = async (data: BodySearch) => {
     return await fetch(`${API_URL}/search`, {
