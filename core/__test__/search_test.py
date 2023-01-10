@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import MagicMock, patch
 from core.EsConnection import EsConnection
 from core.search import retrieve_data, retrieve_all_data

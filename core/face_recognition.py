@@ -30,7 +30,12 @@ def insert_data(dataset, file_name, face_emb, width, height, x, y, key=0):
         "bottom_right": y,
         "face_embedding": face_emb,
     }
-    es.connection.update(index=es.index_name, id=doc_id, doc=doc, doc_as_upsert=True)
+
+    es.connection.update(
+        index=es.index_name, 
+        id=doc_id, 
+        doc=doc, 
+        doc_as_upsert=True)
 
 
 def init(cuda: bool) -> None:
@@ -54,6 +59,8 @@ def process_file(dataset, file, cuda: bool = False) -> bool:
     face_embeddings = get_face_embeddings(img, cuda)
 
     for (key, face_emb) in enumerate(face_embeddings):
+        print(face_emb)
+        print(key)
         insert_data(
             dataset,
             file.name,
@@ -92,6 +99,7 @@ def search_file(file, dataset, cuda=False):
                     str(row["_source"]["top_left"]),
                     str(row["_source"]["bottom_right"]),
                 ])
+                print(results)
         except:
             pass
 
