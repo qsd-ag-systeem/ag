@@ -15,6 +15,7 @@ const useStyles = createStyles(theme => ({
     overflowX: "scroll",
     gridArea: "results",
     position: "relative",
+    scrollSnapType: "x proximity",
   },
 }));
 

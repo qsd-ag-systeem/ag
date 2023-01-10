@@ -2,7 +2,12 @@ import { Badge, Box, createStyles, Flex, Image, Text } from "@mantine/core";
 import usePercentageColor from "../hooks/usePercentageColor";
 
 const useStyles = createStyles(theme => ({
-  match: { position: "relative", userSelect: "none" },
+  match: {
+    position: "relative",
+    userSelect: "none",
+    scrollSnapAlign: "start",
+    scrollMargin: theme.spacing.sm,
+  },
   percentage: {
     zIndex: 2,
     borderRadius: theme.radius.md,
