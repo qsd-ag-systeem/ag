@@ -7,7 +7,7 @@ export default function Home() {
     <Container fluid>
       <DirectoryBrowser />
 
-      <SearchResults folder="C:/Users/Joel/ag/input/test" />
+      <SearchResults folder="input/test" />
     </Container>
   );
 }

@@ -23,9 +23,9 @@ export default function Providers(props: ProvidersProps) {
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <MantineProvider withGlobalStyles withNormalizeCSS>
-          <NotificationsProvider>
-            <ModalsProvider>{props.children}</ModalsProvider>
-          </NotificationsProvider>
+          <ModalsProvider>
+            <NotificationsProvider>{props.children}</NotificationsProvider>
+          </ModalsProvider>
         </MantineProvider>
       </QueryClientProvider>
     </BrowserRouter>

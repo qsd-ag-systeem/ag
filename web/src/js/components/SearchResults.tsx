@@ -5,6 +5,7 @@ import { fetchSearch } from "../api/search";
 import { ContextModalProps } from "@mantine/modals";
 
 import Match from "./Match";
+import {API_URL} from "../constants";
 
 const useStyles = createStyles(theme => ({
   results: {
@@ -55,7 +56,7 @@ export default function SearchResults({ folder, cuda, dataset }: SearchResultsPr
       {isSuccess &&
         result?.data?.map((match, i) => (
           <Match
-            image={`${match.dataset}/${match.file_name}`}
+            image={`${API_URL}/image/${match.dataset}/${match.file_name}`}
             percentage={match.similarity}
             fileName={match.file_name}
             key={match.id + "-" + i}

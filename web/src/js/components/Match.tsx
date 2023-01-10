@@ -48,10 +48,10 @@ export default function Match({ image, percentage, fileName, isModal = false }: 
       }}
       onClick={() => {
         openModal({
-          size: 800,
+          size: "auto",
           title: fileName,
           children: (
-            <Match fileName={fileName} percentage={percentage} image={image} isModal={isModal} />
+            <Match fileName={fileName} percentage={percentage} image={image} isModal={true} />
           ),
         });
       }}
@@ -71,7 +71,7 @@ export default function Match({ image, percentage, fileName, isModal = false }: 
       {fileName && <Badge className={classes.fileName}>{fileName}</Badge>}
       <Box
         sx={{
-          aspectRatio: "1/1",
+          aspectRatio: !isModal ? "1/1" : undefined,
         }}
       >
         <Image
@@ -81,8 +81,8 @@ export default function Match({ image, percentage, fileName, isModal = false }: 
           imageProps={{
             loading: "lazy",
           }}
-          width={isModal ? 500 : 240}
-          height={isModal ? 500 : 240}
+          width={isModal ? 800 : 240}
+          height={isModal ? 800 : 240}
           draggable={false}
           radius="md"
         />
