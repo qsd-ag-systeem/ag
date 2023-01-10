@@ -22,7 +22,9 @@ def get_datasets(debug: bool) -> None:
     except Exception as err:
         error = f": {err}" if debug else ""
         click.echo(
-            f"An error occurred while fetching the datasets{error}", err=True)
+            f"An error occurred while fetching the datasets{error}",
+            err=True
+        )
 
 
 @click.command("delete", help="Verwijdert een dataset.")
