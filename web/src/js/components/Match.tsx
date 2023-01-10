@@ -20,13 +20,13 @@ const useStyles = createStyles(theme => ({
   },
   fileName: {
     zIndex: 2,
-    right: theme.spacing.xs,
-    top: theme.spacing.xs,
+    left: theme.spacing.xs,
+    bottom: theme.spacing.xs,
     position: "absolute",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
 
-    maxWidth: "70%",
+    maxWidth: "90%",
   },
 }));
 
