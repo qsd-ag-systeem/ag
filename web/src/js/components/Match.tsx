@@ -83,8 +83,9 @@ export default function Match({ image, percentage, fileName, isModal = false }: 
           imageProps={{
             loading: "lazy",
           }}
-          width={isModal ? 600 : 240}
+          width={isModal ? undefined : 240}
           height={isModal ? 600 : 240}
+          sx={{ minWidth: isModal ? 600 : 240, minHeight: isModal ? 600 : 240 }}
           draggable={false}
           radius="md"
         />
