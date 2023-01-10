@@ -1,7 +1,9 @@
-import { createStyles, Flex, LoadingOverlay, Overlay } from "@mantine/core";
+import { createStyles, Flex, LoadingOverlay, Overlay, Image, Button } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { BodySearch } from "../../types";
 import { fetchSearch } from "../api/search";
+import { ContextModalProps } from "@mantine/modals";
+
 import Match from "./Match";
 
 const useStyles = createStyles(theme => ({

@@ -1,5 +1,7 @@
-import { Badge, Box, createStyles, Flex, Image, Text } from "@mantine/core";
+import { Badge, Box, createStyles, Flex, Image, Text, Button } from "@mantine/core";
 import usePercentageColor from "../hooks/usePercentageColor";
+import { openModal } from "@mantine/modals";
+import { useCallback } from "react";
 
 const useStyles = createStyles(theme => ({
   match: {
@@ -7,6 +9,9 @@ const useStyles = createStyles(theme => ({
     userSelect: "none",
     scrollSnapAlign: "start",
     scrollMargin: theme.spacing.sm,
+    ":hover": {
+      cursor: "pointer",
+    },
   },
   percentage: {
     zIndex: 2,
@@ -35,7 +40,14 @@ export default function Match({ image, percentage, fileName }: MatchProps) {
   const { classes } = useStyles();
 
   return (
-    <Flex className={classes.match}>
+    <Flex
+      className={classes.match}
+      onClick={() =>
+        openModal({
+          children: <Image src={image} withPlaceholder width="60%" height="80%" />,
+        })
+      }
+    >
       {color && (
         <Box
           className={classes.percentage}

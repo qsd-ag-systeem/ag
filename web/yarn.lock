@@ -539,12 +539,12 @@
   resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-5.9.4.tgz#20b8206a6418fc21260ce307e43a2c8dc06cb8e8"
   integrity sha512-W6RR6fLKh0gPnIA+HLnJ3NRbgnlhbjsajug+Fhhs+CE6z1528ROI63OZ9s5NIAUj/aATkEyJA64P/V/yXYZ69A==
 
-"@mantine/modals@^5.9.4":
-  version "5.9.4"
-  resolved "https://registry.yarnpkg.com/@mantine/modals/-/modals-5.9.4.tgz#eca5705eff6776bf001c24f7f70c32f14317468b"
-  integrity sha512-Iu2qWHv3dxHyLQ1/60aEEtJGPCG+K/+BAzGJyk9a/WPN9cQqtKf03jS25xNTwlXW3IVtS/7MP0Ygq84X6yNKAg==
+"@mantine/modals@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@mantine/modals/-/modals-5.10.0.tgz#b02cadfd875375eeea87f7135848fc0d1bbe869c"
+  integrity sha512-SP9mPoa7FlfGkVzjVMUZ36i7YmYMh7p/9CoeWT/0Rcy7WmOfotNBbs/H/9CXdMNVNZTkehEeHoKeVy9oEkk2zg==
   dependencies:
-    "@mantine/utils" "5.9.4"
+    "@mantine/utils" "5.10.0"
 
 "@mantine/notifications@^5.9.4":
   version "5.9.4"
@@ -561,6 +561,11 @@
   dependencies:
     clsx "1.1.1"
     csstype "3.0.9"
+
+"@mantine/utils@5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-5.10.0.tgz#d77bdbd4fbf0ef7b10dd0c6480ce9a035dd31ae9"
+  integrity sha512-mHnNm0ajIa8qLAIEwv82N6+7YKecynOA3I8vzgBHXS2x4HwGsHITFYGmMh2LNpx5dRL034tObfEFYZXqncyEDw==
 
 "@mantine/utils@5.9.4":
   version "5.9.4"
