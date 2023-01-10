@@ -25,7 +25,8 @@ const useStyles = createStyles(theme => ({
     position: "absolute",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
-    maxWidth: 160,
+
+    maxWidth: "70%",
   },
 }));
 
@@ -49,6 +50,7 @@ export default function Match({ image, percentage, fileName, isModal = false }: 
       onClick={() => {
         openModal({
           size: "auto",
+          overlayBlur: 2,
           title: fileName,
           children: (
             <Match fileName={fileName} percentage={percentage} image={image} isModal={true} />
@@ -81,8 +83,8 @@ export default function Match({ image, percentage, fileName, isModal = false }: 
           imageProps={{
             loading: "lazy",
           }}
-          width={isModal ? 800 : 240}
-          height={isModal ? 800 : 240}
+          width={isModal ? 600 : 240}
+          height={isModal ? 600 : 240}
           draggable={false}
           radius="md"
         />
