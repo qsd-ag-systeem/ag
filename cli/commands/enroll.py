@@ -1,6 +1,8 @@
 import click
 import os
-from core.common import get_files
+
+from core.EsConnection import EsConnection
+from core.common import get_files, refresh_index
 from core.face_recognition import init, process_file, use_cuda
 
 
@@ -26,18 +28,25 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
         click.echo(f"Folder {folder} is empty!")
         return
 
+    fail = 0
+    success = 0
     with click.progressbar(files, show_pos=True, show_percent=True, label="Initializing...") as bar:
         for file in bar:
             try:
                 process_file(folder, file, cuda)
                 bar.label = f"Processing: {os.path.relpath(file)}"
+                success += 1
             except Exception as error:
                 bar.label = f"Error processing: {os.path.relpath(file)}"
+                fail += 1
 
                 if debug:
                     errors.append(error)
 
+    # Refresh the index to make the documents available for search immediately
+    refresh_index()
+
     for error in errors:
         click.echo(error)
 
-    click.echo('Enrollment finished!')
+    click.echo(f"Enrollment finished ({success} of {success + fail} enrolled)!")
