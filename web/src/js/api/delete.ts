@@ -2,8 +2,8 @@ import { API_URL, FETCH_HEADERS } from "../constants";
 
 type BodyDelete = {
     dataset: string;
-    remove_file: boolean;
     file: string;
+    remove_file: boolean;
 }
 
 export const fetchDelete = async (data: BodyDelete) => {
