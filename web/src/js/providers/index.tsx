@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { ModalsProvider } from "@mantine/modals";
-import { ImageModal } from "../components/SearchResults";
 
 type ProvidersProps = {
   children?: ReactNode;
@@ -24,11 +23,9 @@ export default function Providers(props: ProvidersProps) {
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <MantineProvider withGlobalStyles withNormalizeCSS>
-          <ModalsProvider>
-            <NotificationsProvider>
-              <ModalsProvider>{props.children}</ModalsProvider>
-            </NotificationsProvider>
-          </ModalsProvider>
+          <NotificationsProvider>
+            <ModalsProvider>{props.children}</ModalsProvider>
+          </NotificationsProvider>
         </MantineProvider>
       </QueryClientProvider>
     </BrowserRouter>

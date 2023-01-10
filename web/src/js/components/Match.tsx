@@ -9,9 +9,6 @@ const useStyles = createStyles(theme => ({
     userSelect: "none",
     scrollSnapAlign: "start",
     scrollMargin: theme.spacing.sm,
-    ":hover": {
-      cursor: "pointer",
-    },
   },
   percentage: {
     zIndex: 2,
@@ -26,6 +23,9 @@ const useStyles = createStyles(theme => ({
     right: theme.spacing.xs,
     top: theme.spacing.xs,
     position: "absolute",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    maxWidth: 160,
   },
 }));
 
@@ -33,20 +33,28 @@ type MatchProps = {
   image?: string;
   percentage?: number;
   fileName?: string;
+  isModal?: boolean;
 };
 
-export default function Match({ image, percentage, fileName }: MatchProps) {
+export default function Match({ image, percentage, fileName, isModal = false }: MatchProps) {
   const color = usePercentageColor(percentage);
   const { classes } = useStyles();
 
   return (
     <Flex
       className={classes.match}
-      onClick={() =>
+      sx={{
+        cursor: isModal ? "auto" : "pointer",
+      }}
+      onClick={() => {
         openModal({
-          children: <Image src={image} withPlaceholder width="60%" height="80%" />,
-        })
-      }
+          size: 800,
+          title: fileName,
+          children: (
+            <Match fileName={fileName} percentage={percentage} image={image} isModal={isModal} />
+          ),
+        });
+      }}
     >
       {color && (
         <Box
@@ -73,8 +81,8 @@ export default function Match({ image, percentage, fileName }: MatchProps) {
           imageProps={{
             loading: "lazy",
           }}
-          width={240}
-          height={240}
+          width={isModal ? 500 : 240}
+          height={isModal ? 500 : 240}
           draggable={false}
           radius="md"
         />
