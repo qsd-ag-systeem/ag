@@ -1,4 +1,4 @@
-import { Flex, Box, createStyles, Text, Image, Badge } from "@mantine/core";
+import { Badge, Box, createStyles, Flex, Image, Text } from "@mantine/core";
 import usePercentageColor from "../hooks/usePercentageColor";
 
 const useStyles = createStyles(theme => ({
@@ -49,7 +49,18 @@ export default function Match({ image, percentage, fileName }: MatchProps) {
           aspectRatio: "1/1",
         }}
       >
-        <Image src={image} withPlaceholder width={240} height={240} draggable={false} radius="md" />
+        <Image
+          src={image}
+          alt={fileName}
+          withPlaceholder
+          imageProps={{
+            loading: "lazy",
+          }}
+          width={240}
+          height={240}
+          draggable={false}
+          radius="md"
+        />
       </Box>
     </Flex>
   );
