@@ -1,4 +1,4 @@
-import { Flex, Box, createStyles, Text, Image } from "@mantine/core";
+import { Flex, Box, createStyles, Text, Image, Badge } from "@mantine/core";
 import usePercentageColor from "../hooks/usePercentageColor";
 
 const useStyles = createStyles(theme => ({
@@ -11,35 +11,45 @@ const useStyles = createStyles(theme => ({
     top: theme.spacing.xs,
     position: "absolute",
   },
+  fileName: {
+    zIndex: 2,
+    right: theme.spacing.xs,
+    top: theme.spacing.xs,
+    position: "absolute",
+  },
 }));
 
 type MatchProps = {
-  image: string;
-  percentage: number;
+  image?: string;
+  percentage?: number;
+  fileName?: string;
 };
 
-export default function Match({ image, percentage }: MatchProps) {
+export default function Match({ image, percentage, fileName }: MatchProps) {
   const color = usePercentageColor(percentage);
   const { classes } = useStyles();
 
   return (
     <Flex className={classes.match}>
-      <Box
-        className={classes.percentage}
-        sx={{
-          backgroundColor: color,
-        }}
-      >
-        <Text size={"xs"} color="white" weight={"bold"}>
-          {percentage}%
-        </Text>
-      </Box>
+      {color && (
+        <Box
+          className={classes.percentage}
+          sx={{
+            backgroundColor: color,
+          }}
+        >
+          <Text size={"xs"} color="white" weight={"bold"}>
+            {percentage}%
+          </Text>
+        </Box>
+      )}
+      {fileName && <Badge className={classes.fileName}>{fileName}</Badge>}
       <Box
         sx={{
           aspectRatio: "1/1",
         }}
       >
-        <Image src={image} width={240} height={240} draggable={false} radius="md" />
+        <Image src={image} withPlaceholder width={240} height={240} draggable={false} radius="md" />
       </Box>
     </Flex>
   );
