@@ -1,6 +1,7 @@
 import { createStyles, Flex, LoadingOverlay, Overlay } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
-import { BodySearch, fetchSearch } from "../api/search";
+import { BodySearch } from "../../types";
+import { fetchSearch } from "../api/search";
 import Match from "./Match";
 
 const useStyles = createStyles(theme => ({

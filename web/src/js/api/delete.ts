@@ -1,10 +1,5 @@
 import { API_URL, FETCH_HEADERS } from "../constants";
-
-type BodyDelete = {
-    dataset: string;
-    remove_file: boolean;
-    file: string;
-}
+import { BodyDelete } from "../../types";
 
 export const fetchDelete = async (data: BodyDelete) => {
     return await fetch(`${API_URL}/delete`, {

@@ -1,9 +1,5 @@
 import { API_URL, FETCH_HEADERS } from "../constants";
-
-type BodyEnroll = {
-    folder: string;
-    cuda?: boolean;
-}
+import { BodyEnroll } from "../../types";
 
 export const fetchEnroll = async (data: BodyEnroll) => {
     return await fetch(`${API_URL}/enroll`, {
