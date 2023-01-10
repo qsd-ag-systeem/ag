@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchDelete } from "../api/delete";
+import { BodyDelete } from "../../types";
 
-export default function useDelete(dataset: string, file: string, remove_file: boolean = false) {
+export default function useDelete(data: BodyDelete) {
   return useQuery(
-      ["delete", dataset, file, remove_file],
-      () => fetchDelete({dataset, file, remove_file})
+      ["delete", data],
+      () => fetchDelete(data)
   )
 }

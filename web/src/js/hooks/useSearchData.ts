@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchSearch } from "../api/search";
+import { BodySearch } from "../../types";
 
-export default function useSearchData(folder: string, dataset: string, cuda: boolean = false) {
+export default function useSearchData(data: BodySearch) {
   return useQuery(
-      ["search", folder, dataset, cuda],
-      () => fetchSearch({folder, dataset, cuda}),
+      ["search", data],
+      () => fetchSearch(data),
     )
 }
