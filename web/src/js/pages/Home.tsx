@@ -5,9 +5,9 @@ import SearchResults from "../components/SearchResults";
 export default function Home() {
   return (
     <Container fluid>
-      <DirectoryBrowser />
+      {/* <DirectoryBrowser /> */}
 
-      <SearchResults folder="input/test" />
+      <SearchResults folder="input/imdb" />
     </Container>
   );
 }
