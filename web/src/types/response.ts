@@ -7,3 +7,5 @@ export type ErrorResponse<T> = {
   errors: string[];
   data: T | Record<string, any> | null;
 };
+
+
