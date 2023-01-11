@@ -1,9 +1,36 @@
 from unittest.mock import MagicMock, patch
-import numpy as np
+import dlib
 from pathlib import Path
 from core.EsConnection import EsConnection
 from core.face_recognition import use_cuda, insert_data, init, process_file, search_file, get_face_embeddings
 
+class MockImage:
+    def __init__(self, shape):
+        self.shape = shape
+
+class MockRectangle:
+    def __init__(self, left, top, right, bottom):
+        self._left = left
+        self._top = top
+        self._right = right
+        self._bottom = bottom
+
+    def left(self):
+        return self._left
+
+    def top(self):
+        return self._top
+
+    def right(self):
+        return self._right
+
+    def bottom(self):
+        return self._bottom
+
+class MockFullObjectDetection:
+    def __init__(self, rect, parts):
+        self.rect = rect
+        self.parts = parts
 
 class TestFaceRecognition:
     @patch('core.face_recognition.dlib.DLIB_USE_CUDA', True)
@@ -176,3 +203,31 @@ class TestFaceRecognition:
         results = get_face_embeddings(img, False)
         assert results == expected_face_embeddings
 
+    @patch('core.face_recognition.face_detector')
+    @patch('core.face_recognition.shape_predictor')
+    @patch('core.face_recognition.facerec')
+    def test_get_face_embeddings(self, mock_facerec, mock_shape_predictor, mock_face_detector):
+        img_height = 1
+        img_width = 2
+        img = MockImage((img_height, img_width, 0))
+
+        mock_rectangle = MockRectangle(0, 0, 100, 100)
+        mock_shape = MockFullObjectDetection(mock_rectangle, range(68))
+        face_embedding = [*range(128)]
+
+        mock_face_detector.return_value = [mock_rectangle]
+        mock_shape_predictor.return_value = mock_shape
+        mock_facerec.compute_face_descriptor.return_value = face_embedding
+
+        faces = get_face_embeddings(img, False)
+
+        assert len(faces) == 1
+        assert faces[0]["width"] == img_width
+        assert faces[0]["height"] == img_height
+        assert faces[0]["x"] == (mock_rectangle.left(), mock_rectangle.top())
+        assert faces[0]["y"] == (mock_rectangle.right(), mock_rectangle.bottom())
+        assert faces[0]["face_embedding"] == face_embedding
+
+        mock_face_detector.assert_called_once()
+        mock_shape_predictor.assert_called_once()
+        mock_facerec.compute_face_descriptor.assert_called_once_with(img, mock_shape)
