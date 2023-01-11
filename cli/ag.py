@@ -10,6 +10,7 @@ from cli.commands.search import search
 from cli.commands.datasets import get_datasets, delete_dataset
 from cli.commands.export_dataset import export_dataset
 from cli.commands.import_dataset import import_dataset
+from cli.commands.cross_search import cross_search
 from api.app import run as run_api
 
 
@@ -52,6 +53,7 @@ cli.add_command(get_datasets)
 cli.add_command(delete_dataset)
 cli.add_command(export_dataset)
 cli.add_command(import_dataset)
+cli.add_command(cross_search)
 
 
 if __name__ == '__main__':

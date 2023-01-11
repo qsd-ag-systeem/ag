@@ -3,10 +3,8 @@ import os
 from datetime import datetime
 from math import ceil
 import click
-import cv2
 from core.common import get_files, print_table
-from core.face_recognition import init, use_cuda, get_face_embeddings, search_file
-from core.search import retrieve_data, retrieve_all_data
+from core.face_recognition import init, use_cuda, search_file
 
 
 @click.command(help="Zoekt een gelijkend gezicht in de database van de meegegeven foto(s).")
@@ -26,18 +24,17 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
 
     files = get_files(folder)
 
-    cuda = use_cuda(cuda)
-    init(cuda)
-
-    errors = []
-
-    print("⚡ Using CUDA!" if cuda else "🐢 CUDA not available, falling back to CPU processing!")
-
     if len(files) == 0:
         click.echo(f"Folder {folder} is empty!")
         return
 
+    cuda = use_cuda(cuda)
+    init(cuda)
+
+    print("⚡ Using CUDA!" if cuda else "🐢 CUDA not available, falling back to CPU processing!")
+
     results = []
+    errors = []
 
     with click.progressbar(files, show_pos=True, show_percent=True, label="Initializing...") as bar:
         for file in bar:
@@ -97,8 +94,7 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
 
                 print()
                 print()
-                print_table(
-                    columns, results[rows * limit:rows * limit + limit])
+                print_table(columns, results[rows * limit:rows * limit + limit])
 
     if debug:
         for error in errors:
