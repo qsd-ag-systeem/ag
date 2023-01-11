@@ -45,7 +45,7 @@ def export_dataset(file_name: str, datasets: tuple, debug: bool) -> None:
         if not datasets:
             export_datasets(file_path)
         else:
-            export_datasets_by_name(file_path, datasets)
+            export_datasets_by_name(file_path, list(datasets))
     except Exception as e:
         spinner.fail(f"Export to '{file_path}' failed.")
         click.echo(f"Error: {e}", err=True)

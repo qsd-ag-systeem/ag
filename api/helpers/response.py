@@ -3,7 +3,7 @@ from typing import Union
 
 
 # any changes in this file should be discussed
-def success_response(data = "", errors: list = None, status: int = 200) -> Response:
+def success_response(data="", errors: list = None, status: int = 200) -> Response:
     body = {
         "data": data,
         "errors": errors or [],

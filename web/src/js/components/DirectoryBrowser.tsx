@@ -1,19 +1,12 @@
 import { Anchor, Group, Loader, Text, Title } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { fetchDirectories } from "../api/directories";
+import useDirectoriesData from "../hooks/useDirectoriesData";
 import { IconArrowBack } from "@tabler/icons";
 
 export default function DirectoryBrowser(props: any) {
   const [currentDir, setCurrentDir] = useState("");
 
-  const { data, isFetching } = useQuery(
-    ["directories", currentDir],
-    () => fetchDirectories(currentDir),
-    {
-      keepPreviousData: true,
-    }
-  );
+  const { data, isFetching } = useDirectoriesData(currentDir);
 
   const goToParentDir = () => {
     let parentDir = currentDir.replace(/\\/g, "/").split("/").slice(0, -1).join("/");

@@ -1,10 +1,7 @@
 import { API_URL, FETCH_HEADERS } from "../constants";
-import { BodyEnroll } from "../../types";
 
-export const fetchEnroll = async (data: BodyEnroll) => {
-    return await fetch(`${API_URL}/enroll`, {
-        method: 'POST',
-        body: JSON.stringify(data),
+export const fetchDatasets = async () => {
+    return await fetch(`${API_URL}/datasets`, {
         ...FETCH_HEADERS()
     })
         .then((data) => {
