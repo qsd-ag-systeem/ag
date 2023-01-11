@@ -8,6 +8,7 @@ from api.helpers.response import error_response, success_response
 
 def enroll():
     data = request.get_json()
+    canceled = False
     
     if "folder" not in data:
         return error_response("Folder is required")
@@ -35,7 +36,20 @@ def enroll():
     total = len(files)
     current = 0
 
+    socketio = current_app.extensions['socketio']
+
+    # cancel command
+    def cancel(data):
+        nonlocal canceled
+        if data["folder"] == folder:
+            canceled = True
+
+    socketio.on_event('cancel', cancel)
+
     for file in files:
+        if canceled:
+            return error_response("Canceled")
+        
         success = True
         current += 1
 
@@ -46,7 +60,7 @@ def enroll():
             success = False
             pass
         
-        socketio = current_app.extensions['socketio']
+        
         socketio.emit('enroll', {
             "success": success,
             "current": current,

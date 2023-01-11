@@ -43,6 +43,13 @@ export default function Enroll() {
     setLocation(dir);
   };
 
+  const cancelEnroll = () => {
+    socket.emit("cancel", { folder: enrollFolder }, (data: any) => {
+      setEnrollStatus(EnrollStatus.Enrolled);
+      setEnrollLog((prev) => [...prev, "❌ Enrollment geannuleerd."]);
+    });
+  }
+
   useEffect(() => {
     socket.on("connect", () => {
       console.log("connected to socket");
@@ -53,7 +60,6 @@ export default function Enroll() {
 
       // if (data.folder !== enrollFolder) {
       //   console.log(data.folder + " !== " + enrollFolder)
-      //   return;
       // }
       
       setEnrollLog((prev) => [...prev, (data.success ? "Enrolled" : "Failed to enroll") + " " + data.file + " (" + data.current + "/" + data.total + ")"]);
@@ -106,7 +112,9 @@ export default function Enroll() {
         <Button variant="gradient" gradient={{ from: "indigo", to: "cyan" }} leftIcon={<IconPlus size={14} />} onClick={handleEnroll} loading={enrollStatus === EnrollStatus.Enrolling} disabled={enrollStatus === EnrollStatus.Enrolling}>
           {enrollStatus === EnrollStatus.Enrolling ? "Bezig met enrollment..." : "Toevoegen"}
         </Button>
-        <Button color="red" variant="outline" leftIcon={<IconX size={14} />}>Annuleren</Button>
+        <Button color="red" variant="outline" leftIcon={<IconX size={14} />} onClick={cancelEnroll} disabled={enrollStatus !== EnrollStatus.Enrolling}>
+          Annuleren
+        </Button>
       </SimpleGrid>
       {enrollStatus !== EnrollStatus.Idle && enrollData !== null && (
         <div>
