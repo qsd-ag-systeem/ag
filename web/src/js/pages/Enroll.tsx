@@ -57,9 +57,9 @@ export default function Enroll() {
 
     socket.on("enroll", (data: any) => {
       console.log(data);
-
-      // if (data.folder !== enrollFolder) {
-      //   console.log(data.folder + " !== " + enrollFolder)
+      // if (data.folder !== location) {
+      //   console.log(data.folder + " !== " + location)
+      //   return;
       // }
       
       setEnrollLog((prev) => [...prev, (data.success ? "Enrolled" : "Failed to enroll") + " " + data.file + " (" + data.current + "/" + data.total + ")"]);
@@ -102,12 +102,16 @@ export default function Enroll() {
           )}
         </Transition>
       )}
-      <Text>Naam</Text>
-      <Input mb={10} value={name} onChange={(e) => setName(e.currentTarget.value)} />
-      <Text>Locatie</Text>
-      <div style={{ marginBottom: 10 }}>
-        <DirectoryBrowser onChange={onDirectoryChange} />
-      </div>
+      {enrollStatus === EnrollStatus.Idle && (
+        <div>
+          <Text>Naam</Text>
+          <Input mb={10} value={name} onChange={(e) => setName(e.currentTarget.value)} />
+          <Text>Locatie</Text>
+          <div style={{ marginBottom: 10 }}>
+            <DirectoryBrowser onChange={onDirectoryChange} />
+          </div>
+        </div>
+      )}
       <SimpleGrid cols={2}>
         <Button variant="gradient" gradient={{ from: "indigo", to: "cyan" }} leftIcon={<IconPlus size={14} />} onClick={handleEnroll} loading={enrollStatus === EnrollStatus.Enrolling} disabled={enrollStatus === EnrollStatus.Enrolling}>
           {enrollStatus === EnrollStatus.Enrolling ? "Bezig met enrollment..." : "Toevoegen"}
