@@ -1,4 +1,4 @@
-import { Badge, Box, createStyles, Flex, Image, Text, Button } from "@mantine/core";
+import { Badge, Box, createStyles, Flex, Image, Text, Button, Divider, Group } from "@mantine/core";
 import usePercentageColor from "../hooks/usePercentageColor";
 import { openModal } from "@mantine/modals";
 import { useCallback } from "react";
@@ -34,10 +34,19 @@ type MatchProps = {
   image?: string;
   percentage?: number;
   fileName?: string;
+  inputFile?: string;
+  dataset?: string;
   isModal?: boolean;
 };
 
-export default function Match({ image, percentage, fileName, isModal = false }: MatchProps) {
+export default function Match({
+  image,
+  percentage,
+  fileName,
+  dataset,
+  inputFile,
+  isModal = false,
+}: MatchProps) {
   const color = usePercentageColor(percentage);
   const { classes } = useStyles();
 
@@ -51,7 +60,17 @@ export default function Match({ image, percentage, fileName, isModal = false }: 
         openModal({
           size: "auto",
           overlayBlur: 2,
-          title: fileName,
+          title: (
+            <Group sx={{ justifyContent: "space-between" }}>
+              <Group fw={500}>
+                Dataset: <Text fz="sm">{dataset}</Text>
+              </Group>
+              <Divider />
+              <Group fw={500}>
+                Input: <Text fz="sm">{inputFile}</Text>
+              </Group>
+            </Group>
+          ),
           children: (
             <Match fileName={fileName} percentage={percentage} image={image} isModal={true} />
           ),
@@ -70,7 +89,11 @@ export default function Match({ image, percentage, fileName, isModal = false }: 
           </Text>
         </Box>
       )}
-      {fileName && <Badge className={classes.fileName}>{fileName}</Badge>}
+      {fileName && (
+        <Badge opacity={1} className={classes.fileName}>
+          {fileName}
+        </Badge>
+      )}
       <Box
         sx={{
           aspectRatio: !isModal ? "1/1" : undefined,

@@ -7,7 +7,7 @@ export default function Home() {
     <Container fluid>
       {/* <DirectoryBrowser /> */}
 
-      <SearchResults folder="input/imdb" />
+      <SearchResults folder="input/pytest" />
     </Container>
   );
 }
