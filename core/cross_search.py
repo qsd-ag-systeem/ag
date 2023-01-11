@@ -30,10 +30,10 @@ def get_sorted_results(data, msearch_result, limit=100):
                 'file1': data[key]['_source']['file_name'],
                 'file2': result['hits']['hits'][0]['_source']['file_name'],
                 'score': round(result['hits']['hits'][0]['_score'] * 100, 3),
-                'top_left_1': str(data[key]['_source']['top_left']),
-                'top_left_2': str(result['hits']['hits'][0]['_source']['top_left']),
-                'bottom_right1': str(data[key]['_source']['bottom_right']),
-                'bottom_right2': str(result['hits']['hits'][0]['_source']['bottom_right']),
+                'top_left_1': data[key]['_source']['top_left'],
+                'top_left_2': result['hits']['hits'][0]['_source']['top_left'],
+                'bottom_right_1': data[key]['_source']['bottom_right'],
+                'bottom_right_2': result['hits']['hits'][0]['_source']['bottom_right'],
             })
 
     # Sort results by score descending
