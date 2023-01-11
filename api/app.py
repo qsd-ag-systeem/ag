@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from api.helpers.response import error_response
+from api.routes.get_image import get_image
 from api.routes.index import index
 from api.routes.enroll import enroll
 from api.routes.datasets import get
@@ -22,6 +23,7 @@ app.add_url_rule('/search', 'search', search, methods=['POST'])
 app.add_url_rule('/import', 'import', import_dataset, methods=['POST'])
 app.add_url_rule('/export', 'export', export, methods=['POST'])
 app.add_url_rule('/delete', 'delete', delete, methods=['POST'])
+app.add_url_rule('/image/<path:path>', 'image', get_image)
 
 # Directories
 app.add_url_rule('/directories', 'directories', directories)

@@ -88,7 +88,7 @@ def search_file(file, dataset, cuda=False):
                     row["_id"],
                     row["_source"]["dataset"],
                     row["_source"]["file_name"],
-                    round(row["_score"] * 100),
+                    round(row["_score"] * 100, 3),
                     str(row["_source"]["top_left"]),
                     str(row["_source"]["bottom_right"]),
                 ])
