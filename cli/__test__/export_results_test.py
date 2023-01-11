@@ -1,5 +1,4 @@
 from distutils.dir_util import copy_tree
-from pathlib import Path
 from click.testing import CliRunner
 from cli.ag import enroll, search
 import os
@@ -24,12 +23,13 @@ def test_search_export_output_created(runner: CliRunner):
         input_folder = os.path.join(os.getcwd(), "input", "pytest")
         os.makedirs(input_folder)
 
-        copy_tree(os.path.abspath(os.path.join(__file__, "..",
-                  "..", "..", "input", "pytest")), input_folder)
+        copy_tree(os.path.abspath(os.path.join(
+            __file__, "..", "..", "..", "input", "pytest"
+        )), input_folder)
 
         result = runner.invoke(enroll, ['input/pytest'])
 
-        assert "Enrollment finished!" in result.output
+        assert "Enrollment finished" in result.output
         assert result.exit_code == 0
 
         result = runner.invoke(
@@ -39,27 +39,3 @@ def test_search_export_output_created(runner: CliRunner):
 
         assert result.exit_code == 0
         assert os.path.exists(output_folder)
-
-# Temporary disabled
-
-# def test_search_export_no_match(runner: CliRunner):
-#     # Create test folder with fake images
-#     with runner.isolated_filesystem():
-#         input_folder = os.path.join(os.getcwd(), "input", "pytest")
-#         os.makedirs(input_folder)
-
-#         copy_tree(os.path.abspath(os.path.join(__file__, "..",
-#                   "..", "..", "input", "pytest")), input_folder)
-
-#         result = runner.invoke(enroll, ['input/pytest'])
-
-#         assert "Enrollment finished!" in result.output
-#         assert result.exit_code == 0
-
-#         no_match_folder = os.path.join(os.getcwd(), "input", "no_match")
-#         os.makedirs(no_match_folder)
-
-#         result = runner.invoke(
-#             search, ['input/no_match', "-d", "input/pytest", '--export'])
-
-#         assert "No matches found" in result.output
