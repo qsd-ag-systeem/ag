@@ -29,16 +29,11 @@ export default function Enroll() {
     setEnrollLog([]);
     setEnrollFolder(location + "");
 
-    console.log("Enroll folder " + enrollFolder + ", location: " + location);
-
     try {
-      const data = await enroll(location);
-      console.log(data);
+      const data = await enroll(location, name);
     } catch (e: any) {
       setEnrollStatus(EnrollStatus.Idle);
       setEnrollError(e.message);
-
-      console.log(e.message);
     }
   };
 

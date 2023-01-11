@@ -13,6 +13,8 @@ def enroll():
             "message": "Folder is required"
         }
 
+    name = data["name"] if "name" in data else data["folder"]
+
     res = {}
 
     folder = data["folder"]
@@ -47,7 +49,7 @@ def enroll():
         current += 1
 
         try:
-            process_file(folder, file, cuda)
+            process_file(name, file, cuda)
         except Exception as error:
             errors.append(error)
             success = False

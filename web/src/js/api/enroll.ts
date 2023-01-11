@@ -1,8 +1,10 @@
 import { API_URL, FETCH_HEADERS } from "../constants";
 
-export const enroll = async (inputDir: string) => {
+export const enroll = async (inputDir: string, name: string | null) => {
+    if (name?.trim() === "") name = null;
     const data = {
-        folder: inputDir
+        folder: inputDir,
+        name: name,
     };
 
     return await fetch(`${API_URL}/enroll`, {
