@@ -32,8 +32,8 @@ def get_sorted_results(data, msearch_result):
                 'score': round(result['hits']['hits'][0]['_score'] * 100, 3),
                 'top_left_1': str(data[key]['_source']['top_left']),
                 'top_left_2': str(result['hits']['hits'][0]['_source']['top_left']),
-                'bottom_right1': str(data[key]['_source']['bottom_right']),
-                'bottom_right2': str(result['hits']['hits'][0]['_source']['bottom_right']),
+                'bottom_right_1': str(data[key]['_source']['bottom_right']),
+                'bottom_right_2': str(result['hits']['hits'][0]['_source']['bottom_right']),
             })
 
     # Sort results by score descending
