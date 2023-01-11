@@ -1,6 +1,6 @@
 import { Container, Title, Input, Text, Button, SimpleGrid, Transition, Paper, Progress } from "@mantine/core";
 import DirectoryBrowser from "../components/DirectoryBrowser";
-import { enroll } from "../api/enroll";
+import { fetchEnroll } from "../api/enroll";
 import { IconPlus, IconX } from "@tabler/icons";
 import { useState, useEffect } from "react";
 import io from "socket.io-client";
@@ -30,7 +30,7 @@ export default function Enroll() {
     setEnrollFolder(location + "");
 
     try {
-      const data = await enroll(location, name);
+      const data = await fetchEnroll({name, folder: location});
     } catch (e: any) {
       if (e.enrollLog.length !== 0) {
         setEnrollStatus(EnrollStatus.Idle);

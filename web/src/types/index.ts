@@ -11,6 +11,7 @@ export type BodyExport = {
 
 export type BodyEnroll = {
     folder: string;
+    name?: string;
     cuda?: boolean;
 }
 

@@ -13,10 +13,10 @@ def enroll():
     if "folder" not in data:
         return error_response("Folder is required")
 
-    name = data["name"] if "name" in data else data["folder"]
 
     folder = data["folder"]
     cuda = data["cuda"] if "cuda" in data else False
+    name = data["name"] if "name" in data else folder
 
     folder_path = os.path.abspath(os.curdir + "/" + folder)
 
@@ -38,7 +38,6 @@ def enroll():
 
     socketio = current_app.extensions['socketio']
 
-    # cancel command
     def cancel(data):
         nonlocal canceled
         if data["folder"] == folder:
