@@ -1,6 +1,6 @@
 from flask import request
 
-from core.cross_search import cross_search_datasets
+from core.cross_search import get_sorted_results
 from core.import_dataset import import_all
 from api.helpers.response import error_response, success_response
 
@@ -15,7 +15,7 @@ def cross_search():
 
     try:
         # Sort results by score descending
-        data = sorted(cross_search_datasets(dataset1, dataset2), key=lambda k: k['score'], reverse=True)
+        data = sorted(get_sorted_results(dataset1, dataset2), key=lambda k: k['score'], reverse=True)
         return success_response(data)
     except Exception as e:
         return error_response(str(e))

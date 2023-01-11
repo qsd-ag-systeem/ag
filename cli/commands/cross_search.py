@@ -1,8 +1,8 @@
 import click
 from halo import Halo
 
+from core.cross_search import get_sorted_results, validate_datasets_get_first, get_msearch_data, get_face_embeddings
 from core.common import print_table
-from core.cross_search import cross_search_datasets
 
 
 @click.command(help="Vergelijkt twee datasets en geeft de top resultaten weer.")
@@ -15,13 +15,46 @@ def cross_search(dataset1: str, dataset2: str, debug: bool) -> None:
     Search for similar faces in the database of the given image(s).
     """
 
+    data = []
     results = []
+    msearch_result = []
+    face_embeddings = []
     spinner = Halo(text=f"Cross searching dataset {dataset1} and {dataset2}", spinner='dots')
     spinner.start()
 
     try:
+        spinner.text = "Validating and receiving dataset"
+        data = validate_datasets_get_first(dataset1, dataset2)
+    except Exception as e:
+        spinner.fail(f"Cross searching dataset {dataset1} and {dataset2} failed.")
+        click.echo(f"Error: {e}", err=True) if debug else None
+        exit(1)
+
+    try:
+        spinner.text = "Retrieving face embeddings"
+        face_embeddings = get_face_embeddings(data)
+    except Exception as e:
+        spinner.fail(f"Cross searching dataset {dataset1} and {dataset2} failed.")
+        click.echo(f"Error: {e}", err=True) if debug else None
+        exit(1)
+
+    if len(face_embeddings) > 5000:
+        spinner.warn(
+            f"The dataset {dataset1} contains more than 5000 face embeddings. This may take a while, please be patient.")
+        spinner.start()
+
+    try:
+        spinner.text = f"Retrieving matching entries from dataset {dataset2} ..."
+        msearch_result = get_msearch_data(face_embeddings, dataset2)
+    except Exception as e:
+        spinner.fail(f"Cross searching dataset {dataset1} and {dataset2} failed.")
+        click.echo(f"Error: {e}", err=True) if debug else None
+        exit(1)
+
+    try:
+        spinner.text = f"Generating and sorting results"
         # Sort results by score descending
-        results = sorted(cross_search_datasets(dataset1, dataset2), key=lambda k: k['score'], reverse=True)
+        results = get_sorted_results(data, msearch_result)
     except Exception as e:
         spinner.fail(f"Cross searching dataset {dataset1} and {dataset2} failed.")
         click.echo(f"Error: {e}", err=True) if debug else None
@@ -42,6 +75,7 @@ def cross_search(dataset1: str, dataset2: str, debug: bool) -> None:
         'bottom_right2': "Bottom right 2",
     }
 
-    print_table(columns, results)
+    # Print the first 100 results
+    print_table(columns, results[:100])
 
     exit(0)

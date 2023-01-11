@@ -11,14 +11,18 @@ def validate_datasets_get_first(dataset1, dataset2):
         return list(retrieve_dataset_data(dataset1))
 
 
-def cross_search_datasets(dataset1, dataset2):
+def get_face_embeddings(data):
+    return [entry['_source']['face_embedding'] for entry in data]
+
+
+def get_msearch_data(face_embeddings, dataset):
+    return retrieve_msearch_knn_filtered_data(face_embeddings, [dataset], 1)
+
+
+def get_sorted_results(data, msearch_result):
     results = []
-    data = validate_datasets_get_first(dataset1, dataset2)
-    face_embeddings = [entry['_source']['face_embedding'] for entry in data]
 
-    msearch_result = retrieve_msearch_knn_filtered_data(face_embeddings, (dataset2,), 1)
-
-    for (key, result) in enumerate(msearch_result['responses']):
+    for (key, result) in enumerate(msearch_result):
         if result['hits']['hits']:
             results.append({
                 'dataset1': data[key]['_source']['dataset'],
