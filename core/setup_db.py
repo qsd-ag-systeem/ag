@@ -37,7 +37,8 @@ def ensure_db_running():
                 "discovery.type=single-node",
                 "xpack.security.enabled=false",
                 "ELASTIC_PASSWORD=elastic",
-                "LICENSE=basic"
+                "LICENSE=basic",
+                "http.max_content_length=500mb"
             ],
             volumes={
                 volume: {'bind': '/usr/share/elasticsearch/data', 'mode': 'rw'}
