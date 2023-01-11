@@ -32,8 +32,10 @@ export default function Enroll() {
     try {
       const data = await enroll(location, name);
     } catch (e: any) {
-      setEnrollStatus(EnrollStatus.Idle);
-      setEnrollError(e.message);
+      if (e.enrollLog.length !== 0) {
+        setEnrollStatus(EnrollStatus.Idle);
+        setEnrollError(e.message);
+      }
     }
   };
 
