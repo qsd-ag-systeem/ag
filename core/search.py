@@ -23,6 +23,8 @@ def retrieve_dataset_data(dataset: str):
 def retrieve_msearch_knn_filtered_data(face_emb: [list], datasets: tuple, limit: int = 100):
     es = EsConnection()
 
+    responses = []
+
     body = []
     for emb in face_emb:
         body.append({
@@ -49,9 +51,16 @@ def retrieve_msearch_knn_filtered_data(face_emb: [list], datasets: tuple, limit:
             }
         })
 
-    result = es.connection.msearch(body=body)
+    # For each 10000 items, send a msearch API request
+    for i in range(0, len(body), 10000):
+        responses += (
+            es.connection
+            .options(request_timeout=300)
+            .msearch(body=body[i:i+10000])
+            .get('responses')
+        )
 
-    return result
+    return responses
 
 
 def retrieve_knn_filtered_search_data(face_emb: list, datasets: tuple, limit: int = 100):
