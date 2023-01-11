@@ -9,7 +9,6 @@ from core.common import print_table
 @click.option("--dataset1", "-d1", "dataset1", type=str, required=True, multiple=False)
 @click.option("--dataset2", "-d2", "dataset2", type=str, required=True, multiple=False)
 @click.option('--debug/--no-debug', default=False)
-@click.option('--cuda/--no-cuda', default=True)
 def cross_search(dataset1: str, dataset2: str, debug: bool) -> None:
     """
     Search for similar faces in the database of the given image(s).
