@@ -19,7 +19,7 @@ def get_msearch_data(face_embeddings, dataset2):
     return retrieve_msearch_knn_filtered_data(face_embeddings, [dataset2], 1)
 
 
-def get_sorted_results(data, msearch_result):
+def get_sorted_results(data, msearch_result, limit=100):
     results = []
 
     for (key, result) in enumerate(msearch_result):
@@ -37,7 +37,7 @@ def get_sorted_results(data, msearch_result):
             })
 
     # Sort results by score descending
-    return sorted(results, key=lambda k: k['score'], reverse=True)
+    return sorted(results, key=lambda k: k['score'], reverse=True)[:limit]
 
 
 def get_cross_search_data(dataset1, dataset2):

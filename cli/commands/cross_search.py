@@ -76,6 +76,6 @@ def cross_search(dataset1: str, dataset2: str, debug: bool) -> None:
     }
 
     # Print the first 100 results
-    print_table(columns, results[:100])
+    print_table(columns, results[])
 
     exit(0)
