@@ -8,15 +8,15 @@ def validate_datasets_get_first(dataset1, dataset2):
         if not dataset_exists(dataset):
             raise Exception(f"Dataset '{dataset}' does not exist.")
 
-        return list(retrieve_dataset_data(dataset1))
+    return list(retrieve_dataset_data(dataset1))
 
 
 def get_face_embeddings(data):
     return [entry['_source']['face_embedding'] for entry in data]
 
 
-def get_msearch_data(face_embeddings, dataset):
-    return retrieve_msearch_knn_filtered_data(face_embeddings, [dataset], 1)
+def get_msearch_data(face_embeddings, dataset2):
+    return retrieve_msearch_knn_filtered_data(face_embeddings, [dataset2], 1)
 
 
 def get_sorted_results(data, msearch_result):
@@ -38,3 +38,11 @@ def get_sorted_results(data, msearch_result):
 
     # Sort results by score descending
     return sorted(results, key=lambda k: k['score'], reverse=True)
+
+
+def get_cross_search_data(dataset1, dataset2):
+    data = validate_datasets_get_first(dataset1, dataset2)
+    face_embeddings = get_face_embeddings(data)
+    msearch_result = get_msearch_data(face_embeddings, dataset2)
+
+    return get_sorted_results(data, msearch_result)
