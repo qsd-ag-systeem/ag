@@ -6,6 +6,11 @@ export type BodySearch = {
   dataset?: string;
 };
 
+export type BodyCrossSearch = {
+  dataset1: string;
+  dataset2: string;
+};
+
 export type SearchResult = {
   input_file: string;
   id: string;
@@ -21,7 +26,7 @@ export type CrossSearchResult = {
   dataset2: string;
   file1: string;
   file2: string;
-  similarity: number;
+  score: number;
   top_left_1: number[];
   top_left_2: number[];
   bottom_right_1: number[];
@@ -29,6 +34,7 @@ export type CrossSearchResult = {
 };
 
 export type SearchResponse = SuccessResponse<SearchResult[]>;
+export type CrossSearchResponse = SuccessResponse<CrossSearchResult[]>;
 
 export type BodyExport = {
   path: string;

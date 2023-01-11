@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from api.helpers.response import error_response
+from api.routes.cross_search import cross_search
 from api.routes.get_image import get_image
 from api.routes.index import index
 from api.routes.enroll import enroll
@@ -20,6 +21,7 @@ app.add_url_rule('/', 'index', index)
 app.add_url_rule('/datasets', 'datasets', get)
 app.add_url_rule('/enroll', 'enroll', enroll, methods=['POST'])
 app.add_url_rule('/search', 'search', search, methods=['POST'])
+app.add_url_rule('/cross-search', 'cross-search', cross_search, methods=['POST'])
 app.add_url_rule('/import', 'import', import_dataset, methods=['POST'])
 app.add_url_rule('/export', 'export', export, methods=['POST'])
 app.add_url_rule('/delete', 'delete', delete, methods=['POST'])
