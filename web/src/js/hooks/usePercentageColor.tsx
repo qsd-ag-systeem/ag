@@ -4,7 +4,7 @@ export default function usePercentageColor(percentage?: number) {
   const theme = useMantineTheme();
 
   if (!percentage) {
-    return undefined;
+    return "";
   }
 
   if (percentage < 50) {

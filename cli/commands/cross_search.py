@@ -53,7 +53,7 @@ def cross_search(dataset1: str, dataset2: str, debug: bool, cuda: bool) -> None:
         spinner.start(f"Retrieving matching entries from dataset {dataset2} ...")
 
     try:
-        msearch_result = retrieve_msearch_knn_filtered_data(face_embeddings, (dataset2,), 1)
+        msearch_result = retrieve_msearch_knn_filtered_data(face_embeddings, [dataset2], 1)
 
         for (key, result) in enumerate(msearch_result):
             if result['hits']['hits']:

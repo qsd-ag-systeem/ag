@@ -45,7 +45,7 @@ def retrieve_msearch_knn_filtered_data(face_emb: [list], datasets: tuple, limit:
                 "num_candidates": 100,
                 "filter": {
                     "terms": {
-                        "dataset": list(datasets)
+                        "dataset":
                     }
                 }
             }

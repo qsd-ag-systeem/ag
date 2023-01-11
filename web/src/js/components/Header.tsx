@@ -19,9 +19,21 @@ export function Header() {
     <Box>
       <MantineHeader height={60} px="md">
         <Group position="apart" sx={{ height: "100%" }}>
-          <Anchor component={Link} to={"/"}>
-            <AppIcon height={50} />
-          </Anchor>
+          <Group spacing={"md"}>
+            <Anchor component={Link} to={"/"}>
+              <AppIcon height={50} />
+            </Anchor>
+
+            <Group>
+              <Anchor component={Link} to={"/"}>
+                Zoeken
+              </Anchor>
+
+              <Anchor component={Link} to={"/cross-search"}>
+                Kruiszoeken
+              </Anchor>
+            </Group>
+          </Group>
 
           <Group>
             <Button disabled>Log in</Button>
@@ -30,6 +42,7 @@ export function Header() {
               color={dark ? "yellow" : "blue"}
               onClick={() => toggleColorScheme()}
               title="Toggle color scheme"
+              size={36}
             >
               {dark ? <IconSun size={18} /> : <IconMoonStars size={18} />}
             </ActionIcon>
