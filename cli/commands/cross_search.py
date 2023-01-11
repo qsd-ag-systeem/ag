@@ -1,11 +1,8 @@
-import time
-
 import click
 from halo import Halo
 
 from core.common import dataset_exists, print_table
-from core.face_recognition import init, use_cuda
-from core.search import retrieve_dataset_data, retrieve_knn_filtered_search_data, retrieve_msearch_knn_filtered_data
+from core.search import retrieve_dataset_data, retrieve_msearch_knn_filtered_data
 
 
 @click.command(help="Vergelijkt twee datasets en geeft de top resultaten weer.")
@@ -51,10 +48,14 @@ def cross_search(dataset1: str, dataset2: str, debug: bool, cuda: bool) -> None:
     results = []
     face_embeddings = [entry['_source']['face_embedding'] for entry in data]
 
+    if len(face_embeddings) > 5000:
+        spinner.warn(f"The dataset {dataset1} contains more than 5000 face embeddings. This may take a while, please be patient.")
+        spinner.start(f"Retrieving matching entries from dataset {dataset2} ...")
+
     try:
         msearch_result = retrieve_msearch_knn_filtered_data(face_embeddings, (dataset2,), 1)
 
-        for (key, result) in enumerate(msearch_result['responses']):
+        for (key, result) in enumerate(msearch_result):
             if result['hits']['hits']:
                 results.append({
                     'dataset1': data[key]['_source']['dataset'],
@@ -92,6 +93,7 @@ def cross_search(dataset1: str, dataset2: str, debug: bool, cuda: bool) -> None:
         'bottom_right2': "Bottom right 2",
     }
 
-    print_table(columns, results)
+    # Print the first 100 results
+    print_table(columns, results[:100])
 
     exit(0)

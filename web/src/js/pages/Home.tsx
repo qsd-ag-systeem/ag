@@ -1,11 +1,13 @@
-import { Container, Title } from "@mantine/core";
+import { Container, Flex } from "@mantine/core";
 import DirectoryBrowser from "../components/DirectoryBrowser";
+import SearchResults from "../components/SearchResults";
 
 export default function Home() {
   return (
     <Container fluid>
-      <Title>Home</Title>
-      <DirectoryBrowser />
+      {/* <DirectoryBrowser /> */}
+
+      <SearchResults folder="input/pytest" />
     </Container>
   );
 }
