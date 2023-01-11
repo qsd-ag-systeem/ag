@@ -1,7 +1,7 @@
 import click
 from halo import Halo
 
-from core.cross_search import get_sorted_results, validate_datasets_get_first, get_msearch_data, get_face_embeddings
+from core.cross_search import get_sorted_results, validate_datasets_get_first, get_msearch_data, get_face_embeddings_from_data
 from core.common import print_table
 
 
@@ -35,7 +35,7 @@ def cross_search(dataset1: str, dataset2: str, debug: bool) -> None:
     spinner.text = f"Retrieving matching entries from dataset {dataset2} ..."
 
     try:
-        face_embeddings = get_face_embeddings(data)
+        face_embeddings = get_face_embeddings_from_data(data)
     except Exception as e:
         spinner.fail(f"Cross searching dataset {dataset1} and {dataset2} failed.")
         click.echo(f"Error: {e}", err=True) if debug else None
@@ -81,6 +81,6 @@ def cross_search(dataset1: str, dataset2: str, debug: bool) -> None:
     }
 
     # Print the first 100 results
-    print_table(columns, results[])
+    print_table(columns, results)
 
     exit(0)

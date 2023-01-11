@@ -11,7 +11,7 @@ def validate_datasets_get_first(dataset1, dataset2):
     return list(retrieve_dataset_data(dataset1))
 
 
-def get_face_embeddings(data):
+def get_face_embeddings_from_data(data):
     return [entry['_source']['face_embedding'] for entry in data]
 
 
@@ -42,7 +42,7 @@ def get_sorted_results(data, msearch_result, limit=100):
 
 def get_cross_search_data(dataset1, dataset2):
     data = validate_datasets_get_first(dataset1, dataset2)
-    face_embeddings = get_face_embeddings(data)
+    face_embeddings = get_face_embeddings_from_data(data)
     msearch_result = get_msearch_data(face_embeddings, dataset2)
 
     return get_sorted_results(data, msearch_result)
