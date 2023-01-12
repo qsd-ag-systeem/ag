@@ -12,7 +12,6 @@ def get_subdirs(dir: str = ""):
         subdirs = [x for x in p.iterdir() if x.is_dir()]
         return success_response([str(x.relative_to(cwd)) for x in subdirs])
     except Exception as e:
-        print(e)
         return error_response()
 
 

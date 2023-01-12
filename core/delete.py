@@ -2,13 +2,11 @@ import os
 import shutil
 
 from core.EsConnection import EsConnection
-from core.common import dataset_exists
+from core.common import dataset_exists, refresh_index
 
 
 def delete_file_by_name(dataset: str, file_name: str):
-    exists = dataset_exists(dataset)
-
-    if not exists:
+    if not dataset_exists(dataset):
         raise Exception(f"Dataset '{dataset}' does not exist.")
 
     es = EsConnection()
@@ -30,12 +28,11 @@ def delete_file_by_name(dataset: str, file_name: str):
     }
 
     es.connection.delete_by_query(index=es.index_name, query=query)
+    refresh_index()
 
 
 def delete_dataset_by_name(dataset: str):
-    exists = dataset_exists(dataset)
-
-    if not exists:
+    if not dataset_exists(dataset):
         raise Exception(f"Dataset '{dataset}' does not exist.")
 
     es = EsConnection()
@@ -46,6 +43,7 @@ def delete_dataset_by_name(dataset: str):
     }
 
     es.connection.delete_by_query(index=es.index_name, query=query)
+    refresh_index()
 
 
 def delete_dataset_files_by_name(dataset: str):

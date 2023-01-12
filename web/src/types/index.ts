@@ -23,9 +23,9 @@ export type BodyEnroll = {
   cuda?: boolean;
 };
 
-export type BodyDelete = {
+export type BodyDeleteDataset = {
   dataset: string;
-  file: string;
+  files: string[];
   remove_file: boolean;
 };
 

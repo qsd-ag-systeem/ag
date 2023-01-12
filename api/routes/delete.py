@@ -1,32 +1,33 @@
 from api.helpers.response import success_response, error_response
 from flask import request
+
+from api.schemas.delete_dataset import DeleteDatasetInput
+from core.common import dataset_exists
 from core.delete import delete_dataset_by_name, delete_file_by_name, delete_dataset_file_by_name, \
     delete_dataset_files_by_name
 
 
 def delete():
-    data = request.get_json()
-    if "dataset" not in data:
-        return error_response("Dataset name is required")
+    inputs = DeleteDatasetInput(request)
+    if not inputs.validate():
+        return error_response(inputs.errors)
 
-    dataset = data["dataset"]
+    dataset = request.json.get('dataset')
 
-    if dataset == "":
-        return error_response("Dataset name is required")
+    if not dataset_exists(dataset):
+        return error_response(f"Dataset {dataset} does not exist")
 
-    file = ""
-    remove_file: bool = False
+    remove_file = request.json.get('remove_file')
 
-    if "file" in data:
-        file = data["file"]
+    files = []
+    if "files" in request.json:
+        files = request.json.get('files')
 
-    if "remove_file" in data:
-        remove_file = data["remove_file"]
+    if len(files) > 0:
+        delete_file(dataset, files)
 
-    if file != "":
-        delete_file(dataset, file)
         if remove_file:
-            for file_name in file:
+            for file_name in files:
                 delete_dataset_file_by_name(dataset, file_name)
     else:
         delete_dataset(dataset)
