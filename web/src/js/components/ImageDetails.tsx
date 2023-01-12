@@ -1,4 +1,4 @@
-import { Group, Image, Paper, Stack, Text } from "@mantine/core";
+import { Group, Paper, Stack, Text } from "@mantine/core";
 import FacialImage from "./FacialImage";
 
 type ImageDetailsProps = {

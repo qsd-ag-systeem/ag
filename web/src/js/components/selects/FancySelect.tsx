@@ -41,7 +41,7 @@ export function FancySelect<T extends { id?: number | string }>(props: FancySele
         setLoading(false);
 
         setData(
-          filteredData.data.map((value: T) => {
+          filteredData.map((value: T) => {
             return {
               value: `${labelRenderer(value)}`,
               data: value,

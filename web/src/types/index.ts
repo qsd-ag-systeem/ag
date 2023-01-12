@@ -5,7 +5,7 @@ export type Maybe<T> = T | null | undefined;
 export type BodySearch = {
   folder: string;
   cuda?: boolean;
-  dataset?: string;
+  datasets?: string[];
 };
 
 export type BodyCrossSearch = {
@@ -58,6 +58,8 @@ export type CrossSearchResult = {
   bottom_right_2: number[];
   width1: number;
   height1: number;
+  width2: number;
+  height2: number;
 };
 
 export type Dataset = {

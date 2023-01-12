@@ -23,7 +23,14 @@ export default function CrossSearchDetails(props: CrossSearchDetailsProps) {
           width={match.width1}
           height={match.height1}
         />
-        <ImageDetails file_name={match.file2} dataset={match.dataset2} />
+        <ImageDetails
+          file_name={match.file2}
+          dataset={match.dataset2}
+          top_left={match.top_left_2}
+          bottom_right={match.bottom_right_2}
+          width={match.width2}
+          height={match.height2}
+        />
       </Group>
       <Paper withBorder p={"md"}>
         <Group position={"center"}>
