@@ -2,6 +2,7 @@ import { Button, Card, Group, LoadingOverlay, Text } from "@mantine/core";
 import { IconTrash } from "@tabler/icons";
 import useDatasetsData from "../../hooks/dataset/useDatasetsData";
 import useDeleteDataset from "../../hooks/dataset/useDeleteDataset";
+import { pluralize } from "../../tools";
 
 export default function DatasetList() {
   const { data: datasets, isFetching } = useDatasetsData();
@@ -17,7 +18,7 @@ export default function DatasetList() {
               <Text>{dataset.name}</Text>
 
               <Text color={"dimmed"} size={"sm"} inline>
-                ({dataset.count} gezichten)
+                ({dataset.count} {pluralize(dataset.count, "gezicht", "gezichten")})
               </Text>
             </Group>
 
