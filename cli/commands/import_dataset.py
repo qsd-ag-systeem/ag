@@ -12,6 +12,7 @@ def import_dataset(file_name: str) -> None:
     """
     Imports datasets from a csv file into the database.
     """
+
     file_path = os.path.join(os.getcwd(), "input", f"{file_name}.csv")
     file = Path(file_path)
 

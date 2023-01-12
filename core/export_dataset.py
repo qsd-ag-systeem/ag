@@ -23,12 +23,12 @@ def export_datasets(file):
     write_es_export_to_file(file, documents)
 
 
-def export_datasets_by_name(file, datasets: tuple):
+def export_datasets_by_name(file, datasets: list):
     es = EsConnection()
 
     query = {
         "terms": {
-            "dataset": list(datasets)
+            "dataset": datasets
         }
     }
 
@@ -57,6 +57,9 @@ def write_es_export_to_file(file, rows):
 
     mapping = es.connection.indices.get_mapping(index=es.index_name)
     mapping = mapping[es.index_name]['mappings']['properties'].keys()
+
+    if not file.endswith('.csv'):
+        file = f"{file}.csv"
 
     with open(file, 'w') as f:
         w = csv.DictWriter(f, mapping, delimiter=",", quoting=csv.QUOTE_MINIMAL)

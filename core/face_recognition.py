@@ -6,7 +6,7 @@ from collections.abc import Callable
 
 from core.EsConnection import EsConnection
 from core.common import vec2list
-from core.search import retrieve_all_data, retrieve_data
+from core.search import retrieve_knn_search_data, retrieve_knn_filtered_search_data
 
 facerec = None
 shape_predictor: Optional[Callable] = None
@@ -78,9 +78,9 @@ def search_file(file, dataset, cuda=False):
     for (key, face) in enumerate(face_embeddings):
         try:
             if dataset:
-                data = retrieve_data(face["face_embedding"], dataset)
+                data = retrieve_knn_filtered_search_data(face["face_embedding"], dataset)
             else:
-                data = retrieve_all_data(face["face_embedding"])
+                data = retrieve_knn_search_data(face["face_embedding"])
 
             for row in data["hits"]["hits"]:
                 results.append([
@@ -88,7 +88,7 @@ def search_file(file, dataset, cuda=False):
                     row["_id"],
                     row["_source"]["dataset"],
                     row["_source"]["file_name"],
-                    round(row["_score"] * 100),
+                    round(row["_score"] * 100, 3),
                     str(row["_source"]["top_left"]),
                     str(row["_source"]["bottom_right"]),
                 ])

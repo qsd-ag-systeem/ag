@@ -7,13 +7,13 @@ cmake==3.25.0
 colorama==0.4.6
 coverage==6.5.0
 dlib==19.24.0
-exceptiongroup==1.0.4
+exceptiongroup==1.1.0
 execnet==1.9.0
 grapheme==0.6.0
 imutils==0.5.4
 iniconfig==1.1.1
 numpy==1.24.1
-opencv-python==4.6.0.66
+opencv-python==4.7.0.68
 packaging==21.3
 pluggy==1.0.0
 pycodestyle==2.10.0
