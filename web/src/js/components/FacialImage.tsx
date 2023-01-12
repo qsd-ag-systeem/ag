@@ -61,7 +61,6 @@ export default function FacialImage(props: FacialImageProps) {
             zIndex: 1,
             position: "absolute",
             border: "3px solid red",
-            width: "10px",
           }}
         />
       )}

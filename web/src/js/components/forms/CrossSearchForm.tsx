@@ -1,6 +1,5 @@
 import { AutocompleteItem, Button } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useLogger } from "@mantine/hooks";
 import { BodyCrossSearch, Dataset } from "../../../types";
 import { fetchDatasets } from "../../api/datasets";
 import { FancySelect } from "../selects/FancySelect";
