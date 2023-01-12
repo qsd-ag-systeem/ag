@@ -118,9 +118,10 @@ def get_face_embeddings(img, cuda: bool):
         face_locations = face_detector(img, 1)
     except RuntimeError:
         raise Exception("Unable to detect face locations")
-
+            
     for face in face_locations:
         rect = face.rect if cuda else face
+        
         raw_shape = shape_predictor(img, rect)
         face_descriptor = facerec.compute_face_descriptor(img, raw_shape)
         face_emb = vec2list(face_descriptor)

@@ -1,38 +1,11 @@
-from unittest.mock import MagicMock, patch
-import dlib
+from unittest.mock import MagicMock, call, patch
+from unittest import TestCase
 from pathlib import Path
 from core.EsConnection import EsConnection
 from core.face_recognition import use_cuda, insert_data, init, process_file, search_file, get_face_embeddings
 
-class MockImage:
-    def __init__(self, shape):
-        self.shape = shape
+class TestFaceRecognition(TestCase):
 
-class MockRectangle:
-    def __init__(self, left, top, right, bottom):
-        self._left = left
-        self._top = top
-        self._right = right
-        self._bottom = bottom
-
-    def left(self):
-        return self._left
-
-    def top(self):
-        return self._top
-
-    def right(self):
-        return self._right
-
-    def bottom(self):
-        return self._bottom
-
-class MockFullObjectDetection:
-    def __init__(self, rect, parts):
-        self.rect = rect
-        self.parts = parts
-
-class TestFaceRecognition:
     @patch('core.face_recognition.dlib.DLIB_USE_CUDA', True)
     def test_use_cuda_with_DLIB_USE_CUDA(self):
         assert use_cuda() is False
@@ -135,6 +108,8 @@ class TestFaceRecognition:
             key
         )
 
+class TestFaceRecognitionSearchFile(TestCase):
+
     @patch('core.face_recognition.get_face_embeddings')
     @patch('core.face_recognition.retrieve_data')
     @patch('core.face_recognition.retrieve_all_data')
@@ -166,7 +141,7 @@ class TestFaceRecognition:
                             "top_left": "(1,2)",
                             "bottom_right": "(3,4)"
                         },
-                        "_score": 1,
+                        "_score": 1
                     }
                 ]
             }
@@ -175,59 +150,153 @@ class TestFaceRecognition:
         mock_retrieve_data.return_value = retrieve_data_response
         mock_retrieve_all_data.return_value = retrieve_data_response
         
-        # check function output with dataset
         results = search_file(file, dataset=dataset, cuda=False)
         assert results == expected_results_dataset
         mock_retrieve_data.assert_called_once()
 
-        # check function output without dataset
         mock_retrieve_data.reset_mock()
         results = search_file(file, dataset=None, cuda=False)
         assert results == expected_results_no_dataset
         mock_retrieve_all_data.assert_called_once()
 
-                       
-    @patch("dlib.rectangle")
-    @patch("dlib.full_object_detection")
-    def test_get_face_embeddings(self, detection_mock, rectangle_mock):
-        img = MagicMock()
-        shape = (3, 4, 3)
-        img.shape = shape
-        width, height, _ = shape
-        rectangle_mock.return_value = (1, 2, 3, 4)
-        detection_mock.return_value = [1, 2, 3]
-        expected_face_embeddings = [
-            {"face_embedding": [1, rectangle_mock, 3], "width": width, "height": height, "x": (1, 2), "y": (3, 4)}
-        ]
+class TestFaceRecognitionGetFaceEmbedding(TestCase):
+    class MockImage:
+        def __init__(self, shape):
+            self.shape = shape
 
-        results = get_face_embeddings(img, False)
-        assert results == expected_face_embeddings
+    class MockRectangle:
+        def __init__(self, left, top, right, bottom):
+            self._left = left
+            self._top = top
+            self._right = right
+            self._bottom = bottom
+
+        def left(self):
+            return self._left
+
+        def top(self):
+            return self._top
+
+        def right(self):
+            return self._right
+
+        def bottom(self):
+            return self._bottom
+
+    class MockFullObjectDetection:
+        def __init__(self, rect, parts):
+            self.rect = rect
+            self.parts = parts
+
+    img_height = 100
+    img_width = 90
+    img = MockImage((img_height, img_width, 3))
+    face_embedding = [*range(128)]
+
+    face1_width = 50
+    face1_height = 50
+    face1_x = 0
+    face1_y = 0
+    mock_rectangle1 = MockRectangle(face1_x, face1_y, face1_x + face1_width, face1_y + face1_height)
+    mock_full_object_detection1 = MockFullObjectDetection(mock_rectangle1, range(68))
+
+    face2_width = 50
+    face2_height = 50
+    face2_x = 50
+    face2_y = 50
+    mock_rectangle2 = MockRectangle(face2_x, face2_y, face2_x + face2_width, face2_y + face2_height)
+    mock_full_object_detection2 = MockFullObjectDetection(mock_rectangle2, range(68))
 
     @patch('core.face_recognition.face_detector')
     @patch('core.face_recognition.shape_predictor')
     @patch('core.face_recognition.facerec')
-    def test_get_face_embeddings(self, mock_facerec, mock_shape_predictor, mock_face_detector):
-        img_height = 1
-        img_width = 2
-        img = MockImage((img_height, img_width, 0))
+    def test_get_face_embeddings_one_face(self, mock_facerec, mock_shape_predictor, mock_face_detector):
+        mock_face_detector.return_value = [self.mock_rectangle1]
+        mock_shape_predictor.return_value = self.mock_rectangle1
+        mock_facerec.compute_face_descriptor.return_value = self.face_embedding
 
-        mock_rectangle = MockRectangle(0, 0, 100, 100)
-        mock_shape = MockFullObjectDetection(mock_rectangle, range(68))
-        face_embedding = [*range(128)]
-
-        mock_face_detector.return_value = [mock_rectangle]
-        mock_shape_predictor.return_value = mock_shape
-        mock_facerec.compute_face_descriptor.return_value = face_embedding
-
-        faces = get_face_embeddings(img, False)
+        faces = get_face_embeddings(self.img, False)
 
         assert len(faces) == 1
-        assert faces[0]["width"] == img_width
-        assert faces[0]["height"] == img_height
-        assert faces[0]["x"] == (mock_rectangle.left(), mock_rectangle.top())
-        assert faces[0]["y"] == (mock_rectangle.right(), mock_rectangle.bottom())
-        assert faces[0]["face_embedding"] == face_embedding
+        assert faces[0]["width"] == self.img_width
+        assert faces[0]["height"] == self.img_height
+        assert faces[0]["x"] == (self.mock_rectangle1.left(), self.mock_rectangle1.top())
+        assert faces[0]["y"] == (self.mock_rectangle1.right(), self.mock_rectangle1.bottom())
+        assert faces[0]["face_embedding"] == self.face_embedding
 
         mock_face_detector.assert_called_once()
         mock_shape_predictor.assert_called_once()
-        mock_facerec.compute_face_descriptor.assert_called_once_with(img, mock_shape)
+        mock_facerec.compute_face_descriptor.assert_called_once_with(self.img, self.mock_rectangle1)
+
+    @patch('core.face_recognition.shape_predictor')
+    @patch('core.face_recognition.face_detector')
+    @patch('core.face_recognition.facerec')
+    def test_get_face_embeddings_multiple_faces(self, mock_facerec, mock_face_detector, mock_shape_predictor):
+        mock_face_detector.return_value = [
+            self.mock_rectangle1, 
+            self.mock_rectangle2]
+
+        mock_shape_predictor.side_effect = [
+            self.mock_rectangle1,
+            self.mock_rectangle2]
+        
+        mock_facerec.compute_face_descriptor.return_value = self.face_embedding
+
+        faces = get_face_embeddings(self.img, False)
+        assert len(faces) == 2
+
+        assert faces[0]["width"] == self.img_width
+        assert faces[0]["height"] == self.img_height
+        assert faces[0]["x"] == (self.face1_x, self.face1_y)
+        assert faces[0]["y"] == (self.face1_x + self.face1_width, self.face1_y + self.face1_height)
+
+        assert faces[1]["width"] == self.img_width
+        assert faces[1]["height"] == self.img_height
+        assert faces[1]["x"] == (self.face2_x, self.face2_y)
+        assert faces[1]["y"] == (self.face2_x + self.face2_width, self.face2_y + self.face2_height)
+    
+        mock_face_detector.assert_called_once_with(self.img, 1)
+        mock_shape_predictor.assert_has_calls([
+            call(self.img, self.mock_rectangle1),
+            call(self.img, self.mock_rectangle2)])
+
+        mock_facerec.compute_face_descriptor.assert_has_calls([
+            call(self.img, self.mock_rectangle1),
+            call(self.img, self.mock_rectangle2)])
+
+    @patch('core.face_recognition.shape_predictor')
+    @patch('core.face_recognition.face_detector')
+    @patch('core.face_recognition.facerec')
+    def test_get_face_embeddings_no_face(self, mock_shape_predictor, mock_face_detector, mock_facerec):
+        mock_face_detector.side_effect = RuntimeError()
+
+        with self.assertRaises(Exception) as e:
+            faces = get_face_embeddings(self.img, False)
+
+            assert str(e.exception) == "Unable to detect face locations"
+            mock_face_detector.assert_called_once_with(self.img, 1)
+            mock_shape_predictor.assert_not_called()
+            mock_facerec.compute_face_descriptor.assert_not_called()
+
+    @patch('core.face_recognition.shape_predictor')
+    @patch('core.face_recognition.face_detector')
+    @patch('core.face_recognition.facerec')
+    def test_get_face_embedding_cuda_enabled(self, mock_facerec, mock_face_detector, mock_shape_predictor):
+        mock_face_detector.return_value = [self.mock_full_object_detection1]
+        mock_shape_predictor.return_value = self.mock_rectangle1
+        mock_facerec.compute_face_descriptor.return_value = self.face_embedding
+
+        faces = get_face_embeddings(self.img, True)
+
+        assert len(faces) == 1
+        
+        assert faces[0]["width"] == self.img_width
+        assert faces[0]["height"] == self.img_height
+        assert faces[0]["x"] == (self.mock_rectangle1.left(), self.mock_rectangle1.top())
+        assert faces[0]["y"] == (self.mock_rectangle1.right(), self.mock_rectangle1.bottom())
+        assert faces[0]["face_embedding"] == self.face_embedding
+
+        mock_face_detector.assert_called_once()
+        mock_shape_predictor.assert_called_once()
+        mock_facerec.compute_face_descriptor.assert_called_once_with(self.img, self.mock_rectangle1)
+
