@@ -30,7 +30,10 @@ def enroll():
 
     for file in files:
         try:
-            process_file(folder, file, cuda)
+            process_errors = process_file(folder, file, cuda)
+
+            if (process_errors):
+                errors.extend(process_errors)
         except Exception as error:
             errors.append(error)
             pass

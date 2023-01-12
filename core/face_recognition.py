@@ -53,26 +53,29 @@ def init(cuda: bool) -> None:
         detector_path) if cuda else dlib.get_frontal_face_detector()
 
 
-def process_file(dataset, file, cuda: bool = False) -> bool:
+def process_file(dataset, file, cuda: bool = False):
     file_name = str(file.resolve())
     img = cv2.imread(file_name)
     face_embeddings = get_face_embeddings(img, cuda)
+    errors = []
 
     for (key, face_emb) in enumerate(face_embeddings):
-        print(face_emb)
-        print(key)
-        insert_data(
-            dataset,
-            file.name,
-            face_emb["face_embedding"],
-            face_emb["width"],
-            face_emb["height"],
-            face_emb["x"],
-            face_emb["y"],
-            key
-        )
+        try:
+            insert_data(
+                dataset,
+                file.name,
+                face_emb["face_embedding"],
+                face_emb["width"],
+                face_emb["height"],
+                face_emb["x"],
+                face_emb["y"],
+                key
+            )
+        except:
+            errors.append((key, face_emb))
+            pass
 
-    return True
+    return errors
 
 
 def search_file(file, dataset, cuda=False):
@@ -83,6 +86,7 @@ def search_file(file, dataset, cuda=False):
     face_embeddings = get_face_embeddings(img, cuda)
 
     for (key, face) in enumerate(face_embeddings):
+
         try:
             if dataset:
                 data = retrieve_data(face["face_embedding"], dataset)
@@ -99,7 +103,6 @@ def search_file(file, dataset, cuda=False):
                     str(row["_source"]["top_left"]),
                     str(row["_source"]["bottom_right"]),
                 ])
-                print(results)
         except:
             pass
 
@@ -121,7 +124,7 @@ def get_face_embeddings(img, cuda: bool):
             
     for face in face_locations:
         rect = face.rect if cuda else face
-        
+
         raw_shape = shape_predictor(img, rect)
         face_descriptor = facerec.compute_face_descriptor(img, raw_shape)
         face_emb = vec2list(face_descriptor)
