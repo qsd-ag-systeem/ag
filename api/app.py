@@ -4,7 +4,6 @@ from flask_cors import CORS
 from api.helpers.response import error_response
 from api.routes.cross_search import cross_search
 from api.routes.get_image import get_image
-from api.routes.index import index
 from api.routes.enroll import enroll
 from api.routes.datasets import get
 from api.routes.search import search
@@ -17,7 +16,6 @@ app = Flask(__name__)
 CORS(app)
 
 # API routes
-app.add_url_rule('/', 'index', index)
 app.add_url_rule('/datasets', 'datasets', get)
 app.add_url_rule('/enroll', 'enroll', enroll, methods=['POST'])
 app.add_url_rule('/search', 'search', search, methods=['POST'])

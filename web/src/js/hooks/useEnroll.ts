@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchEnroll } from "../api/enroll";
-import { BodyDelete } from "../../types";
+import { BodyEnroll } from "../../types";
 
-export default function useEnroll(data: BodyDelete) {
+export default function useEnroll(data: BodyEnroll) {
   return useQuery(["enroll", data], () => fetchEnroll(data))
 }

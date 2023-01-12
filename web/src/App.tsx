@@ -1,3 +1,4 @@
+import "./index.css";
 import { Header } from "./js/components/Header";
 import FullRouteCollection from "./js/components/routing/FullRouteCollection";
 

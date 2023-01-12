@@ -1,7 +1,7 @@
 import { API_URL, FETCH_HEADERS } from "../constants";
 
-export const fetchDatasets = async () => {
-    return await fetch(`${API_URL}/datasets`, {
+export const fetchDatasets = async (query: string = "") => {
+    return await fetch(`${API_URL}/datasets?q=${query}`, {
         ...FETCH_HEADERS()
     })
         .then((data) => {

@@ -1,9 +1,8 @@
 import { Badge, Box, createStyles, Flex, Image, Text, Button, Divider, Group } from "@mantine/core";
 import usePercentageColor from "../hooks/usePercentageColor";
 import { openModal } from "@mantine/modals";
-import { useCallback } from "react";
 
-const useStyles = createStyles(theme => ({
+const useStyles = createStyles((theme) => ({
   match: {
     position: "relative",
     userSelect: "none",
@@ -37,6 +36,7 @@ type MatchProps = {
   inputFile?: string;
   dataset?: string;
   isModal?: boolean;
+  disableModal?: boolean;
 };
 
 export default function Match({
@@ -46,6 +46,7 @@ export default function Match({
   dataset,
   inputFile,
   isModal = false,
+  disableModal = false,
 }: MatchProps) {
   const color = usePercentageColor(percentage);
   const { classes } = useStyles();
@@ -57,24 +58,25 @@ export default function Match({
         cursor: isModal ? "auto" : "pointer",
       }}
       onClick={() => {
-        openModal({
-          size: "auto",
-          overlayBlur: 2,
-          title: (
-            <Group sx={{ justifyContent: "space-between" }}>
-              <Group fw={500}>
-                Dataset: <Text fz="sm">{dataset}</Text>
+        !disableModal &&
+          openModal({
+            size: "auto",
+            overlayBlur: 2,
+            title: (
+              <Group sx={{ justifyContent: "space-between" }}>
+                <Group fw={500}>
+                  Dataset: <Text fz="sm">{dataset}</Text>
+                </Group>
+                <Divider />
+                <Group fw={500}>
+                  Input: <Text fz="sm">{inputFile}</Text>
+                </Group>
               </Group>
-              <Divider />
-              <Group fw={500}>
-                Input: <Text fz="sm">{inputFile}</Text>
-              </Group>
-            </Group>
-          ),
-          children: (
-            <Match fileName={fileName} percentage={percentage} image={image} isModal={true} />
-          ),
-        });
+            ),
+            children: (
+              <Match fileName={fileName} percentage={percentage} image={image} isModal={true} />
+            ),
+          });
       }}
     >
       {color && (

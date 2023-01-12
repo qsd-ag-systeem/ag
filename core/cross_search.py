@@ -34,6 +34,10 @@ def get_sorted_results(data, msearch_result, limit=100):
                 'top_left_2': result['hits']['hits'][0]['_source']['top_left'],
                 'bottom_right_1': data[key]['_source']['bottom_right'],
                 'bottom_right_2': result['hits']['hits'][0]['_source']['bottom_right'],
+                'width1': int(data[key]['_source']['width']),
+                'height1': int(data[key]['_source']['height']),
+                'width2': int(result['hits']['hits'][0]['_source']['width']),
+                'height2': int(result['hits']['hits'][0]['_source']['height']),
             })
 
     # Sort results by score descending
