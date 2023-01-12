@@ -8,8 +8,6 @@ import { BodyEnroll } from "../../types";
 import DirectoryBrowser from "../components/DirectoryBrowser";
 import { env } from "../tools";
 
-// const socket = io(env("API_URL"));
-
 interface EnrollData {
   success: boolean;
   file: string;
@@ -19,6 +17,14 @@ interface EnrollData {
   status: "idle" | "processing" | "enrolled";
   folder: string;
   progress: number;
+}
+
+interface EnrollCancelData {
+  success: boolean;
+}
+
+interface EnrollErrorData {
+  message: string;
 }
 
 interface ServerToClientEvents {
@@ -45,12 +51,10 @@ export default function Enroll() {
       data.name = undefined;
     }
 
-    sendMessage<EnrollData>(data);
+    sendEnrollMessage<EnrollData>(data);
   };
 
   const onEnroll = (data: EnrollData | undefined) => {
-    console.log("ENROLL");
-
     if (!data) return;
 
     if (data.status === "enrolled") {
@@ -65,8 +69,8 @@ export default function Enroll() {
     }
   };
 
-  const onCancel = () => {
-    console.log("CANCEL");
+  const onCancel = (data: EnrollCancelData | undefined) => {
+    if (data === undefined) return;
 
     showNotification({
       title: "Enrollment geannuleerd",
@@ -78,13 +82,30 @@ export default function Enroll() {
     closeAllModals();
   };
 
-  const { lastMessage, sendMessage } = useSocketEvent<EnrollData | undefined>(socket, "enroll", {
+  const onError = (data: EnrollErrorData | undefined) => {
+    if (data === undefined) return;
+    
+    showNotification({
+      title: "Enrollment mislukt",
+      message: data.message,
+      color: "red",
+      autoClose: true,
+    });
+  }
+
+  
+  const { lastMessage, sendMessage: sendEnrollMessage } = useSocketEvent<EnrollData | undefined>(socket, "enroll", {
     onMessage: onEnroll,
   });
-  const { sendMessage: sendCancelMessage } = useSocketEvent(socket, "cancel", {
+  
+  const { sendMessage: sendCancelMessage } = useSocketEvent<EnrollCancelData | undefined>(socket, "cancel", {
     onMessage: onCancel,
   });
 
+  const { } = useSocketEvent<EnrollErrorData | undefined>(socket, "err", {
+    onMessage: onError,
+  });
+  
   const onDirectoryChange = (dir: string) => {
     setLocation(dir);
   };

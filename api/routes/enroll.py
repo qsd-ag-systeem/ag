@@ -7,24 +7,21 @@ from api.helpers.response import error_response, success_response
 from core.common import get_files
 from core.face_recognition import init, process_file, use_cuda
 
-
-canceled = False;
+canceled = False
 
 def cancel(data):
     global canceled
-
     canceled = True
-
-
 
 def enroll(data):
     global canceled
     status = "idle"
 
     if "folder" not in data:
+        emit("err", {
+            "message": "Folder is required"
+        })
         pass
-        # return error_response("Folder is required")
-
 
     folder = data["folder"]
     cuda = data["cuda"] if "cuda" in data else False
@@ -33,8 +30,10 @@ def enroll(data):
     folder_path = os.path.abspath(os.curdir + "/" + folder)
 
     if not os.path.exists(folder_path):
+        emit("err", {
+            "message": f"Folder \"{folder}\" does not exist!"
+        })
         pass
-        # return error_response(f"Folder \"{folder}\" does not exist!")
 
     files = get_files(folder_path)
 
@@ -43,10 +42,13 @@ def enroll(data):
 
     errors = []
 
-    if len(files) == 0:
-        pass
-        # return error_response(f"Folder {folder} is empty!")
     totalFiles = len(files)
+
+    if totalFiles == 0:
+        emit("err", {
+            "message": f"Folder {folder} is empty!"
+        })
+        pass
 
     emit('enroll', {
         "dataset": name,
@@ -59,27 +61,17 @@ def enroll(data):
         "progress":0
     })
 
-
-    # socketio = current_app.extensions['socketio']
-
-    # def cancel(data):
-    #     nonlocal canceled
-    #     if data["folder"] == folder:
-    #         canceled = True
-
-    # socketio.on_event('cancel', cancel)
-
     for filesProcessed, file in enumerate(files):
         status = "processing"
 
-
         if canceled:
-            # emit("cancel")
+            emit("cancel", {
+                "success": True
+            })
             break
-        # if canceled:
-        #     return error_response("Canceled")
 
         success = True
+
         try:
             process_file(name, file, cuda)
         except Exception as error:
@@ -89,7 +81,6 @@ def enroll(data):
 
         if totalFiles == filesProcessed + 1:
             status = "enrolled"
-
 
         emit('enroll', {
             "dataset": name,
@@ -103,5 +94,3 @@ def enroll(data):
         })
 
     canceled = False
-    # it is a success response but could still contain errors
-    # return success_response(errors=errors)

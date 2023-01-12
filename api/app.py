@@ -20,7 +20,6 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # API routes
 app.add_url_rule('/', 'index', index)
 app.add_url_rule('/datasets', 'datasets', get)
-# app.add_url_rule('/enroll', 'enroll', enroll, methods=['POST'])
 app.add_url_rule('/search', 'search', search, methods=['POST'])
 app.add_url_rule('/import', 'import', import_dataset, methods=['POST'])
 app.add_url_rule('/export', 'export', export, methods=['POST'])
