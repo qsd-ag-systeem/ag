@@ -48,9 +48,11 @@ def delete_dataset_by_name(dataset: str):
 
 def delete_dataset_files_by_name(dataset: str):
     folder_path = os.path.abspath(os.path.join(os.curdir, dataset))
-    shutil.rmtree(folder_path)
+    if os.path.exists(folder_path):
+        shutil.rmtree(folder_path)
 
 
 def delete_dataset_file_by_name(dataset: str, file_name: str):
     file_path = os.path.abspath(os.path.join(os.curdir, dataset, file_name))
-    os.remove(file_path)
+    if os.path.exists(file_path):
+        os.remove(file_path)
