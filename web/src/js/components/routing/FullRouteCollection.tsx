@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
-import CrossSearch from "../../pages/CrossSearch";
-import Home from "../../pages/Home";
+import CrossSearch from "../../pages/cross-search";
+import Search from "../../pages/search";
 import NotFound from "../../pages/NotFound";
 import { ConditionalComponent } from "./ConditionalComponent";
 
@@ -12,7 +12,7 @@ export default function FullRouteCollection() {
     <Routes>
       <Route
         path={"/"}
-        element={<ConditionalComponent condition={isAuthed} Component={Home} title={"Home"} />}
+        element={<ConditionalComponent condition={isAuthed} Component={Search} title={"Home"} />}
       />
 
       <Route
