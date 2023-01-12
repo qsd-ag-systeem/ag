@@ -5,6 +5,7 @@ import { NotificationsProvider } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode } from "react";
 import { BrowserRouter } from "react-router-dom";
+import { IoProvider } from "socket.io-react-hook";
 
 type ProvidersProps = {
   children?: ReactNode;
@@ -34,15 +35,17 @@ export default function Providers(props: ProvidersProps) {
 
   return (
     <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-          <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme }}>
-            <ModalsProvider>
-              <NotificationsProvider>{props.children}</NotificationsProvider>
-            </ModalsProvider>
-          </MantineProvider>
-        </ColorSchemeProvider>
-      </QueryClientProvider>
+      <IoProvider>
+        <QueryClientProvider client={queryClient}>
+          <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
+            <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme }}>
+              <ModalsProvider>
+                <NotificationsProvider position="top-right">{props.children}</NotificationsProvider>
+              </ModalsProvider>
+            </MantineProvider>
+          </ColorSchemeProvider>
+        </QueryClientProvider>
+      </IoProvider>
     </BrowserRouter>
   );
 }

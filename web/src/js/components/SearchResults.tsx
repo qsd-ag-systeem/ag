@@ -1,11 +1,9 @@
-import { createStyles, Flex, LoadingOverlay, Overlay, Image, Button } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
+import { createStyles, Flex, LoadingOverlay } from "@mantine/core";
 import { BodySearch } from "../../types";
-import { fetchSearch } from "../api/search";
-import { ContextModalProps } from "@mantine/modals";
 
-import Match from "./Match";
 import { API_URL } from "../constants";
+import useSearchData from "../hooks/useSearchData";
+import Match from "./Match";
 
 const useStyles = createStyles(theme => ({
   results: {
@@ -27,33 +25,13 @@ type SearchResultsProps = BodySearch;
 export default function SearchResults({ folder, cuda, dataset }: SearchResultsProps) {
   const { classes } = useStyles();
 
-  const {
-    isSuccess,
-    data: result,
-    isLoading,
-    isFetching,
-  } = useQuery(["results", folder, cuda, dataset], () => fetchSearch({ folder, cuda, dataset }), {
-    keepPreviousData: true,
-    placeholderData: {
-      data: Array.from({ length: 10 })
-        .fill(0)
-        .map((_, i) => ({
-          id: "loading-" + i,
-          dataset: "",
-          file_name: "",
-          similarity: 0,
-          input_file: "",
-          left_bound: [0],
-          right_bound: [0],
-        })),
-      errors: [],
-    },
-  });
+  const { isSuccess, data: result, isFetching } = useSearchData({ folder, cuda, dataset });
 
   return (
     <Flex className={classes.results} sx={{ overflowX: isFetching ? "hidden" : "auto" }}>
       <LoadingOverlay visible={isFetching} overlayBlur={2} />
       {isSuccess &&
+        Array.isArray(result?.data) &&
         result?.data?.map((match, i) => (
           <Match
             image={`${API_URL}/image/${match.dataset}/${match.file_name}`}

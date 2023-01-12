@@ -1,149 +1,137 @@
-import { Container, Title, Input, Text, Button, SimpleGrid, Transition, Paper, Progress } from "@mantine/core";
-import DirectoryBrowser from "../components/DirectoryBrowser";
-import { fetchEnroll } from "../api/enroll";
+import { Box, Button, Input, Progress, SimpleGrid, Text } from "@mantine/core";
+import { closeAllModals } from "@mantine/modals";
+import { showNotification } from "@mantine/notifications";
 import { IconPlus, IconX } from "@tabler/icons";
-import { useState, useEffect } from "react";
-import io from "socket.io-client";
+import { useMemo, useState } from "react";
+import { useSocket, useSocketEvent } from "socket.io-react-hook";
+import { BodyEnroll } from "../../types";
+import DirectoryBrowser from "../components/DirectoryBrowser";
+import { env } from "../tools";
 
-const socket = io("http://localhost:5000");
+// const socket = io(env("API_URL"));
+
+interface EnrollData {
+  success: boolean;
+  file: string;
+  dataset: string;
+  filesProcessed: number;
+  totalFiles: number;
+  status: "idle" | "processing" | "enrolled";
+  folder: string;
+  progress: number;
+}
+
+interface ServerToClientEvents {
+  enroll: (data: EnrollData) => void;
+}
+
+interface ClientToServerEvents {
+  enroll: (data: BodyEnroll) => void;
+}
 
 export default function Enroll() {
-  const EnrollStatus = {
-    Idle: 0,
-    Enrolling: 1,
-    Enrolled: 2
-  }
+  const { socket } = useSocket<ServerToClientEvents, ClientToServerEvents>(env("API_URL"));
 
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
-  const [enrollStatus, setEnrollStatus] = useState(EnrollStatus.Idle);
-  const [enrollError, setEnrollError] = useState<string | null>(null);
-  const [enrollData, setEnrollData] = useState<any>(null);
-  const [enrollFolder, setEnrollFolder] = useState<string>("");
-  const [enrollLog, setEnrollLog] = useState<string[]>([]);
 
   const handleEnroll = async () => {
-    setEnrollStatus(EnrollStatus.Enrolling);
-    setEnrollError(null);
-    setEnrollData(null);
-    setEnrollLog([]);
-    setEnrollFolder(location + "");
+    const data: BodyEnroll = {
+      name,
+      folder: location,
+    };
 
-    try {
-      const data = await fetchEnroll({name, folder: location});
-    } catch (e: any) {
-      if (e.enrollLog.length !== 0) {
-        setEnrollStatus(EnrollStatus.Idle);
-        setEnrollError(e.message);
-      }
+    if (data.name !== undefined && data.name.trim().length === 0) {
+      data.name = undefined;
+    }
+
+    sendMessage<EnrollData>(data);
+  };
+
+  const onEnroll = (data: EnrollData | undefined) => {
+    console.log("ENROLL");
+
+    if (!data) return;
+
+    if (data.status === "enrolled") {
+      showNotification({
+        title: "Enrollment voltooid",
+        message: `De dataset: '${data.dataset}' is succesvol toegevoegd.`,
+        color: "green",
+        autoClose: false,
+      });
+
+      closeAllModals();
     }
   };
+
+  const onCancel = () => {
+    console.log("CANCEL");
+
+    showNotification({
+      title: "Enrollment geannuleerd",
+      message: "",
+      color: "red",
+      autoClose: true,
+    });
+
+    closeAllModals();
+  };
+
+  const { lastMessage, sendMessage } = useSocketEvent<EnrollData | undefined>(socket, "enroll", {
+    onMessage: onEnroll,
+  });
+  const { sendMessage: sendCancelMessage } = useSocketEvent(socket, "cancel", {
+    onMessage: onCancel,
+  });
 
   const onDirectoryChange = (dir: string) => {
     setLocation(dir);
   };
 
   const cancelEnroll = () => {
-    socket.emit("cancel", { folder: enrollFolder }, (data: any) => {
-      setEnrollStatus(EnrollStatus.Enrolled);
-      setEnrollLog((prev) => [...prev, "❌ Enrollment geannuleerd."]);
-    });
-  }
+    sendCancelMessage({ folder: location });
+  };
 
-  useEffect(() => {
-    socket.on("connect", () => {
-      console.log("connected to socket");
-    })
+  const status = useMemo(() => (lastMessage ? lastMessage.status : "idle"), [lastMessage]);
 
-    socket.on("enroll", (data: any) => {
-      console.log(data);
-      // if (data.folder !== location) {
-      //   console.log(data.folder + " !== " + location)
-      //   return;
-      // }
-      
-      setEnrollLog((prev) => [...prev, (data.success ? "Enrolled" : "Failed to enroll") + " " + data.file + " (" + data.current + "/" + data.total + ")"]);
-
-      if (data.current === data.total) {
-        setEnrollStatus(EnrollStatus.Enrolled);
-        setEnrollLog((prev) => [...prev, "✅ Enrollment voltooid."]);
-      }
-      
-      setEnrollData(data);
-    })
-
-    return () => {
-      socket.off("connect");
-      socket.off("enroll");
-    }
-  }, []);
-
+  const progress = useMemo(() => (lastMessage ? lastMessage.progress : 0), [lastMessage]);
 
   return (
-    <Container fluid>
-      <Title>Dataset toevoegen</Title>
-      <Transition mounted={enrollError !== null} transition="fade" duration={400} timingFunction="ease">
-        {(styles) => (
-          <Paper shadow="xs" p="md" radius="md" bg="red" style={{ ...styles, marginTop: 15, marginBottom: 15 }}>
-            <Text color="white">
-              {enrollError !== undefined ? enrollError : "Er is een onbekende fout opgetreden."}
-            </Text>
-          </Paper>
-        )}
-      </Transition>
-      {enrollStatus === EnrollStatus.Enrolled && (
-        <Transition mounted={enrollStatus === EnrollStatus.Enrolled} transition="fade" duration={400} timingFunction="ease">
-          {(styles) => (
-            <Paper shadow="xs" p="md" radius="md" bg="green" style={{ ...styles, marginTop: 15, marginBottom: 15 }}>
-              <Text color="white">
-                Dataset is toegevoegd.
-              </Text>
-            </Paper>
-          )}
-        </Transition>
+    <Box>
+      {status !== "idle" && (
+        <Box mb="md">
+          <Progress size="xl" value={progress} />
+        </Box>
       )}
-      {enrollStatus === EnrollStatus.Idle && (
-        <div>
+
+      {status === "idle" && (
+        <Box mb="xs">
           <Text>Naam</Text>
-          <Input mb={10} value={name} onChange={(e) => setName(e.currentTarget.value)} />
-          <Text>Locatie</Text>
-          <div style={{ marginBottom: 10 }}>
-            <DirectoryBrowser onChange={onDirectoryChange} />
-          </div>
-        </div>
+          <Input mb={10} value={name} onChange={e => setName(e.currentTarget.value)} />
+          <DirectoryBrowser onChange={onDirectoryChange} />
+        </Box>
       )}
       <SimpleGrid cols={2}>
-        <Button variant="gradient" gradient={{ from: "indigo", to: "cyan" }} leftIcon={<IconPlus size={14} />} onClick={handleEnroll} loading={enrollStatus === EnrollStatus.Enrolling} disabled={enrollStatus === EnrollStatus.Enrolling}>
-          {enrollStatus === EnrollStatus.Enrolling ? "Bezig met enrollment..." : "Toevoegen"}
-        </Button>
-        <Button color="red" variant="outline" leftIcon={<IconX size={14} />} onClick={cancelEnroll} disabled={enrollStatus !== EnrollStatus.Enrolling}>
+        <Button
+          color="red"
+          variant="outline"
+          leftIcon={<IconX size={14} />}
+          onClick={cancelEnroll}
+          // loading={status !== "idle"}
+          // disabled={status !== "idle"}
+        >
           Annuleren
         </Button>
+        <Button
+          leftIcon={<IconPlus size={14} />}
+          onClick={handleEnroll}
+          loading={status !== "idle"}
+          disabled={status !== "idle"}
+        >
+          Toevoegen
+        </Button>
       </SimpleGrid>
-      {enrollStatus !== EnrollStatus.Idle && enrollData !== null && (
-        <div>
-          <div style={{ marginTop: 15 }}>
-            <div style={{ marginBottom: 10 }}>
-              <Text>
-                File: {enrollData?.file}
-              </Text>
-            </div>
-            <Progress size="xl" value={
-              enrollData?.current !== undefined ? (enrollData.current / enrollData.total) * 100 : 0
-            } striped animate />
-          </div>
-
-          <div style={{ marginTop: 15, overflowY: "auto", maxHeight: 300, backgroundColor: "#F9F9F9", borderRadius: "15px", padding: "10px" }}>
-            <Text>
-              {enrollLog.slice().reverse().map((log, i) => (
-                <div key={i}>
-                  {log}
-                </div>
-              ))}
-            </Text>
-          </div>
-        </div>
-      )}
-    </Container>
+    </Box>
   );
 }
