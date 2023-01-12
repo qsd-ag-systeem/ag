@@ -80,3 +80,7 @@ export async function handleRequestErrors(response: Response) {
 
   return response;
 }
+
+export function pluralize(count: number, singular: string, plural: string) {
+  return count === 1 ? singular : plural;
+}
