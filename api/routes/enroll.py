@@ -1,17 +1,29 @@
-from flask import request
-from core.face_recognition import init, process_file, use_cuda
-from core.common import get_files
-from flask import current_app
 import os
+
+from flask import request
+from flask_socketio import emit
+
 from api.helpers.response import error_response, success_response
+from core.common import get_files
+from core.face_recognition import init, process_file, use_cuda
 
 
-def enroll():
-    data = request.get_json()
-    canceled = False
-    
+canceled = False;
+
+def cancel(data):
+    global canceled
+
+    canceled = True
+
+
+
+def enroll(data):
+    global canceled
+    status = "idle"
+
     if "folder" not in data:
-        return error_response("Folder is required")
+        pass
+        # return error_response("Folder is required")
 
 
     folder = data["folder"]
@@ -21,7 +33,8 @@ def enroll():
     folder_path = os.path.abspath(os.curdir + "/" + folder)
 
     if not os.path.exists(folder_path):
-        return error_response(f"Folder \"{folder}\" does not exist!")
+        pass
+        # return error_response(f"Folder \"{folder}\" does not exist!")
 
     files = get_files(folder_path)
 
@@ -31,42 +44,64 @@ def enroll():
     errors = []
 
     if len(files) == 0:
-        return error_response(f"Folder {folder} is empty!")
-    
-    total = len(files)
-    current = 0
+        pass
+        # return error_response(f"Folder {folder} is empty!")
+    totalFiles = len(files)
 
-    socketio = current_app.extensions['socketio']
+    emit('enroll', {
+        "dataset": name,
+        "success": False,
+        "filesProcessed": 0,
+        "totalFiles": totalFiles,
+        "status":  status,
+        "file": None,
+        "folder": folder,
+        "progress":0
+    })
 
-    def cancel(data):
-        nonlocal canceled
-        if data["folder"] == folder:
-            canceled = True
 
-    socketio.on_event('cancel', cancel)
+    # socketio = current_app.extensions['socketio']
 
-    for file in files:
+    # def cancel(data):
+    #     nonlocal canceled
+    #     if data["folder"] == folder:
+    #         canceled = True
+
+    # socketio.on_event('cancel', cancel)
+
+    for filesProcessed, file in enumerate(files):
+        status = "processing"
+
+
         if canceled:
-            return error_response("Canceled")
-        
-        success = True
-        current += 1
+            # emit("cancel")
+            break
+        # if canceled:
+        #     return error_response("Canceled")
 
+        success = True
         try:
             process_file(name, file, cuda)
         except Exception as error:
             errors.append(error)
             success = False
             pass
-        
-        
-        socketio.emit('enroll', {
+
+        if totalFiles == filesProcessed + 1:
+            status = "enrolled"
+
+
+        emit('enroll', {
+            "dataset": name,
             "success": success,
-            "current": current,
-            "total": total,
+            "filesProcessed": filesProcessed + 1,
+            "totalFiles": totalFiles,
+            "status":  status,
             "file": file.name,
-            "folder": folder
+            "folder": folder,
+            "progress": (filesProcessed + 1) / totalFiles * 100
         })
 
+    canceled = False
     # it is a success response but could still contain errors
-    return success_response(errors=errors)
+    # return success_response(errors=errors)

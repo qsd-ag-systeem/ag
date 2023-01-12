@@ -22,9 +22,10 @@ def cli():
     init_app()
 
 
+@click.option('--debug/--no-debug', default=False)
 @cli.command(help="Start de web applicatie")
-def web():
-    run_api('127.0.0.1', 8080)
+def web(debug: bool):
+    run_api('127.0.0.1', 8080, debug)
 
 
 @cli.command(hidden=True)
