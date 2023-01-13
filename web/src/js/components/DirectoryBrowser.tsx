@@ -17,7 +17,7 @@ export default function DirectoryBrowser(props: any) {
   const setDir = (dir: string) => {
     setCurrentDir(dir);
     if (props.onChange) {
-      props.onChange(dir);
+      props.onChange(dir.replace(/\\/g, "/"));
     }
   };
 
