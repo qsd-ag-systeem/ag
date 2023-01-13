@@ -21,7 +21,7 @@ def enroll(data):
         emit("err", {
             "message": "Folder is required"
         })
-        pass
+        return
 
     folder = data["folder"]
     cuda = data["cuda"] if "cuda" in data else False
@@ -33,7 +33,7 @@ def enroll(data):
         emit("err", {
             "message": f"Folder \"{folder}\" does not exist!"
         })
-        pass
+        return
 
     files = get_files(folder_path)
 
@@ -48,7 +48,7 @@ def enroll(data):
         emit("err", {
             "message": f"Folder {folder} is empty!"
         })
-        pass
+        return
 
     emit('enroll', {
         "dataset": name,
@@ -77,7 +77,6 @@ def enroll(data):
         except Exception as error:
             errors.append(error)
             success = False
-            pass
 
         if totalFiles == filesProcessed + 1:
             status = "enrolled"
