@@ -13,7 +13,7 @@ def search():
 
     folder = data["folder"]
     cuda = data["cuda"] if "cuda" in data else False
-    dataset = data["dataset"] if "dataset" in data else False
+    dataset = data["datasets"] if "datasets" in data else False
     folder_path = os.path.abspath(folder)
 
     if not os.path.exists(folder_path):

@@ -5,7 +5,7 @@ import { IconPlus, IconX } from "@tabler/icons";
 import { useMemo, useState } from "react";
 import { useSocket, useSocketEvent } from "socket.io-react-hook";
 import { BodyEnroll } from "../../types";
-import DirectoryBrowser from "../components/DirectoryBrowser";
+import DirectoryBrowser from "./DirectoryBrowser";
 import { env } from "../tools";
 
 interface EnrollData {
@@ -84,28 +84,35 @@ export default function Enroll() {
 
   const onError = (data: EnrollErrorData | undefined) => {
     if (data === undefined) return;
-    
+
     showNotification({
       title: "Enrollment mislukt",
       message: data.message,
       color: "red",
       autoClose: true,
     });
-  }
+  };
 
-  
-  const { lastMessage, sendMessage: sendEnrollMessage } = useSocketEvent<EnrollData | undefined>(socket, "enroll", {
-    onMessage: onEnroll,
-  });
-  
-  const { sendMessage: sendCancelMessage } = useSocketEvent<EnrollCancelData | undefined>(socket, "cancel", {
-    onMessage: onCancel,
-  });
+  const { lastMessage, sendMessage: sendEnrollMessage } = useSocketEvent<EnrollData | undefined>(
+    socket,
+    "enroll",
+    {
+      onMessage: onEnroll,
+    }
+  );
 
-  const { } = useSocketEvent<EnrollErrorData | undefined>(socket, "err", {
+  const { sendMessage: sendCancelMessage } = useSocketEvent<EnrollCancelData | undefined>(
+    socket,
+    "cancel",
+    {
+      onMessage: onCancel,
+    }
+  );
+
+  const {} = useSocketEvent<EnrollErrorData | undefined>(socket, "err", {
     onMessage: onError,
   });
-  
+
   const onDirectoryChange = (dir: string) => {
     setLocation(dir);
   };
@@ -130,7 +137,7 @@ export default function Enroll() {
         <Box mb="xs">
           <Text>Naam</Text>
           <Input mb={10} value={name} onChange={e => setName(e.currentTarget.value)} />
-          <DirectoryBrowser onChange={onDirectoryChange} />
+          <DirectoryBrowser onUpdate={onDirectoryChange} />
         </Box>
       )}
       <SimpleGrid cols={2}>

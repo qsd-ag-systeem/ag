@@ -22,26 +22,24 @@ const useStyles = createStyles(theme => ({
 
 type SearchResultsProps = BodySearch;
 
-export default function SearchResults({ folder, cuda, dataset }: SearchResultsProps) {
+export default function SearchResults({ folder, cuda, datasets }: SearchResultsProps) {
   const { classes } = useStyles();
 
-  const { isSuccess, data: result, isFetching } = useSearchData({ folder, cuda, dataset });
+  const { isSuccess, data: results, isFetching } = useSearchData({ folder, cuda, datasets });
 
   return (
     <Flex className={classes.results} sx={{ overflowX: isFetching ? "hidden" : "auto" }}>
       <LoadingOverlay visible={isFetching} overlayBlur={2} />
-      {isSuccess &&
-        Array.isArray(result?.data) &&
-        result?.data?.map((match, i) => (
-          <Match
-            image={`${API_URL}/image/${match.dataset}/${match.file_name}`}
-            percentage={match.similarity}
-            fileName={match.file_name}
-            dataset={match.dataset}
-            inputFile={match.input_file}
-            key={match.id + "-" + i}
-          />
-        ))}
+      {results?.map((match, i) => (
+        <Match
+          image={`${API_URL}/image/${match.dataset}/${match.file_name}`}
+          percentage={match.similarity}
+          fileName={match.file_name}
+          dataset={match.dataset}
+          inputFile={match.input_file}
+          key={match.id + "-" + i}
+        />
+      ))}
     </Flex>
   );
 }

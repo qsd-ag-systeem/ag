@@ -20,7 +20,7 @@ def retrieve_dataset_data(dataset: str):
     return results
 
 
-def retrieve_msearch_knn_filtered_data(face_emb: [list], datasets: tuple, limit: int = 100):
+def retrieve_msearch_knn_filtered_data(face_emb: [list], datasets: list, limit: int = 100):
     es = EsConnection()
 
     responses = []
@@ -45,7 +45,7 @@ def retrieve_msearch_knn_filtered_data(face_emb: [list], datasets: tuple, limit:
                 "num_candidates": 100,
                 "filter": {
                     "terms": {
-                        "dataset": list(datasets)
+                        "dataset": datasets
                     }
                 }
             }

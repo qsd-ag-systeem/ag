@@ -1,7 +1,7 @@
 import { API_URL, FETCH_HEADERS } from "../constants";
-import { BodySearch, SearchResponse } from "../../types";
+import { BodySearch } from "../../types";
 
-export const fetchSearch = async (data: BodySearch): Promise<SearchResponse> => {
+export const fetchSearch = async (data: BodySearch) => {
   return await fetch(`${API_URL}/search`, {
     method: "POST",
     body: JSON.stringify(data),
@@ -9,6 +9,9 @@ export const fetchSearch = async (data: BodySearch): Promise<SearchResponse> => 
   })
     .then(data => {
       return data.json();
+    })
+    .then(data => {
+      return data.data;
     })
     .catch(error => {
       throw error.message;
