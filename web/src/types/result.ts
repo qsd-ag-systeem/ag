@@ -1,9 +1,3 @@
-export * from "./response";
-export * from "./result";
-export * from "./body";
-
-export type Maybe<T> = T | null | undefined;
-
 export type SearchResult = {
   input_file: string;
   id: string;
@@ -26,12 +20,4 @@ export type CrossSearchResult = {
   bottom_right_2: number[];
   width1: number;
   height1: number;
-  width2: number;
-  height2: number;
 };
-
-export type Dataset = {
-    id: string;
-    name: string;
-    count: number;
-}
