@@ -28,7 +28,7 @@ export default function DirectoryBrowser(props: any) {
         <thead>
           <tr>
             <th>
-              <Title order={5}>{currentDir || "~"}</Title>
+              <Title order={5}>{currentDir || "/"}</Title>
             </th>
           </tr>
         </thead>
