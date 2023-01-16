@@ -1,7 +1,7 @@
 import { Anchor, Group, Loader, Text, Title } from "@mantine/core";
-import { useEffect, useState } from "react";
-import useDirectoriesData from "../hooks/useDirectoriesData";
 import { IconArrowBack } from "@tabler/icons";
+import { useState } from "react";
+import useDirectoriesData from "../hooks/useDirectoriesData";
 
 type DirectoryBrowserProps = {
   onUpdate?: (currentDir: string) => void;
@@ -16,11 +16,8 @@ export default function DirectoryBrowser(props: DirectoryBrowserProps) {
   const goToParentDir = () => {
     let parentDir = currentDir.replace(/\\/g, "/").split("/").slice(0, -1).join("/");
     setCurrentDir(parentDir);
+    onUpdate?.(parentDir);
   };
-
-  useEffect(() => {
-    onUpdate?.(currentDir);
-  }, [currentDir]);
 
   return (
     <>
