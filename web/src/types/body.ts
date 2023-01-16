@@ -15,7 +15,7 @@ export type BodyImport = {
 export type BodySearch = {
   folder: string;
   cuda?: boolean;
-  dataset?: string;
+  datasets?: string[];
 };
 
 export type BodyCrossSearch = {

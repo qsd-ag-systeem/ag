@@ -1,30 +1,49 @@
-import { Button, Card, Group, LoadingOverlay, Text } from "@mantine/core";
+import { Button, Card, Checkbox, Group, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { IconTrash } from "@tabler/icons";
+import { useState } from "react";
 import useDatasetsData from "../../hooks/dataset/useDatasetsData";
 import useDeleteDataset from "../../hooks/dataset/useDeleteDataset";
 import { pluralize } from "../../tools";
 
-export default function DatasetList() {
+type DatasetListProps = {
+  onUpdateSelected?: (selected: string[]) => void;
+};
+
+export default function DatasetList(props: DatasetListProps) {
+  const { onUpdateSelected } = props;
   const { data: datasets, isFetching } = useDatasetsData();
   const { openModal: openDeleteDatasetModal } = useDeleteDataset();
+  const [selected, setSelected] = useState<string[]>([]);
+
+  const updateSelected = (id: string, value: boolean) => {
+    let newState = value ? [...selected, id] : selected.filter((item) => item !== id);
+    setSelected(newState);
+    onUpdateSelected?.(newState);
+  };
 
   return (
     <div style={{ position: "relative" }}>
       <LoadingOverlay visible={isFetching} overlayBlur={2} />
       {datasets?.map((dataset) => (
-        <Card key={dataset.name} mb={"md"}>
-          <Group position="apart">
-            <Group spacing={5}>
-              <Text>{dataset.name}</Text>
+        <Card shadow="sm" key={dataset.name} mb={"sm"}>
+          <Group>
+            <Checkbox
+              sx={{ display: "flex" }}
+              onChange={(event) => updateSelected(dataset.id, event.currentTarget.checked)}
+            />
+            <Group position="apart" sx={{ flexGrow: 1 }}>
+              <Stack spacing={5}>
+                <Text>{dataset.name}</Text>
 
-              <Text color={"dimmed"} size={"sm"} inline>
-                ({dataset.count} {pluralize(dataset.count, "gezicht", "gezichten")})
-              </Text>
+                <Text color={"dimmed"} size={"sm"} inline>
+                  {dataset.count} {pluralize(dataset.count, "gezicht", "gezichten")}
+                </Text>
+              </Stack>
+
+              <Button color={"red"} onClick={() => openDeleteDatasetModal(dataset)}>
+                <IconTrash />
+              </Button>
             </Group>
-
-            <Button color={"red"} onClick={() => openDeleteDatasetModal(dataset)}>
-              <IconTrash />
-            </Button>
           </Group>
         </Card>
       ))}

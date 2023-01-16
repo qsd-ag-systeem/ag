@@ -1,7 +1,6 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_cors import CORS
 
-from api.helpers.response import error_response
 from api.routes.cross_search import cross_search
 from api.routes.get_image import get_image
 from api.routes.enroll import enroll
@@ -12,7 +11,11 @@ from api.routes.import_dataset import import_dataset
 from api.routes.export import export
 from api.routes.delete import delete
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    static_url_path='',
+    static_folder='../web/dist',
+)
 CORS(app)
 
 # API routes
@@ -33,7 +36,7 @@ app.add_url_rule('/directories/<path:subpath>', 'directories', directories)
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return error_response('Page not found', 404)
+    return send_from_directory('./../web/dist/', 'index.html')
 
 
 def run(host: str = '0.0.0.0', port: int = 5000, debug: bool = False):

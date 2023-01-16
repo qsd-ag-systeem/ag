@@ -1,13 +1,11 @@
-import { createStyles, Flex, LoadingOverlay, Overlay, Image, Button } from "@mantine/core";
+import { createStyles, Flex, LoadingOverlay } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
-import { BodySearch } from "../../types";
+import { BodySearch, SearchResult } from "../../types";
 import { fetchSearch } from "../api/search";
-import { ContextModalProps } from "@mantine/modals";
-
-import Match from "./Match";
 import { API_URL } from "../constants";
+import Match from "./Match";
 
-const useStyles = createStyles(theme => ({
+const useStyles = createStyles((theme) => ({
   results: {
     padding: `${theme.spacing.sm}px ${theme.spacing.md}px`,
     border: `1px solid ${
@@ -24,18 +22,19 @@ const useStyles = createStyles(theme => ({
 
 type SearchResultsProps = BodySearch;
 
-export default function SearchResults({ folder, cuda, dataset }: SearchResultsProps) {
+export default function SearchResults({ folder, cuda, datasets }: SearchResultsProps) {
   const { classes } = useStyles();
 
   const {
     isSuccess,
-    data: result,
-    isLoading,
+    data: results,
     isFetching,
-  } = useQuery(["results", folder, cuda, dataset], () => fetchSearch({ folder, cuda, dataset }), {
-    keepPreviousData: true,
-    placeholderData: {
-      data: Array.from({ length: 10 })
+  } = useQuery<SearchResult[]>(
+    ["results", folder, cuda, datasets],
+    () => fetchSearch({ folder, cuda, datasets }),
+    {
+      keepPreviousData: true,
+      placeholderData: Array.from({ length: 10 })
         .fill(0)
         .map((_, i) => ({
           id: "loading-" + i,
@@ -46,24 +45,22 @@ export default function SearchResults({ folder, cuda, dataset }: SearchResultsPr
           left_bound: [0],
           right_bound: [0],
         })),
-      errors: [],
-    },
-  });
+    }
+  );
 
   return (
     <Flex className={classes.results} sx={{ overflowX: isFetching ? "hidden" : "auto" }}>
       <LoadingOverlay visible={isFetching} overlayBlur={2} />
-      {isSuccess &&
-        result?.data?.map((match, i) => (
-          <Match
-            image={`${API_URL}/image/${match.dataset}/${match.file_name}`}
-            percentage={match.similarity}
-            fileName={match.file_name}
-            dataset={match.dataset}
-            inputFile={match.input_file}
-            key={match.id + "-" + i}
-          />
-        ))}
+      {results?.map((match, i) => (
+        <Match
+          image={`${API_URL}/image/${match.dataset}/${match.file_name}`}
+          percentage={match.similarity}
+          fileName={match.file_name}
+          dataset={match.dataset}
+          inputFile={match.input_file}
+          key={match.id + "-" + i}
+        />
+      ))}
     </Flex>
   );
 }
