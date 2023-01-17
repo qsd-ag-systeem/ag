@@ -39,9 +39,11 @@ export default function Providers(props: ProvidersProps) {
         <QueryClientProvider client={queryClient}>
           <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
             <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme }}>
-              <ModalsProvider>
-                <NotificationsProvider position="top-right">{props.children}</NotificationsProvider>
-              </ModalsProvider>
+                <NotificationsProvider position="top-right">
+                  <ModalsProvider>
+                    {props.children}
+                  </ModalsProvider>
+                </NotificationsProvider>
             </MantineProvider>
           </ColorSchemeProvider>
         </QueryClientProvider>
