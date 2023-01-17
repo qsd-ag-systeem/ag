@@ -120,7 +120,11 @@ export default function Enroll() {
   };
 
   const cancelEnroll = () => {
-    sendCancelMessage({ folder: location });
+    if (status === "processing") {
+      sendCancelMessage({ folder: location });
+    } else {
+      closeAllModals();
+    }
   };
 
   const status = useMemo(() => (lastMessage ? lastMessage.status : "idle"), [lastMessage]);
