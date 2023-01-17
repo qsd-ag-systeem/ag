@@ -19,6 +19,11 @@ export default function DirectoryBrowser(props: DirectoryBrowserProps) {
     onUpdate?.(parentDir);
   };
 
+  const setDir = (dir: string) => {
+    setCurrentDir(dir);
+    onUpdate?.(dir);
+  };
+
   return (
     <>
       <LoadingOverlay visible={isFetching} overlayBlur={2} transitionDuration={500} />
@@ -49,7 +54,7 @@ export default function DirectoryBrowser(props: DirectoryBrowserProps) {
                 leftIcon={<IconFolder />}
                 variant="subtle"
                 sx={{ display: "flex", width: "100%" }}
-                onClick={() => setCurrentDir(item)}
+                onClick={() => setDir(item)}
               >
                 {item}
               </Button>
