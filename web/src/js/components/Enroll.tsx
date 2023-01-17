@@ -7,6 +7,7 @@ import { useSocket, useSocketEvent } from "socket.io-react-hook";
 import { BodyEnroll } from "../../types";
 import DirectoryBrowser from "./DirectoryBrowser";
 import { env } from "../tools";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface EnrollData {
   success: boolean;
@@ -37,13 +38,12 @@ interface ClientToServerEvents {
 
 export default function Enroll() {
   const { socket } = useSocket<ServerToClientEvents, ClientToServerEvents>(env("API_URL"));
+  const queryClient = useQueryClient();
 
-  const [name, setName] = useState("");
   const [location, setLocation] = useState("");
 
   const handleEnroll = async () => {
     const data: BodyEnroll = {
-      name,
       folder: location,
     };
 
@@ -64,6 +64,8 @@ export default function Enroll() {
         color: "green",
         autoClose: false,
       });
+
+      queryClient.invalidateQueries("datasets");
 
       closeAllModals();
     }
@@ -109,7 +111,7 @@ export default function Enroll() {
     }
   );
 
-  const {} = useSocketEvent<EnrollErrorData | undefined>(socket, "err", {
+  useSocketEvent<EnrollErrorData | undefined>(socket, "err", {
     onMessage: onError,
   });
 
@@ -135,20 +137,11 @@ export default function Enroll() {
 
       {status === "idle" && (
         <Box mb="xs">
-          <Text>Naam</Text>
-          <Input mb={10} value={name} onChange={e => setName(e.currentTarget.value)} />
           <DirectoryBrowser onUpdate={onDirectoryChange} />
         </Box>
       )}
       <SimpleGrid cols={2}>
-        <Button
-          color="red"
-          variant="outline"
-          leftIcon={<IconX size={14} />}
-          onClick={cancelEnroll}
-          // loading={status !== "idle"}
-          // disabled={status !== "idle"}
-        >
+        <Button color="red" variant="outline" leftIcon={<IconX size={14} />} onClick={cancelEnroll}>
           Annuleren
         </Button>
         <Button

@@ -10,7 +10,7 @@ def get_subdirs(dir: str = ""):
         path_name = os.path.join(cwd, dir)
         p = Path(path_name)
         subdirs = [x for x in p.iterdir() if x.is_dir()]
-        return success_response([str(x.relative_to(cwd)) for x in subdirs])
+        return success_response([str(x.relative_to(cwd)).replace("\\", "/") for x in subdirs])
     except Exception as e:
         return error_response()
 

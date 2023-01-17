@@ -1,4 +1,4 @@
-import { Button, LoadingOverlay, Table, Text, Title } from "@mantine/core";
+import { Button, LoadingOverlay, Table, Text, Title, Box } from "@mantine/core";
 import { IconArrowBack, IconFolder } from "@tabler/icons";
 import { useState } from "react";
 import useDirectoriesData from "../hooks/useDirectoriesData";
@@ -21,13 +21,13 @@ export default function DirectoryBrowser(props: DirectoryBrowserProps) {
 
   const setDir = (dir: string) => {
     setCurrentDir(dir);
-    onUpdate?.(dir);
+    onUpdate?.(dir.replace(/\\/g, "/"));
   };
 
   return (
-    <>
-      <LoadingOverlay visible={isFetching} overlayBlur={2} transitionDuration={500} />
+    <Box sx={{ position: "relative" }}>
       <Table striped highlightOnHover withBorder withColumnBorders>
+        <LoadingOverlay visible={isFetching} overlayBlur={2} transitionDuration={500} />
         <thead>
           <tr>
             <th>
@@ -62,6 +62,6 @@ export default function DirectoryBrowser(props: DirectoryBrowserProps) {
           ))}
         </tbody>
       </Table>
-    </>
+    </Box>
   );
 }
