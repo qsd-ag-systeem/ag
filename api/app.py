@@ -2,13 +2,8 @@ from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO
 
-<<<<<<< HEAD
 from api.helpers.response import error_response
-=======
 from api.routes.cross_search import cross_search
-from api.routes.get_image import get_image
-from api.routes.enroll import enroll
->>>>>>> 62f0fbe96141f2a501bf9c0f56aeacfbbfda8614
 from api.routes.datasets import get
 from api.routes.delete import delete
 from api.routes.directories import directories
