@@ -6,7 +6,6 @@ from core.delete import delete_dataset_by_name, delete_dataset_file_by_name, del
 
 class TestDeleteFile(TestCase):
 
-
     @patch('core.delete.dataset_exists')
     def test_delete_file_by_name_dataset_not_exists(self, mock_dataset_exists):
         mock_dataset_exists.return_value = False
@@ -18,7 +17,6 @@ class TestDeleteFile(TestCase):
             delete_file_by_name(dataset, file_name)
 
         self.assertIn("Dataset '{}' does not exist.".format(dataset), str(context.exception))
-        
 
     @patch('core.delete.dataset_exists')
     @patch('core.delete.EsConnection')
@@ -58,8 +56,7 @@ class TestDeleteDataset(TestCase):
         with self.assertRaises(Exception) as context:
             delete_dataset_by_name(dataset)
 
-        self.assertIn("Dataset '{}' does not exist.".format(dataset), str(context.exception))
-        
+        self.assertIn("Dataset '{}' does not exist.".format(dataset), str(context.exception))   
 
     @patch('core.delete.dataset_exists')
     @patch('core.delete.EsConnection')

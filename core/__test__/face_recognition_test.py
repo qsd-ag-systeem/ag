@@ -374,7 +374,6 @@ class TestFaceRecognitionSearchFile(TestCase):
 
         mock_get_face_embeddings.return_value = self.face_embedding_2_face
         
-        # Raise an exception for the first face
         mock_retrieve_data.side_effect = [Exception, retrieve_data_response]
         mock_retrieve_all_data.side_effect = Exception
 
