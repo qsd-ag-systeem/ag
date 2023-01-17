@@ -12,6 +12,7 @@ from cli.commands.delete_dataset import delete_dataset
 from cli.commands.export_dataset import export_dataset
 from cli.commands.import_dataset import import_dataset
 from cli.commands.cross_search import cross_search
+from cli.commands.winnovation import winnovation
 from api.app import run as run_api
 
 
@@ -58,6 +59,7 @@ cli.add_command(delete_dataset)
 cli.add_command(export_dataset)
 cli.add_command(import_dataset)
 cli.add_command(cross_search)
+cli.add_command(winnovation)
 
 
 if __name__ == '__main__':
