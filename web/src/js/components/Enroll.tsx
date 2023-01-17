@@ -65,7 +65,7 @@ export default function Enroll() {
         autoClose: false,
       });
 
-      queryClient.invalidateQueries("datasets");
+      queryClient.invalidateQueries(["datasets"]);
 
       closeAllModals();
     }
