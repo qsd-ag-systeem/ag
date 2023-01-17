@@ -25,7 +25,6 @@ def enroll(data):
 
     folder = data["folder"]
     cuda = data["cuda"] if "cuda" in data else False
-    name = data["name"] if "name" in data else folder
 
     folder_path = os.path.abspath(os.curdir + "/" + folder)
 
@@ -51,7 +50,7 @@ def enroll(data):
         return
 
     emit('enroll', {
-        "dataset": name,
+        "dataset": folder,
         "success": False,
         "filesProcessed": 0,
         "totalFiles": totalFiles,
@@ -73,7 +72,7 @@ def enroll(data):
         success = True
 
         try:
-            process_file(name, file, cuda)
+            process_file(folder, file, cuda)
         except Exception as error:
             errors.append(error)
             success = False
@@ -82,7 +81,7 @@ def enroll(data):
             status = "enrolled"
 
         emit('enroll', {
-            "dataset": name,
+            "dataset": folder,
             "success": success,
             "filesProcessed": filesProcessed + 1,
             "totalFiles": totalFiles,
