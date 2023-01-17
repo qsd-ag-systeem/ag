@@ -123,9 +123,8 @@ class TestFaceRecognitionProcessFile(TestCase):
 
         mock_get_face_embeddings.return_value = self.face_embedding_return_1
 
-        errors = process_file(self.dataset, self.file, cuda=False)
+        process_file(self.dataset, self.file, cuda=False)
 
-        self.assertFalse(errors)
         self.assertEqual(mock_insert_data.call_count, 1)
         mock_insert_data.assert_called_once_with(
             self.dataset,
@@ -146,7 +145,7 @@ class TestFaceRecognitionProcessFile(TestCase):
         mock_file.resolve.side_effect = FileNotFoundError
 
         with self.assertRaises(FileNotFoundError) as context:
-            result = process_file(self.dataset, mock_file, cuda=False)
+            process_file(self.dataset, mock_file, cuda=False)
 
         mock_insert_data.assert_not_called()
         mock_get_face_embeddings.assert_not_called()
@@ -159,9 +158,8 @@ class TestFaceRecognitionProcessFile(TestCase):
         mock_imread.return_value = self.img
         mock_get_face_embeddings.return_value = []
 
-        errors = process_file(self.dataset, self.file, cuda=False)
+        process_file(self.dataset, self.file, cuda=False)
 
-        self.assertFalse(errors)
         mock_insert_data.assert_not_called()
 
     @patch('cv2.imread')
@@ -184,9 +182,10 @@ class TestFaceRecognitionProcessFile(TestCase):
         mock_get_face_embeddings.return_value = self.face_embedding_return_2
         mock_insert_data.side_effect = [Exception, None]
 
-        errors = process_file(self.dataset, self.file, cuda=False)
-        
-        self.assertEqual(errors, [(0, self.face_embedding_return_2[0])])
+        with self.assertRaises(Exception) as context:
+            process_file(self.dataset, self.file, cuda=False)
+
+        self.assertIn(str([(0, self.face_embedding_return_2[0])]), str(context.exception))
 
     @patch('cv2.imread')
     @patch('core.face_recognition.get_face_embeddings')
@@ -195,9 +194,8 @@ class TestFaceRecognitionProcessFile(TestCase):
         mock_imread.return_value = self.img
         mock_get_face_embeddings.return_value = self.face_embedding_return_1
 
-        errors = process_file(self.dataset, self.file, cuda=True)
+        process_file(self.dataset, self.file, cuda=True)
         
-        self.assertFalse(errors)
         mock_insert_data.assert_called_once()
         mock_get_face_embeddings.assert_called_once_with(self.img, True)
 
@@ -208,9 +206,8 @@ class TestFaceRecognitionProcessFile(TestCase):
         mock_imread.return_value = self.img
         mock_get_face_embeddings.return_value = self.face_embedding_return_2
 
-        errors = process_file(self.dataset, self.file, cuda=False)
+        process_file(self.dataset, self.file, cuda=False)
         
-        self.assertFalse(errors)
         self.assertEqual(mock_insert_data.call_count, 2)
         mock_get_face_embeddings.assert_called_once()
 

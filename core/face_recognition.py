@@ -74,9 +74,9 @@ def process_file(dataset, file, cuda: bool = False):
         except:
             errors.append((key, face_emb))
             pass
-
-    return errors
-
+    
+    if (errors):
+        raise Exception(errors)
 
 def search_file(file, dataset, cuda=False):
     results = []
