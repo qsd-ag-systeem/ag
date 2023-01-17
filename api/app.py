@@ -44,6 +44,6 @@ def page_not_found(e):
 socketio.on_event("enroll", enroll)
 socketio.on_event("cancel", cancel)
 
+
 def run(host: str = '0.0.0.0', port: int = 8080, debug: bool = False):
-    app.run(host=host, port=port, debug=debug)
     socketio.run(app, host=host, port=port, debug=debug)
