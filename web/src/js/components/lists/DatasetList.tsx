@@ -1,6 +1,6 @@
 import { Button, Card, Checkbox, Group, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { IconTrash } from "@tabler/icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useDatasetsData from "../../hooks/dataset/useDatasetsData";
 import useDeleteDataset from "../../hooks/dataset/useDeleteDataset";
 import { pluralize } from "../../tools";
@@ -16,12 +16,10 @@ export default function DatasetList(props: DatasetListProps) {
   const [selected, setSelected] = useState<string[]>([]);
 
   const updateSelected = (id: string, value: boolean) => {
-    value ? setSelected([...selected, id]) : setSelected(selected.filter((item) => item !== id));
+    let newState = value ? [...selected, id] : selected.filter((item) => item !== id);
+    setSelected(newState);
+    onUpdateSelected?.(newState);
   };
-
-  useEffect(() => {
-    onUpdateSelected?.(selected);
-  }, [selected]);
 
   return (
     <div style={{ position: "relative" }}>

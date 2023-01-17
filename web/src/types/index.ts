@@ -1,5 +1,9 @@
 import { SuccessResponse } from "./response";
 
+export * from "./response";
+export * from "./result";
+export * from "./body";
+
 export type Maybe<T> = T | null | undefined;
 
 export type BodySearch = {
@@ -19,9 +23,9 @@ export type BodyExport = {
 };
 
 export type BodyEnroll = {
-    folder: string;
-    name?: string;
-    cuda?: boolean;
+  folder: string;
+  name?: string;
+  cuda?: boolean;
 };
 
 export type BodyDeleteDataset = {
@@ -64,7 +68,7 @@ export type CrossSearchResult = {
 };
 
 export type Dataset = {
-    id: string;
-    name: string;
-    count: number;
-}
+  id: string;
+  name: string;
+  count: number;
+};

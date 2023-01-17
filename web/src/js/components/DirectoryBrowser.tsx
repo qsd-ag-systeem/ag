@@ -1,6 +1,6 @@
 import { Button, LoadingOverlay, Table, Text, Title } from "@mantine/core";
 import { IconArrowBack, IconFolder } from "@tabler/icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useDirectoriesData from "../hooks/useDirectoriesData";
 
 type DirectoryBrowserProps = {
@@ -15,13 +15,8 @@ export default function DirectoryBrowser(props: DirectoryBrowserProps) {
 
   const goToParentDir = () => {
     let parentDir = currentDir.replace(/\\/g, "/").split("/").slice(0, -1).join("/");
-    setDir(parentDir);
-  };
-
-  const setDir = (dir: string) => {
-    setCurrentDir(dir);
-
-    onUpdate?.(dir.replace(/\\/g, "/"));
+    setCurrentDir(parentDir);
+    onUpdate?.(parentDir);
   };
 
   return (
@@ -54,7 +49,7 @@ export default function DirectoryBrowser(props: DirectoryBrowserProps) {
                 leftIcon={<IconFolder />}
                 variant="subtle"
                 sx={{ display: "flex", width: "100%" }}
-                onClick={() => setDir(item)}
+                onClick={() => setCurrentDir(item)}
               >
                 {item}
               </Button>
