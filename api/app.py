@@ -11,7 +11,6 @@ from api.routes.enroll import cancel, enroll
 from api.routes.export import export
 from api.routes.get_image import get_image
 from api.routes.import_dataset import import_dataset
-from api.routes.index import index
 from api.routes.search import search
 
 app = Flask(

@@ -40,9 +40,7 @@ export default function Search() {
                 });
               }}
             >
-              <Button>
-                <IconPlus />
-              </Button>
+              <IconPlus />
             </Button>
           </Group>
           <DatasetList onUpdateSelected={setSelected} />
