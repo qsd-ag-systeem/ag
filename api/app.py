@@ -1,8 +1,8 @@
 from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO
+import webbrowser
 
-from api.helpers.response import error_response
 from api.routes.cross_search import cross_search
 from api.routes.datasets import get
 from api.routes.delete import delete
@@ -46,4 +46,5 @@ socketio.on_event("cancel", cancel)
 
 
 def run(host: str = '0.0.0.0', port: int = 8080, debug: bool = False):
+    webbrowser.open(f"http://{host}:{port}")
     socketio.run(app, host=host, port=port, debug=debug)
