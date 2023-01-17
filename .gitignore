@@ -165,8 +165,3 @@ input/*
 
 output/*
 !output/.gitkeep
-
-# Docker Compose data
-pg-data/
-.yarn/
-node_modules/
