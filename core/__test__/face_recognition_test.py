@@ -248,9 +248,9 @@ class TestFaceRecognitionSearchFile(TestCase):
 
     @patch('cv2.imread')
     @patch('core.face_recognition.get_face_embeddings')
-    @patch('core.face_recognition.retrieve_data')
-    @patch('core.face_recognition.retrieve_all_data')
-    def test_search_file_success(self, mock_retrieve_all_data, mock_retrieve_data, mock_get_face_embeddings, mock_imread):
+    @patch('core.face_recognition.retrieve_knn_filtered_search_data')
+    @patch('core.face_recognition.retrieve_knn_search_data')
+    def test_search_file_success(self, mock_retrieve_knn_search_data, mock_retrieve_knn_filtered_search_data, mock_get_face_embeddings, mock_imread):
         expected_results_dataset = [[self.file_name, "_id", "dataset", "file_name", round(1 * 100), "(1,2)", "(3,4)"]]
         expected_results_no_dataset = [[self.file_name, "_id", "dataset", "file_name", round(1 * 100), "(1,2)", "(3,4)"]]
         mock_get_face_embeddings.return_value = self.face_embedding_1_face
@@ -273,28 +273,28 @@ class TestFaceRecognitionSearchFile(TestCase):
             }
         }
 
-        mock_retrieve_data.return_value = retrieve_data_response
-        mock_retrieve_all_data.return_value = retrieve_data_response
+        mock_retrieve_knn_filtered_search_data.return_value = retrieve_data_response
+        mock_retrieve_knn_search_data.return_value = retrieve_data_response
         
         results = search_file(self.file, dataset=self.dataset, cuda=False)
         self.assertEqual(results, expected_results_dataset)
-        mock_retrieve_data.assert_called_once()
+        mock_retrieve_knn_filtered_search_data.assert_called_once()
 
-        mock_retrieve_data.reset_mock()
+        mock_retrieve_knn_filtered_search_data.reset_mock()
         results = search_file(self.file, dataset=None, cuda=False)
         self.assertEqual(results, expected_results_no_dataset)
-        mock_retrieve_all_data.assert_called_once()
+        mock_retrieve_knn_search_data.assert_called_once()
 
     @patch('cv2.imread')
     @patch('core.face_recognition.get_face_embeddings')
-    @patch('core.face_recognition.retrieve_data')
-    @patch('core.face_recognition.retrieve_all_data')
-    def test_search_file_no_faces(self, mock_retrieve_all_data, mock_retrieve_data, mock_get_face_embeddings, mock_imread):
+    @patch('core.face_recognition.retrieve_knn_filtered_search_data')
+    @patch('core.face_recognition.retrieve_knn_search_data')
+    def test_search_file_no_faces(self, mock_retrieve_knn_search_data, mock_retrieve_knn_filtered_search_data, mock_get_face_embeddings, mock_imread):
         mock_get_face_embeddings.side_effect = Exception("No faces found")
         mock_imread.return_value = self.img
 
-        mock_retrieve_data.assert_not_called()
-        mock_retrieve_all_data.assert_not_called()
+        mock_retrieve_knn_filtered_search_data.assert_not_called()
+        mock_retrieve_knn_search_data.assert_not_called()
 
         with self.assertRaises(Exception) as context:
             search_file(self.file, dataset=self.dataset, cuda=False)
@@ -316,9 +316,9 @@ class TestFaceRecognitionSearchFile(TestCase):
 
     @patch('cv2.imread')
     @patch('core.face_recognition.get_face_embeddings')
-    @patch('core.face_recognition.retrieve_data')
-    @patch('core.face_recognition.retrieve_all_data')
-    def test_search_file_cuda_enabled(self, mock_retrieve_all_data, mock_retrieve_data, mock_get_face_embeddings, mock_imread):
+    @patch('core.face_recognition.retrieve_knn_filtered_search_data')
+    @patch('core.face_recognition.retrieve_knn_search_data')
+    def test_search_file_cuda_enabled(self, mock_retrieve_knn_search_data, mock_retrieve_knn_filtered_search_data, mock_get_face_embeddings, mock_imread):
         mock_imread.return_value = self.img
 
         mock_get_face_embeddings.return_value = self.face_embedding_1_face
@@ -338,8 +338,8 @@ class TestFaceRecognitionSearchFile(TestCase):
                 ]
             }
         }
-        mock_retrieve_data.return_value = retrieve_data_response
-        mock_retrieve_all_data.return_value = retrieve_data_response
+        mock_retrieve_knn_filtered_search_data.return_value = retrieve_data_response
+        mock_retrieve_knn_search_data.return_value = retrieve_data_response
 
         search_file(self.file, dataset=None, cuda=True)
 
@@ -347,9 +347,9 @@ class TestFaceRecognitionSearchFile(TestCase):
 
     @patch('cv2.imread')
     @patch('core.face_recognition.get_face_embeddings')
-    @patch('core.face_recognition.retrieve_data')
-    @patch('core.face_recognition.retrieve_all_data')
-    def test_search_file_exception_in_retrieval(self, mock_retrieve_all_data, mock_retrieve_data, mock_get_face_embeddings, mock_imread):
+    @patch('core.face_recognition.retrieve_knn_filtered_search_data')
+    @patch('core.face_recognition.retrieve_knn_search_data')
+    def test_search_file_exception_in_retrieval(self, mock_retrieve_knn_search_data, mock_retrieve_knn_filtered_search_data, mock_get_face_embeddings, mock_imread):
         mock_imread.return_value = self.img
                 
         retrieve_data_response = {
@@ -371,8 +371,8 @@ class TestFaceRecognitionSearchFile(TestCase):
 
         mock_get_face_embeddings.return_value = self.face_embedding_2_face
         
-        mock_retrieve_data.side_effect = [Exception, retrieve_data_response]
-        mock_retrieve_all_data.side_effect = Exception
+        mock_retrieve_knn_filtered_search_data.side_effect = [Exception, retrieve_data_response]
+        mock_retrieve_knn_search_data.side_effect = Exception
 
         results = search_file(self.file, dataset=self.dataset, cuda=False)
 
@@ -381,15 +381,15 @@ class TestFaceRecognitionSearchFile(TestCase):
 
     @patch('cv2.imread')
     @patch('core.face_recognition.get_face_embeddings')
-    @patch('core.face_recognition.retrieve_data')
-    @patch('core.face_recognition.retrieve_all_data')
-    def test_search_file_empty_result(self, mock_retrieve_all_data, mock_retrieve_data, mock_get_face_embeddings, mock_imread):
+    @patch('core.face_recognition.retrieve_knn_filtered_search_data')
+    @patch('core.face_recognition.retrieve_knn_search_data')
+    def test_search_file_empty_result(self, mock_retrieve_knn_search_data, mock_retrieve_knn_filtered_search_data, mock_get_face_embeddings, mock_imread):
         expected_results = []
 
         mock_imread.return_value = self.img
         mock_get_face_embeddings.return_value = self.face_embedding_1_face
-        mock_retrieve_data.return_value = {"hits": {"hits": []}}
-        mock_retrieve_all_data.return_value = {"hits": {"hits": []}}
+        mock_retrieve_knn_filtered_search_data.return_value = {"hits": {"hits": []}}
+        mock_retrieve_knn_search_data.return_value = {"hits": {"hits": []}}
 
         results = search_file(self.file, dataset=self.dataset, cuda=False)
         self.assertEqual(results, expected_results)

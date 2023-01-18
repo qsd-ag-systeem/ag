@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 from core.EsConnection import EsConnection
-from core.search import retrieve_data, retrieve_all_data
+from core.search import retrieve_knn_filtered_search_data, retrieve_knn_search_data
 
 class TestRetrieveData:
     @patch('core.search.EsConnection', spec=EsConnection)
@@ -11,7 +11,7 @@ class TestRetrieveData:
 
         face_emb = [1, 2, 3]
         datasets = ("dataset1", "dataset2")
-        result = retrieve_data(face_emb, datasets)
+        result = retrieve_knn_filtered_search_data(face_emb, datasets)
 
         mock_connection.search.assert_called_once_with(
             index=mock_es.return_value.index_name,
@@ -39,7 +39,7 @@ class TestRetrieveData:
         mock_es.return_value.connection = mock_connection
 
         face_emb = [1, 2, 3]
-        result = retrieve_all_data(face_emb)
+        result = retrieve_knn_search_data(face_emb)
 
         mock_connection.search.assert_called_once_with(
             index=mock_es.return_value.index_name,
