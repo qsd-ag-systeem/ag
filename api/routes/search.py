@@ -39,12 +39,12 @@ def search():
             )
 
             for search_result in search_results:
-                left_bound = np.fromstring(
+                top_left = np.fromstring(
                     search_result[5].strip("[]"),
                     sep=', '
                 )
 
-                right_bound = np.fromstring(
+                bottom_right = np.fromstring(
                     search_result[6].strip("[]"),
                     sep=', '
                 )
@@ -55,8 +55,11 @@ def search():
                     "dataset": search_result[2],
                     "file_name": search_result[3],
                     "similarity": search_result[4],
-                    "left_bound": list(left_bound),
-                    "right_bound": list(right_bound),
+                    "top_left": list(top_left),
+                    "bottom_right": list(bottom_right),
+                    "width": search_result[7],
+                    "height": search_result[8],
+
                 })
 
         except Exception as error:

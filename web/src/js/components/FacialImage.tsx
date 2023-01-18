@@ -1,15 +1,15 @@
-import { Image } from "@mantine/core";
+import { Image, ImageProps } from "@mantine/core";
 import { useEffect, useRef } from "react";
 import { API_URL } from "../constants";
 
-type FacialImageProps = {
+export type FacialImageProps = {
   dataset: string;
   file_name: string;
   top_left?: number[];
   bottom_right?: number[];
   width?: number;
   height?: number;
-} & React.HTMLAttributes<HTMLImageElement>;
+} & ImageProps;
 
 export default function FacialImage(props: FacialImageProps) {
   const { dataset, file_name, top_left, bottom_right, width = 0, height = 0, ...restProps } = props;

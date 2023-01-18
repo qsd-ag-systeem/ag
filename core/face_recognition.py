@@ -91,6 +91,8 @@ def search_file(file, dataset, cuda=False):
                     round(row["_score"] * 100, 3),
                     str(row["_source"]["top_left"]),
                     str(row["_source"]["bottom_right"]),
+                    row['_source']['width'],
+                    row['_source']['height'],
                 ])
         except:
             pass

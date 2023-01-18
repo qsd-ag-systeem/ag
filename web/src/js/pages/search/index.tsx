@@ -2,8 +2,10 @@ import { Button, createStyles, Flex, Group, Paper, Text, Title } from "@mantine/
 import { openModal } from "@mantine/modals";
 import { IconPlus } from "@tabler/icons";
 import { useState } from "react";
+import { SearchResult } from "../../../types";
 import DirectoryBrowser from "../../components/DirectoryBrowser";
 import Enroll from "../../components/Enroll";
+import FacialImage from "../../components/FacialImage";
 import DatasetList from "../../components/lists/DatasetList";
 import SearchResults from "../../components/SearchResults";
 
@@ -20,6 +22,8 @@ export default function Search() {
 
   const [selected, setSelected] = useState<string[]>([]);
   const [currentDir, setCurrentDir] = useState<string>("");
+
+  const [selectedMatch, setSelectedMatch] = useState<SearchResult>();
 
   return (
     <Flex gap="sm" p="sm" direction="column">
@@ -47,11 +51,21 @@ export default function Search() {
         </Paper>
         <Paper sx={{ flexGrow: 1 }} p={"sm"} withBorder>
           <DirectoryBrowser onUpdate={setCurrentDir} />
+          {selectedMatch?.dataset && (
+            <FacialImage {...selectedMatch} file_name={selectedMatch.input_file} />
+          )}
         </Paper>
-        <Paper p={"sm"} withBorder sx={{ flexGrow: 1 }}></Paper>
+        <Paper p={"sm"} withBorder sx={{ flexGrow: 1 }}>
+          {selectedMatch?.dataset && <FacialImage {...selectedMatch} />}
+        </Paper>
       </Flex>
       <Flex sx={{ flexGrow: 2 }}>
-        <SearchResults folder={currentDir} datasets={selected} />
+        <SearchResults
+          folder={currentDir}
+          datasets={selected}
+          setSelectedMatch={setSelectedMatch}
+          selectedMatch={selectedMatch}
+        />
       </Flex>
     </Flex>
   );

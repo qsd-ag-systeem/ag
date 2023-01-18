@@ -4,8 +4,8 @@ export type SearchResult = {
   dataset: string;
   file_name: string;
   similarity: number;
-  left_bound: number[];
-  right_bound: number[];
+  top_left: number[];
+  bottom_right: number[];
 };
 
 export type CrossSearchResult = {

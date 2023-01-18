@@ -1,5 +1,6 @@
 import { createStyles, Flex, LoadingOverlay } from "@mantine/core";
-import { BodySearch } from "../../types";
+import { Dispatch, SetStateAction, useEffect } from "react";
+import { BodySearch, SearchResult } from "../../types";
 
 import { API_URL } from "../constants";
 import useSearchData from "../hooks/useSearchData";
@@ -20,25 +21,32 @@ const useStyles = createStyles(theme => ({
   },
 }));
 
-type SearchResultsProps = BodySearch;
+type SearchResultsProps = BodySearch & {
+  setSelectedMatch: Dispatch<SetStateAction<SearchResult | undefined>>;
+  selectedMatch: SearchResult | undefined;
+};
 
-export default function SearchResults({ folder, cuda, datasets }: SearchResultsProps) {
+export default function SearchResults({
+  folder,
+  datasets,
+  setSelectedMatch,
+  selectedMatch,
+}: SearchResultsProps) {
   const { classes } = useStyles();
 
-  const { isSuccess, data: results, isFetching } = useSearchData({ folder, cuda, datasets });
+  const { data: results, isFetching, isSuccess } = useSearchData({ folder, datasets });
+
+  useEffect(() => {
+    if (isSuccess) {
+      setSelectedMatch?.(results?.[0]);
+    }
+  }, [results]);
 
   return (
     <Flex className={classes.results} sx={{ overflowX: isFetching ? "hidden" : "auto" }}>
       <LoadingOverlay visible={isFetching} overlayBlur={2} />
       {results?.map((match, i) => (
-        <Match
-          image={`${API_URL}/image/${match.dataset}/${match.file_name}`}
-          percentage={match.similarity}
-          fileName={match.file_name}
-          dataset={match.dataset}
-          inputFile={match.input_file}
-          key={match.id + "-" + i}
-        />
+        <Match key={match.id + "-" + i} onClick={() => setSelectedMatch(match)} {...match} />
       ))}
     </Flex>
   );
