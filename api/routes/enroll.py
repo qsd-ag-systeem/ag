@@ -73,6 +73,7 @@ def enroll(data):
 
         try:
             process_file(folder, file, cuda)
+
         except Exception as error:
             errors.append(error)
             success = False

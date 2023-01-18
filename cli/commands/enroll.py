@@ -34,6 +34,7 @@ def enroll(folder: str, debug: bool, cuda: bool) -> None:
         for file in bar:
             try:
                 process_file(folder, file, cuda)
+
                 bar.label = f"Processing: {os.path.relpath(file)}"
                 success += 1
             except Exception as error:
