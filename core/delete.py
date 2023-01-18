@@ -10,7 +10,7 @@ def delete_file_by_name(dataset: str, file_name: str):
         raise Exception(f"Dataset '{dataset}' does not exist.")
 
     es = EsConnection()
-    print(es)
+    
     query = {
         "bool": {
             "must": [

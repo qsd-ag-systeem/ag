@@ -70,7 +70,6 @@ class TestDeleteDataset(TestCase):
 
         delete_dataset_by_name(dataset)
 
-        print(mock_es_conn.connection.delete_by_query.call_args_list)
         mock_es_conn.connection.delete_by_query.assert_called_once_with(index='face_embeddings', query={
             "term": {
                 "dataset": dataset,
