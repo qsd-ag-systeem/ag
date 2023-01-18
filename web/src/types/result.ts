@@ -6,6 +6,7 @@ export type SearchResult = {
   similarity: number;
   top_left: number[];
   bottom_right: number[];
+  input: SearchResult;
 };
 
 export type CrossSearchResult = {

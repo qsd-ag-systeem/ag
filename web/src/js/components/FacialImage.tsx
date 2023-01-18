@@ -9,6 +9,7 @@ export type FacialImageProps = {
   bottom_right?: number[];
   width?: number;
   height?: number;
+  debug?: boolean;
 } & ImageProps;
 
 export default function FacialImage(props: FacialImageProps) {
@@ -18,11 +19,23 @@ export default function FacialImage(props: FacialImageProps) {
   const imageRef = useRef<HTMLImageElement>(null);
   const rectangleRef = useRef<HTMLDivElement>(null);
 
+  const getContainedSize = (img: HTMLImageElement) => {
+    var ratio = img.naturalWidth / img.naturalHeight;
+    var width = img.height * ratio;
+    var height = img.height;
+
+    if (width > img.width) {
+      width = img.width;
+      height = img.width / ratio;
+    }
+
+    return [width, height];
+  };
+
   const drawRectangle = () => {
     if (!shouldDrawRectangle || !imageRef.current) return;
 
-    let imageWidth = imageRef.current.width;
-    let imageHeight = imageRef.current.height;
+    let [imageWidth, imageHeight] = getContainedSize(imageRef.current);
 
     let widthFactor = imageWidth / width;
     let heightFactor = imageHeight / height;
@@ -53,7 +66,7 @@ export default function FacialImage(props: FacialImageProps) {
   const onLoad = () => drawRectangle();
 
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", height: "100%" }}>
       {shouldDrawRectangle && (
         <div
           ref={rectangleRef}
@@ -68,6 +81,19 @@ export default function FacialImage(props: FacialImageProps) {
         onLoad={onLoad}
         imageRef={imageRef}
         width={"100%"}
+        height={"100%"}
+        fit="contain"
+        styles={{
+          image: {
+            objectPosition: "left",
+          },
+          imageWrapper: { height: "100%" },
+          figure: { height: "100%" },
+          root: {
+            height: "100%",
+            width: "100%",
+          },
+        }}
         draggable={false}
         src={`${API_URL}/image/${dataset}/${file_name}`}
         {...restProps}

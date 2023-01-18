@@ -1,3 +1,4 @@
+import json
 import os
 import numpy as np
 from flask import request
@@ -59,7 +60,7 @@ def search():
                     "bottom_right": list(bottom_right),
                     "width": search_result[7],
                     "height": search_result[8],
-
+                    "input": search_result[9],
                 })
 
         except Exception as error:
