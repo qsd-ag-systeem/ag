@@ -85,7 +85,7 @@ export default function FacialImage(props: FacialImageProps) {
         fit="contain"
         styles={{
           image: {
-            objectPosition: "left",
+            objectPosition: "top left",
           },
           imageWrapper: { height: "100%" },
           figure: { height: "100%" },

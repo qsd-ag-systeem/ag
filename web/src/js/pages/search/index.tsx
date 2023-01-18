@@ -1,6 +1,6 @@
 import { Box, Button, createStyles, Flex, Group, Paper, Text, Title } from "@mantine/core";
 import { openModal } from "@mantine/modals";
-import { IconPlus } from "@tabler/icons";
+import { IconEye, IconEyeOff, IconPlus } from "@tabler/icons";
 import { useEffect, useState } from "react";
 import { SearchResult } from "../../../types";
 import DirectoryBrowser from "../../components/DirectoryBrowser";
@@ -8,8 +8,9 @@ import Enroll from "../../components/Enroll";
 import FacialImage from "../../components/FacialImage";
 import DatasetList from "../../components/lists/DatasetList";
 import SearchResults from "../../components/SearchResults";
+import Similarity from "../../components/Similarity";
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles(theme => ({
   datasetListContainer: {
     overflowY: "scroll",
   },
@@ -62,15 +63,28 @@ export default function Search() {
           withBorder
           sx={{ display: "flex", flexDirection: "column" }}
         >
-          <Box sx={{ flexGrow: 1, height: "100%" }}>
+          <Box sx={{ flexGrow: 1, height: "100%", position: "relative" }}>
             {selectedMatch?.dataset ? (
-              <FacialImage {...selectedMatch.input} dataset={currentDir} />
+              <>
+                <FacialImage {...selectedMatch.input} dataset={currentDir} />
+                <Button
+                  onClick={() => setSelectedMatch(undefined)}
+                  sx={theme => ({
+                    position: "absolute",
+                    top: theme.spacing.sm,
+                    right: theme.spacing.sm,
+                  })}
+                >
+                  <IconEyeOff />
+                </Button>
+              </>
             ) : (
               <DirectoryBrowser onUpdate={setCurrentDir} />
             )}
           </Box>
         </Paper>
-        <Paper p={"sm"} withBorder className={classes.rowItem}>
+        <Paper p={"sm"} withBorder className={classes.rowItem} pos="relative">
+          {selectedMatch?.similarity && <Similarity percentage={selectedMatch.similarity} />}
           {selectedMatch?.dataset && <FacialImage {...selectedMatch} />}
         </Paper>
       </Flex>

@@ -18,6 +18,15 @@ export default function useSearchData({ folder, datasets, cuda }: BodySearch) {
           input_file: "",
           top_left: [],
           bottom_right: [],
+          input: {
+            id: "loading-" + i,
+            dataset: "",
+            file_name: "",
+            similarity: 0,
+            input_file: "",
+            top_left: [],
+            bottom_right: [],
+          },
         })),
     }
   );

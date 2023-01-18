@@ -46,7 +46,12 @@ export default function SearchResults({
     <Flex className={classes.results} sx={{ overflowX: isFetching ? "hidden" : "auto" }}>
       <LoadingOverlay visible={isFetching} overlayBlur={2} />
       {results?.map((match, i) => (
-        <Match key={match.id + "-" + i} onClick={() => setSelectedMatch(match)} {...match} />
+        <Match
+          key={match.id + "-" + i}
+          onClick={() => setSelectedMatch(match)}
+          percentage={match.similarity}
+          {...match}
+        />
       ))}
     </Flex>
   );

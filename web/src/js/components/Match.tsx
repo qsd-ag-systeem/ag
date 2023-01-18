@@ -2,6 +2,7 @@ import { Badge, Box, createStyles, Flex, Image, Text, Button, Divider, Group } f
 import usePercentageColor from "../hooks/usePercentageColor";
 import { openModal } from "@mantine/modals";
 import FacialImage, { FacialImageProps } from "./FacialImage";
+import Similarity from "./Similarity";
 
 const useStyles = createStyles(theme => ({
   match: {
@@ -9,14 +10,6 @@ const useStyles = createStyles(theme => ({
     userSelect: "none",
     scrollSnapAlign: "start",
     scrollMargin: theme.spacing.sm,
-  },
-  percentage: {
-    zIndex: 2,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.xs,
-    left: theme.spacing.xs,
-    top: theme.spacing.xs,
-    position: "absolute",
   },
   fileName: {
     zIndex: 2,
@@ -67,6 +60,12 @@ export default function Match(props: MatchProps) {
       //     });
       // }}
     >
+      {props.percentage && <Similarity percentage={props.percentage} />}
+      {props.file_name && (
+        <Badge opacity={1} className={classes.fileName}>
+          {props.file_name}
+        </Badge>
+      )}
       <Box
         sx={{
           aspectRatio: !props.isModal ? "1/1" : undefined,
@@ -78,23 +77,6 @@ export default function Match(props: MatchProps) {
           overflow: "hidden",
         }}
       >
-        {color && (
-          <Box
-            className={classes.percentage}
-            sx={{
-              backgroundColor: color,
-            }}
-          >
-            <Text size={"xs"} color="white" weight={"bold"}>
-              {props.percentage}%
-            </Text>
-          </Box>
-        )}
-        {props.file_name && (
-          <Badge opacity={1} className={classes.fileName}>
-            {props.file_name}
-          </Badge>
-        )}
         <FacialImage
           draggable={false}
           radius="md"
