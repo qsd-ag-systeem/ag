@@ -47,10 +47,6 @@ export default function Enroll() {
       folder: location,
     };
 
-    if (data.name !== undefined && data.name.trim().length === 0) {
-      data.name = undefined;
-    }
-
     sendEnrollMessage<EnrollData>(data);
   };
 

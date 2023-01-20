@@ -21,4 +21,6 @@ export type CrossSearchResult = {
   bottom_right_2: number[];
   width1: number;
   height1: number;
+  width2: number;
+  height2: number;
 };
