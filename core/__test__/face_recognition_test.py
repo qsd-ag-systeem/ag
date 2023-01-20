@@ -251,11 +251,6 @@ class TestFaceRecognitionSearchFile(TestCase):
     @patch('core.face_recognition.retrieve_knn_filtered_search_data')
     @patch('core.face_recognition.retrieve_knn_search_data')
     def test_search_file_success(self, mock_retrieve_knn_search_data, mock_retrieve_knn_filtered_search_data, mock_get_face_embeddings, mock_imread):
-        expected_results_dataset = [[self.file_name, "_id", "dataset", "file_name", round(1 * 100), "(1,2)", "(3,4)"]]
-        expected_results_no_dataset = [[self.file_name, "_id", "dataset", "file_name", round(1 * 100), "(1,2)", "(3,4)"]]
-        mock_get_face_embeddings.return_value = self.face_embedding_1_face
-        mock_imread.return_value = self.img
-
         retrieve_data_response = {
             "hits": {
                 "hits": [
@@ -265,13 +260,20 @@ class TestFaceRecognitionSearchFile(TestCase):
                             "dataset": "dataset",
                             "file_name": "file_name",
                             "top_left": "(1,2)",
-                            "bottom_right": "(3,4)"
+                            "bottom_right": "(3,4)",
+                            "width": "10",
+                            "height": "50"
                         },
                         "_score": 1
                     }
                 ]
             }
         }
+        
+        expected_results_dataset = [[self.file_name, "_id", "dataset", "file_name", round(1 * 100), "(1,2)", "(3,4)", "10", "50", {"file_name": "image1.jpg", "width": 100, "height": 100, "top_left": (1, 2), "bottom_right": (3, 4)}]]
+        expected_results_no_dataset = [[self.file_name, "_id", "dataset", "file_name", round(1 * 100), "(1,2)", "(3,4)", "10", "50", {"file_name": "image1.jpg", "width": 100, "height": 100, "top_left": (1, 2), "bottom_right": (3, 4)}]]
+        mock_get_face_embeddings.return_value = self.face_embedding_1_face
+        mock_imread.return_value = self.img
 
         mock_retrieve_knn_filtered_search_data.return_value = retrieve_data_response
         mock_retrieve_knn_search_data.return_value = retrieve_data_response
@@ -331,7 +333,9 @@ class TestFaceRecognitionSearchFile(TestCase):
                             "dataset": "dataset",
                             "file_name": "file_name",
                             "top_left": "(1,2)",
-                            "bottom_right": "(3,4)"
+                            "bottom_right": "(3,4)",
+                            "width": "10",
+                            "height": "50"
                         },
                         "_score": 1
                     }
@@ -361,7 +365,9 @@ class TestFaceRecognitionSearchFile(TestCase):
                             "dataset": "dataset",
                             "file_name": "file_name",
                             "top_left": "(1,2)",
-                            "bottom_right": "(3,4)"
+                            "bottom_right": "(3,4)",
+                            "width": "10",
+                            "height": "50"
                         },
                         "_score": 1
                     }
