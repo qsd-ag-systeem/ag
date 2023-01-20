@@ -1,14 +1,27 @@
-from flask import request
-from core.face_recognition import init, process_file, use_cuda
-from core.common import get_files
 import os
+
+from flask import request
+from flask_socketio import emit
+
 from api.helpers.response import error_response, success_response
+from core.common import get_files
+from core.face_recognition import init, process_file, use_cuda
 
+canceled = False
 
-def enroll():
-    data = request.get_json()
+def cancel(data):
+    global canceled
+    canceled = True
+
+def enroll(data):
+    global canceled
+    status = "idle"
+
     if "folder" not in data:
-        return error_response("Folder is required")
+        emit("err", {
+            "message": "Folder is required"
+        })
+        return
 
     folder = data["folder"]
     cuda = data["cuda"] if "cuda" in data else False
@@ -16,7 +29,10 @@ def enroll():
     folder_path = os.path.abspath(os.curdir + "/" + folder)
 
     if not os.path.exists(folder_path):
-        return error_response(f"Folder \"{folder}\" does not exist!")
+        emit("err", {
+            "message": f"Folder \"{folder}\" does not exist!"
+        })
+        return
 
     files = get_files(folder_path)
 
@@ -25,16 +41,55 @@ def enroll():
 
     errors = []
 
-    if len(files) == 0:
-        return error_response(f"Folder {folder} is empty!")
+    totalFiles = len(files)
 
-    for file in files:
+    if totalFiles == 0:
+        emit("err", {
+            "message": f"Folder {folder} is empty!"
+        })
+        return
+
+    emit('enroll', {
+        "dataset": folder,
+        "success": False,
+        "filesProcessed": 0,
+        "totalFiles": totalFiles,
+        "status":  status,
+        "file": None,
+        "folder": folder,
+        "progress":0
+    })
+
+    for filesProcessed, file in enumerate(files):
+        status = "processing"
+
+        if canceled:
+            emit("cancel", {
+                "success": True
+            })
+            break
+
+        success = True
+
         try:
             process_file(folder, file, cuda)
 
         except Exception as error:
             errors.append(error)
-            pass
+            success = False
 
-    # it is a success response but could still contain errors
-    return success_response(errors=errors)
+        if totalFiles == filesProcessed + 1:
+            status = "enrolled"
+
+        emit('enroll', {
+            "dataset": folder,
+            "success": success,
+            "filesProcessed": filesProcessed + 1,
+            "totalFiles": totalFiles,
+            "status":  status,
+            "file": file.name,
+            "folder": folder,
+            "progress": (filesProcessed + 1) / totalFiles * 100
+        })
+
+    canceled = False

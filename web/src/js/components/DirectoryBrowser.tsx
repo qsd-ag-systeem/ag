@@ -1,5 +1,5 @@
-import { Anchor, Group, Loader, Text, Title } from "@mantine/core";
-import { IconArrowBack } from "@tabler/icons";
+import { Button, LoadingOverlay, Table, Text, Title, Box, Paper } from "@mantine/core";
+import { IconArrowBack, IconFolder } from "@tabler/icons";
 import { useState } from "react";
 import useDirectoriesData from "../hooks/useDirectoriesData";
 
@@ -19,30 +19,47 @@ export default function DirectoryBrowser(props: DirectoryBrowserProps) {
     onUpdate?.(parentDir);
   };
 
+  const setDir = (dir: string) => {
+    setCurrentDir(dir);
+    onUpdate?.(dir.replace(/\\/g, "/"));
+  };
+
   return (
-    <>
-      {isFetching ? (
-        <Loader />
-      ) : (
-        <>
-          <Title order={5}>{currentDir}</Title>
-          {currentDir && (
-            <Text>
-              <Anchor onClick={goToParentDir}>
-                <Group spacing={5}>
-                  <IconArrowBack />
+    <Box sx={{ position: "relative", height: "100%", display: "flex", flexDirection: "column" }}>
+      <Paper radius={0} withBorder px="sm" py={5}>
+        <Title order={5}>{currentDir || "/"}</Title>
+      </Paper>
+      <Box sx={{ flexGrow: 1, overflowY: "scroll" }}>
+        <LoadingOverlay visible={isFetching} overlayBlur={2} transitionDuration={500} />
+        <Table striped highlightOnHover withBorder withColumnBorders>
+          <tbody>
+            <tr>
+              {currentDir && (
+                <Button
+                  leftIcon={<IconArrowBack />}
+                  variant="subtle"
+                  sx={{ display: "flex", width: "100%" }}
+                  onClick={goToParentDir}
+                >
                   <Text>Parent directory</Text>
-                </Group>
-              </Anchor>
-            </Text>
-          )}
-          {data.data.map((item: string) => (
-            <Text key={Math.random()}>
-              <Anchor onClick={() => setCurrentDir(item)}>{item}</Anchor>
-            </Text>
-          ))}
-        </>
-      )}
-    </>
+                </Button>
+              )}
+            </tr>
+            {data?.data?.map((item: string, idx: number) => (
+              <tr key={idx}>
+                <Button
+                  leftIcon={<IconFolder />}
+                  variant="subtle"
+                  sx={{ display: "flex", width: "100%" }}
+                  onClick={() => setDir(item)}
+                >
+                  {item}
+                </Button>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </Box>
+    </Box>
   );
 }

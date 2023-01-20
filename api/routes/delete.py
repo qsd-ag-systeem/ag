@@ -3,8 +3,7 @@ from flask import request
 
 from api.schemas.delete_dataset import DeleteDatasetInput
 from core.common import dataset_exists
-from core.delete import delete_dataset_by_name, delete_file_by_name, delete_dataset_file_by_name, \
-    delete_dataset_files_by_name
+from core.delete import delete_dataset_by_name, delete_file_by_name, delete_dataset_file_by_name, delete_dataset_files_by_name
 
 
 def delete():

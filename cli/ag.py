@@ -4,15 +4,15 @@ CLI for the face recognition application.
 import click
 from halo import Halo
 
-from core.setup_db import ensure_index_exists, ensure_db_running
-from cli.commands.enroll import enroll
-from cli.commands.search import search
-from cli.commands.get_datasets import get_datasets
-from cli.commands.delete_dataset import delete_dataset
-from cli.commands.export_dataset import export_dataset
-from cli.commands.import_dataset import import_dataset
-from cli.commands.cross_search import cross_search
 from api.app import run as run_api
+from cli.commands.cross_search import cross_search
+from cli.commands.delete_dataset import delete_dataset
+from cli.commands.enroll import enroll
+from cli.commands.export_dataset import export_dataset
+from cli.commands.get_datasets import get_datasets
+from cli.commands.import_dataset import import_dataset
+from cli.commands.search import search
+from core.setup_db import ensure_db_running, ensure_index_exists
 
 
 @click.group(help="Dit is de command line interface (CLI) voor het gebruiken van het automatisch gelaat herkenningssysteem")

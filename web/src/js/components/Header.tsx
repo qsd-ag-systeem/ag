@@ -8,11 +8,14 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { IconMoonStars, IconSun } from "@tabler/icons";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { FacialBorderContext } from "../providers/facial-borders";
 import AppIcon from "./icons/AppIcon";
 
 export function Header() {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const { facialBorderVisible, setFacialBorderVisible } = useContext(FacialBorderContext);
   const dark = colorScheme === "dark";
 
   return (
@@ -36,7 +39,9 @@ export function Header() {
           </Group>
 
           <Group>
-            <Button disabled>Log in</Button>
+            <Button onClick={() => setFacialBorderVisible(!facialBorderVisible)}>
+              Toggle Facial Borders
+            </Button>
             <ActionIcon
               variant="outline"
               color={dark ? "yellow" : "blue"}

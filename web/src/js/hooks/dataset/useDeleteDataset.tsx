@@ -32,8 +32,8 @@ export default function useDeleteDataset() {
 
   const { mutate } = useMutateDatasetData(deleteDataset, onSuccess, onError);
 
-  const onSubmit = async (modalId: string, values: BodyDeleteDataset) => {
-    modals.closeModal(modalId);
+  const onSubmit = async (values: BodyDeleteDataset) => {
+    modals.closeAll();
 
     showNotification({
       disallowClose: true,
@@ -46,13 +46,13 @@ export default function useDeleteDataset() {
   };
 
   const openModal = (dataset: Dataset) => {
-    const modalId = modals.openModal({
+    modals.openModal({
       centered: true,
       title: "Weet je het zeker?",
       children: (
         <DeleteDatasetForm
-          submitAction={(values) => onSubmit(modalId, values)}
-          cancelAction={() => modals.closeModal(modalId)}
+          submitAction={onSubmit}
+          cancelAction={() => modals.closeAll()}
           dataset={dataset}
         />
       ),

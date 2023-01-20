@@ -16,12 +16,15 @@
     "@mantine/form": "^5.9.4",
     "@mantine/hooks": "^5.9.4",
     "@mantine/modals": "^5.10.0",
-    "@mantine/notifications": "^5.9.4",
+    "@mantine/notifications": "^5.10.0",
     "@tabler/icons": "^1.117.0",
     "@tanstack/react-query": "^4.20.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.4.5"
+    "react-router-dom": "^6.4.5",
+    "socket.io-client": "^4.5.4",
+    "socket.io-react-hook": "^2.2.2",
+    "use-socket.io-client": "^1.1.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.26",

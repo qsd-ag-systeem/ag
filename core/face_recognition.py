@@ -93,6 +93,15 @@ def search_file(file, dataset, cuda=False):
             else:
                 data = retrieve_knn_search_data(face["face_embedding"])
 
+            height, width, channels = img.shape
+            input_file = {
+                "file_name": file_name,
+                "width": width,
+                "height": height,
+                "top_left": face["x"],
+                "bottom_right": face["y"],
+            }
+
             for row in data["hits"]["hits"]:
                 results.append([
                     file_name,
@@ -102,8 +111,12 @@ def search_file(file, dataset, cuda=False):
                     round(row["_score"] * 100, 3),
                     str(row["_source"]["top_left"]),
                     str(row["_source"]["bottom_right"]),
+                    row['_source']['width'],
+                    row['_source']['height'],
+                    input_file
                 ])
-        except:
+        except Exception as e:
+            print(f"Error: {e}")
             pass
 
     return results

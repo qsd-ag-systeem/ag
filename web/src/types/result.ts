@@ -4,8 +4,9 @@ export type SearchResult = {
   dataset: string;
   file_name: string;
   similarity: number;
-  left_bound: number[];
-  right_bound: number[];
+  top_left: number[];
+  bottom_right: number[];
+  input: Omit<SearchResult, "input">;
 };
 
 export type CrossSearchResult = {
@@ -20,4 +21,6 @@ export type CrossSearchResult = {
   bottom_right_2: number[];
   width1: number;
   height1: number;
+  width2: number;
+  height2: number;
 };

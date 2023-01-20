@@ -1,6 +1,6 @@
-import { Badge, Box, createStyles, Flex, Image, Text, Button, Divider, Group } from "@mantine/core";
-import usePercentageColor from "../hooks/usePercentageColor";
-import { openModal } from "@mantine/modals";
+import { Badge, Box, createStyles, Flex } from "@mantine/core";
+import FacialImage, { FacialImageProps } from "./FacialImage";
+import Similarity from "./Similarity";
 
 const useStyles = createStyles((theme) => ({
   match: {
@@ -9,14 +9,6 @@ const useStyles = createStyles((theme) => ({
     scrollSnapAlign: "start",
     scrollMargin: theme.spacing.sm,
   },
-  percentage: {
-    zIndex: 2,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.xs,
-    left: theme.spacing.xs,
-    top: theme.spacing.xs,
-    position: "absolute",
-  },
   fileName: {
     zIndex: 2,
     left: theme.spacing.xs,
@@ -24,7 +16,6 @@ const useStyles = createStyles((theme) => ({
     position: "absolute",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
-
     maxWidth: "90%",
   },
 }));
@@ -32,87 +23,51 @@ const useStyles = createStyles((theme) => ({
 type MatchProps = {
   image?: string;
   percentage?: number;
-  fileName?: string;
-  inputFile?: string;
-  dataset?: string;
   isModal?: boolean;
-  disableModal?: boolean;
-};
+  customWidth?: boolean;
+} & FacialImageProps;
 
-export default function Match({
-  image,
-  percentage,
-  fileName,
-  dataset,
-  inputFile,
-  isModal = false,
-  disableModal = false,
-}: MatchProps) {
-  const color = usePercentageColor(percentage);
+export default function Match(props: MatchProps) {
   const { classes } = useStyles();
 
   return (
     <Flex
       className={classes.match}
       sx={{
-        cursor: isModal ? "auto" : "pointer",
+        cursor: props.isModal ? "auto" : "pointer",
       }}
-      onClick={() => {
-        !disableModal &&
-          openModal({
-            size: "auto",
-            overlayBlur: 2,
-            title: (
-              <Group sx={{ justifyContent: "space-between" }}>
-                <Group fw={500}>
-                  Dataset: <Text fz="sm">{dataset}</Text>
-                </Group>
-                <Divider />
-                <Group fw={500}>
-                  Input: <Text fz="sm">{inputFile}</Text>
-                </Group>
-              </Group>
-            ),
-            children: (
-              <Match fileName={fileName} percentage={percentage} image={image} isModal={true} />
-            ),
-          });
-      }}
+      onClick={props.onClick}
     >
-      {color && (
-        <Box
-          className={classes.percentage}
-          sx={{
-            backgroundColor: color,
-          }}
-        >
-          <Text size={"xs"} color="white" weight={"bold"}>
-            {percentage}%
-          </Text>
-        </Box>
-      )}
-      {fileName && (
+      {props.percentage && <Similarity percentage={props.percentage} />}
+      {props.file_name && (
         <Badge opacity={1} className={classes.fileName}>
-          {fileName}
+          {props.file_name}
         </Badge>
       )}
       <Box
         sx={{
-          aspectRatio: !isModal ? "1/1" : undefined,
+          aspectRatio: !props.isModal ? "1/1" : undefined,
+
+          position: "relative",
+          overflow: "hidden",
+          ...(!props.customWidth
+            ? {
+                minWidth: props.isModal ? 600 : 240,
+                minHeight: props.isModal ? 600 : 240,
+                width: props.isModal ? undefined : 240,
+                height: props.isModal ? 600 : 240,
+              }
+            : {}),
         }}
       >
-        <Image
-          src={image}
-          alt={fileName}
-          withPlaceholder
+        <FacialImage
+          draggable={false}
+          radius="md"
           imageProps={{
             loading: "lazy",
           }}
-          width={isModal ? undefined : 240}
-          height={isModal ? 600 : 240}
-          sx={{ minWidth: isModal ? 600 : 240, minHeight: isModal ? 600 : 240 }}
-          draggable={false}
-          radius="md"
+          sx={{ backgroundPosition: "center", objectFit: "cover", objectPosition: "center" }}
+          {...props}
         />
       </Box>
     </Flex>

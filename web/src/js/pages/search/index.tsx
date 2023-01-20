@@ -1,46 +1,100 @@
-import { Anchor, Button, createStyles, Flex, Group, Paper, Title } from "@mantine/core";
-import { IconPlus } from "@tabler/icons";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Box, Button, createStyles, Flex, Group, Paper, Text, Title } from "@mantine/core";
+import { openModal } from "@mantine/modals";
+import { IconEye, IconEyeOff, IconPlus } from "@tabler/icons";
+import { useEffect, useState } from "react";
+import { SearchResult } from "../../../types";
 import DirectoryBrowser from "../../components/DirectoryBrowser";
+import Enroll from "../../components/Enroll";
+import FacialImage from "../../components/FacialImage";
 import DatasetList from "../../components/lists/DatasetList";
 import SearchResults from "../../components/SearchResults";
+import Similarity from "../../components/Similarity";
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles(theme => ({
   datasetListContainer: {
-    flexGrow: 0.5,
     overflowY: "scroll",
-    flexBasis: "min-content",
+  },
+
+  rowItem: {
+    flexBasis: "33.33%",
+    height: "calc(100vh - 380px)",
   },
 }));
 
 export default function Search() {
-  const { classes } = useStyles();
+  const { classes, cx } = useStyles();
 
   const [selected, setSelected] = useState<string[]>([]);
   const [currentDir, setCurrentDir] = useState<string>("");
+  const [selectedMatch, setSelectedMatch] = useState<SearchResult | undefined>();
+
+  // Reset selected match when selected datasets or current directory changes
+  useEffect(() => {
+    setSelectedMatch(undefined);
+  }, [selected, currentDir]);
 
   return (
     <Flex gap="sm" p="sm" direction="column">
       <Flex direction="row" gap="sm" sx={{ flexBasis: 1 }}>
-        <Paper p={"sm"} withBorder className={classes.datasetListContainer}>
+        <Paper p={"sm"} withBorder className={cx(classes.rowItem, classes.datasetListContainer)}>
           <Group position={"apart"} pb={"md"}>
             <Title order={3}>Datasets</Title>
-            <Anchor component={Link} to={"/enroll"}>
-              <Button>
-                <IconPlus />
-              </Button>
-            </Anchor>
+            <Button
+              onClick={() => {
+                openModal({
+                  title: (
+                    <Text fw={700} fz="xl">
+                      Dataset toevoegen
+                    </Text>
+                  ),
+                  children: <Enroll />,
+                  size: "lg",
+                });
+              }}
+            >
+              <IconPlus />
+            </Button>
           </Group>
           <DatasetList onUpdateSelected={setSelected} />
         </Paper>
-        <Paper sx={{ flexGrow: 1 }} p={"sm"} withBorder>
-          <DirectoryBrowser onUpdate={setCurrentDir} />
+        <Paper
+          className={classes.rowItem}
+          p={"sm"}
+          withBorder
+          sx={{ display: "flex", flexDirection: "column" }}
+        >
+          <Box sx={{ flexGrow: 1, height: "100%", position: "relative" }}>
+            {selectedMatch?.dataset ? (
+              <>
+                <FacialImage {...selectedMatch.input} dataset={currentDir} />
+                <Button
+                  onClick={() => setSelectedMatch(undefined)}
+                  sx={theme => ({
+                    position: "absolute",
+                    top: theme.spacing.sm,
+                    right: theme.spacing.sm,
+                  })}
+                >
+                  <IconEyeOff />
+                </Button>
+              </>
+            ) : (
+              <DirectoryBrowser onUpdate={setCurrentDir} />
+            )}
+          </Box>
         </Paper>
-        <Paper p={"sm"} withBorder sx={{ flexGrow: 1 }}></Paper>
+        <Paper p={"sm"} withBorder className={classes.rowItem} pos="relative">
+          {selectedMatch?.similarity && <Similarity percentage={selectedMatch.similarity} />}
+          {selectedMatch?.dataset && <FacialImage {...selectedMatch} />}
+        </Paper>
       </Flex>
       <Flex sx={{ flexGrow: 2 }}>
-        <SearchResults folder={currentDir} datasets={selected} />
+        <SearchResults
+          folder={currentDir}
+          datasets={selected}
+          setSelectedMatch={setSelectedMatch}
+          selectedMatch={selectedMatch}
+        />
       </Flex>
     </Flex>
   );
