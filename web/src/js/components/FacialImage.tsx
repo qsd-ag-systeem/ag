@@ -1,6 +1,7 @@
 import { Image, ImageProps } from "@mantine/core";
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { API_URL } from "../constants";
+import { FacialBorderContext } from "../providers/facial-borders";
 
 export type FacialImageProps = {
   dataset: string;
@@ -14,7 +15,9 @@ export type FacialImageProps = {
 
 export default function FacialImage(props: FacialImageProps) {
   const { dataset, file_name, top_left, bottom_right, width = 0, height = 0, ...restProps } = props;
-  const shouldDrawRectangle = top_left && bottom_right;
+  const { facialBorderVisible } = useContext(FacialBorderContext);
+
+  const shouldDrawRectangle = top_left && bottom_right && facialBorderVisible;
 
   const imageRef = useRef<HTMLImageElement>(null);
   const rectangleRef = useRef<HTMLDivElement>(null);
@@ -61,7 +64,7 @@ export default function FacialImage(props: FacialImageProps) {
 
   useEffect(() => {
     drawRectangle();
-  }, [top_left, bottom_right]);
+  }, [top_left, bottom_right, facialBorderVisible]);
 
   const onLoad = () => drawRectangle();
 

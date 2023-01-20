@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { IoProvider } from "socket.io-react-hook";
+import FacialBorderProvider from "./facial-borders";
 
 type ProvidersProps = {
   children?: ReactNode;
@@ -25,7 +26,7 @@ export default function Providers(props: ProvidersProps) {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: "mantine-color-scheme",
     defaultValue: preferredColorScheme,
-    getInitialValueInEffect: true,
+  getInitialValueInEffect: true,
   });
 
   const toggleColorScheme = (value?: ColorScheme) =>
@@ -39,11 +40,11 @@ export default function Providers(props: ProvidersProps) {
         <QueryClientProvider client={queryClient}>
           <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
             <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme }}>
-                <NotificationsProvider position="top-right">
-                  <ModalsProvider>
-                    {props.children}
-                  </ModalsProvider>
-                </NotificationsProvider>
+              <NotificationsProvider position="top-right">
+                <FacialBorderProvider>
+                  <ModalsProvider>{props.children}</ModalsProvider>
+                </FacialBorderProvider>
+              </NotificationsProvider>
             </MantineProvider>
           </ColorSchemeProvider>
         </QueryClientProvider>
