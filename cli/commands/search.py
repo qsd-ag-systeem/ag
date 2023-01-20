@@ -55,6 +55,8 @@ def search(folder: str, dataset: tuple, limit: int, debug: bool, cuda: bool, exp
 
         columns = ["Input file", "ID", "Dataset", "File name", "Similarity (%)", "Left top", "Right bottom"]
 
+        # Remove all results array columns after the 7th column and sort by similarity
+        results = map(lambda x: x[:7], results)
         results = sorted(results, key=lambda x: x[4], reverse=True)
 
         if export:
