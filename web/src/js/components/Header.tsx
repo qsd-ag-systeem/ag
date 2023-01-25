@@ -23,10 +23,6 @@ export function Header() {
       <MantineHeader height={60} px="md">
         <Group position="apart" sx={{ height: "100%" }}>
           <Group spacing={"md"}>
-            <Anchor component={Link} to={"/"}>
-              <AppIcon height={50} />
-            </Anchor>
-
             <Group>
               <Anchor component={Link} to={"/"}>
                 Zoeken
